@@ -26,5 +26,11 @@ build_property.EnableCodeStyleSeverity =
 [C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/MainWindow.axaml]
+[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/AccountsView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/JournalView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/NewTransactionView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
