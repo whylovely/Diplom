@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Models
 {
-    internal class Transaction
+    public sealed class Transaction
     {
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
+        public string Description { get; set; } = string.Empty;
+        public List<Entry> Entries { get; set; } = new();
     }
 }

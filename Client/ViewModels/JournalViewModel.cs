@@ -1,12 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Client.Services;
+using System.Collections.ObjectModel;
+using System.Transactions;
 
 namespace Client.ViewModels
 {
-    internal class JournalViewModel
+    public sealed partial class JournalViewModel
     {
+        private readonly IDataService _data;
+
+        public ObservableCollection<Transaction> Transactions { get; }
+
+        public JournalViewModel(IDataService data)
+        {
+            _data = data;
+            Transactions = new ObservableCollection<Transaction>(_data.Transactions);
+        }
+
+        public void Refresh()
+        {
+            Transactions.Clear();
+            foreach (var tx in _data.Transactions)
+            {
+                Transactions.Add(tx);
+            }
+        }
     }
 }

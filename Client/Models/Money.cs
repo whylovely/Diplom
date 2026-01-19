@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Models
 {
-    internal class Money
+    public record class Money
     {
+        public override string ToString()
+        {
+            return $"{Amount:0.##} {CurrencyCode}";
+        }
     }
 }
