@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Client.Models
+{
+    public sealed class Transaction
+    {
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
+        public string Description { get; set; } = string.Empty;
+        public List<Entry> Entries { get; set; } = new();
+    }
+}

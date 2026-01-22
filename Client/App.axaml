@@ -1,0 +1,34 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
+             x:Class="Client.App">
+
+  <Application.Styles>
+    <fluent:FluentTheme />
+
+    <Style Selector="TextBlock">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+    <Style Selector="TemplatedControl">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+    <Style Selector="MenuItem">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="FontFamily" Value="Inter"/>
+    </Style>
+
+  </Application.Styles>
+</Application>

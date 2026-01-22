@@ -1,0 +1,67 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Client.ViewModels"
+             xmlns:models="using:Client.Models"
+             x:Class="Client.Views.NewTransactionView"
+             x:DataType="vm:NewTransactionViewModel">
+  <StackPanel Spacing="10">
+    <TextBlock Text="Новая операция" FontSize="22"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Тип:" Width="80"/>
+      <ComboBox ItemsSource="{Binding KindValues}" 
+                SelectedItem="{Binding Kind}"
+                Width="200"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Дата:" Width="80"/>
+      <DatePicker SelectedDate="{Binding Date}" Width="200"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Описание:" Width="80"/>
+      <TextBox Text="{Binding Description}" Width="420"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Счет:" Width="80"/>
+      <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding FromAccount}" Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Куда:" Width="80"/>
+      <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding ToAccount}" Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Категория:" Width="80"/>
+      <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Сумма:" Width="80"/>
+      <TextBox Text="{Binding Amount}" Width="200"/>
+    </StackPanel>
+
+    <Button Content="Провести" Command="{Binding PostCommand}" Width="140"/>
+  </StackPanel>
+</UserControl>
