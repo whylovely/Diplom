@@ -21,7 +21,11 @@ namespace Client.ViewModels
 
             AccountsVm = new AccountsViewModel(_data);
             JournalVm = new JournalViewModel(_data);
-            NewTxVm = new NewTransactionViewModel(_data);
+            NewTxVm = new NewTransactionViewModel(_data, onPosted: () =>
+            {
+                JournalVm.Refresh();
+                Current = JournalVm;
+            });
 
             _current = AccountsVm;
         }

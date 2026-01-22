@@ -1,10 +1,10 @@
 ﻿using Client.Services;
 using System.Collections.ObjectModel;
-using System.Transactions;
+using Client.Models;
 
 namespace Client.ViewModels
 {
-    public sealed partial class JournalViewModel
+    public sealed partial class JournalViewModel : ViewModelBase
     {
         private readonly IDataService _data;
 

@@ -32,5 +32,8 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/JournalView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/MainWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/NewTransactionView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

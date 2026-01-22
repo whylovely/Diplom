@@ -74,3 +74,4 @@ C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\obj\Debug\n
 C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\obj\Debug\net8.0\Client.pdb
 C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\obj\Debug\net8.0\Client.genruntimeconfig.cache
 C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\obj\Debug\net8.0\ref\Client.dll
+C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\bin\Debug\net8.0\Avalonia.Controls.DataGrid.dll

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using Client.Models;
 
 namespace Client.Services
 {
-    public sealed class MockDS // по сути заглушка
+    public sealed class MockDS : IDataService // по сути заглушка
     {
         private readonly List<Account> _accounts = new();
         private readonly List<Category> _categories = new();
@@ -41,7 +42,7 @@ namespace Client.Services
             {
                 var acc = _accounts.Single(a => a.Id == e.AccountId);
 
-                if (acc.CurrencyCode != e.Amount.CurrenceCode)
+                if (acc.CurrencyCode != e.Amount.CurrencyCode)
                     throw new InvalidOperationException("Валюта проводки не совпадает с валютой счета");
 
                 var d = e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount;

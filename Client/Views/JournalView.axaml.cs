@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Client;
+namespace Client.Views;
 
-public partial class JournalView : Window
+public partial class JournalView : UserControl
 {
     public JournalView()
     {

@@ -1,0 +1,39 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Client.ViewModels"
+        xmlns:views="using:Client.Views"
+        x:Class="Client.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1000" Height="650"
+        Title="FinanceApp">
+
+  <Window.DataContext>
+    <vm:MainWindowViewModel/>
+  </Window.DataContext>
+
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Left" Width="220" Spacing="8" Margin="12">
+      <TextBlock Text="Навигация" FontSize="18"/>
+      <Button Content="Счета" Command="{Binding NavigateAccountsCommand}"/>
+      <Button Content="Журнал" Command="{Binding NavigateJournalCommand}"/>
+      <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>
+    </StackPanel>
+
+
+    <Border Margin="12" Padding="12" CornerRadius="8">
+      <ContentControl Content="{Binding Current}">
+        <ContentControl.DataTemplates>
+          <DataTemplate DataType="{x:Type vm:AccountsViewModel}">
+            <views:AccountsView/>
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:JournalViewModel}">
+            <views:JournalView/>
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:NewTransactionViewModel}">
+            <views:NewTransactionView/>
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+      </ContentControl>
+    </Border>
+  </DockPanel>
+</Window>

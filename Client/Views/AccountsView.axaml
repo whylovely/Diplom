@@ -1,9 +1,23 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Client.AccountsView"
-        Title="AccountsView">
-  Welcome to Avalonia!
-</Window>
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Client.ViewModels"
+             x:Class="Client.Views.AccountsView"
+             x:DataType="vm:AccountsViewModel">
+
+  <StackPanel Spacing="10">
+    <TextBlock Text="Счета" FontSize="22"/>
+    <Button Content="Добавить счет"
+            Command="{Binding AddAccountCommand}"
+            Width="160"/>
+
+    <DataGrid ItemsSource="{Binding Accounts}"
+              AutoGenerateColumns="False"
+              Height="420">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="120"/>
+        <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
+      </DataGrid.Columns>
+    </DataGrid>
+  </StackPanel>
+</UserControl>

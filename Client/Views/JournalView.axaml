@@ -1,9 +1,25 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Client.JournalView"
-        Title="JournalView">
-  Welcome to Avalonia!
-</Window>
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Client.ViewModels"
+             xmlns:models="using:Client.Models"
+             x:Class="Client.Views.JournalView"
+             x:DataType="vm:JournalViewModel">
+
+  <StackPanel Spacing="10">
+    <TextBlock Text="Журнал операций" FontSize="22"/>
+
+    <ItemsControl ItemsSource="{Binding Transactions}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="models:Transaction">
+          <Border Padding="10" Margin="0,0,0,8" CornerRadius="8">
+            <StackPanel>
+              <TextBlock Text="{Binding Date}" />
+              <TextBlock Text="{Binding Description}" FontSize="16"/>
+              <TextBlock Text="{Binding Entries.Count, StringFormat=Проводок: {0}}" />
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>
