@@ -1,4 +1,4 @@
 # Diplom
-Сервер на ASP .NET
-Клиент на Avalonia UI
-БД - PostgreSQL
+<p> Сервер на ASP .NET </p>
+<p> Клиент на Avalonia UI</p>
+<p> БД - PostgreSQL</p>
