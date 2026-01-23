@@ -8,9 +8,7 @@
     <TextBlock Text="Счета" FontSize="22"/>
     <Button Content="Добавить счет"
             Command="{Binding AddAccountCommand}"
-            Click="AddAccount_Click"
             Width="160"/>
-
 
     <DataGrid ItemsSource="{Binding Accounts}"
               AutoGenerateColumns="False"
