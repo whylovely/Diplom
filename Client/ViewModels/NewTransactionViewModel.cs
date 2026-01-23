@@ -52,8 +52,20 @@ namespace Client.ViewModels
         [RelayCommand]
         private void Post()
         {
-            if (_fromAccount != null) throw new InvalidOperationException("Не выбран счет");
-            if (_amount <= 0) throw new InvalidOperationException("Сумма должна быть больше нуля");
+            if (_fromAccount != null) 
+                throw new InvalidOperationException("Не выбран счет");
+
+            if (_amount <= 0) 
+                throw new InvalidOperationException("Сумма должна быть больше нуля");
+
+            if (_kind != TXKind.Transfer && _category is null)
+                throw new InvalidOperationException("Не выбрана категория");
+
+            if (_kind != TXKind.Transfer && _toAccount is null)
+                throw new InvalidOperationException("Не выбран счет назначения");
+
+            if (_kind != TXKind.Transfer && _toAccount.Id == _fromAccount.Id)
+                throw new InvalidOperationException("Счета должны отличаться");
 
             var tx = new Transaction
             {
@@ -61,64 +73,86 @@ namespace Client.ViewModels
                 Description = string.IsNullOrWhiteSpace(_description) ? _kind.ToString() : _description
             };
 
+            var money = new Money(_amount, _fromAccount.CurrencyCode);
+
             switch (_kind)
             {
                 case TXKind.Expense:
-                    if (_category == null) throw new InvalidOperationException("Не выбрана категория");
+                {
+                    var expAcc = _data.GetExpenseAccountForCatefory(_category!.Id);
+
                     tx.Entries.Add(new Entry
                     {
                         AccountId = _fromAccount.Id,
                         CategoryId = _category.Id,
                         Direction = EntryDirection.Credit,
-                        Amount = new Money(_amount, _fromAccount.CurrencyCode)
+                        Amount = money
                     });
+
                     tx.Entries.Add(new Entry
                     {
-                        AccountId = _fromAccount.Id,
+                        AccountId = expAcc.Id,
                         CategoryId = _category.Id,
-                        Amount = new Money(0, _fromAccount.CurrencyCode)
+                        Direction = EntryDirection.Debit,
+                        Amount = money
                     });
+
                     break;
+                }
+
 
                 case TXKind.Income:
-                    if (_category == null) throw new InvalidOperationException("Не выбрана категория");
-                    tx.Entries.Add(new Entry
                     {
-                        AccountId = _fromAccount.Id,
-                        CategoryId = _category.Id,
-                        Direction = EntryDirection.Credit,
-                        Amount = new Money(_amount, _fromAccount.CurrencyCode)
-                    });
-                    tx.Entries.Add(new Entry
-                    {
-                        AccountId = _fromAccount.Id,
-                        CategoryId = _category.Id,
-                        Amount = new Money(0, _fromAccount.CurrencyCode)
-                    });
-                    break;
+                        var incAcc =  _data.GetIncomeAccountForCatefory(_category!.Id);
+
+                        tx.Entries.Add(new Entry
+                        {
+                            AccountId = _fromAccount.Id,
+                            CategoryId = _category.Id,
+                            Direction = EntryDirection.Credit,
+                            Amount = money
+                        });
+
+                        tx.Entries.Add(new Entry
+                        {
+                            AccountId = incAcc.Id,
+                            CategoryId = _category.Id,
+                            Direction = EntryDirection.Debit,
+                            Amount = money
+                        });
+
+                        break;
+                    }
+     
 
                 case TXKind.Transfer:
-                    if (_toAccount is null) throw new InvalidOperationException("Не выбран счет получения");
-                    if (_toAccount.Id == _fromAccount.Id) throw new InvalidOperationException("Счета должны отличаться");
-                    if (_toAccount.CurrencyCode != _fromAccount.CurrencyCode) throw new InvalidOperationException("Счета должны быть в одной валюте");
-                    
-                    var catId = _category?.Id ?? _data.Categories.First().Id;
+                    {
+                        if (_toAccount.CurrencyCode != _fromAccount.CurrencyCode) 
+                            throw new InvalidOperationException("Счета должны быть в одной валюте");
 
-                    tx.Entries.Add(new Entry
-                    {
-                        AccountId = _fromAccount.Id,
-                        CategoryId = catId,
-                        Direction = EntryDirection.Credit,
-                        Amount = new Money(_amount, _fromAccount.CurrencyCode)
-                    });
-                    tx.Entries.Add(new Entry
-                    {
-                        AccountId = _toAccount.Id,
-                        CategoryId = catId,
-                        Direction = EntryDirection.Debit,
-                        Amount = new Money(_amount, _toAccount.CurrencyCode)
-                    });
-                    break;
+                        var catId = _category?.Id ?? _data.Categories.First().Id;
+
+                        tx.Entries.Add(new Entry
+                        {
+                            AccountId = _fromAccount.Id,
+                            CategoryId = catId,
+                            Direction = EntryDirection.Credit,
+                            Amount = money
+                        });
+
+                        tx.Entries.Add(new Entry
+                        {
+                            AccountId = _toAccount.Id,
+                            CategoryId = catId,
+                            Direction = EntryDirection.Debit,
+                            Amount = money
+                        });
+
+                        break;
+                    }
+
+                default:
+                    throw new InvalidOperationException("Неизвестный тип операции");
             }
 
             _data.PostTransaction(tx);

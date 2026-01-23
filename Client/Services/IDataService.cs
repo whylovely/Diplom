@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Client.Models;
 
 namespace Client.Services
@@ -11,6 +12,9 @@ namespace Client.Services
 
         void AddAccount(Account account);
         void AddCategory(Category category);
+
+        Account GetExpenseAccountForCatefory(Guid categoryId);
+        Account GetIncomeAccountForCatefory(Guid categoryId);
 
         void PostTransaction(Transaction tx); // Пока заглушка
     }

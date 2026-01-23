@@ -10,6 +10,9 @@ namespace Client.Services
         private readonly List<Account> _accounts = new();
         private readonly List<Category> _categories = new();
         private readonly List<Transaction> _tx = new();
+            
+        private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();    // быстрый поиск без перебора
+        private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId = new();
 
         public IReadOnlyList<Account> Accounts => _accounts;
         public IReadOnlyList<Category> Categories => _categories;
@@ -27,10 +30,50 @@ namespace Client.Services
                 new Category{ Name = "Зарплата" },
                 new Category{ Name = "Подарки" },
             ]);
+
+            CreateTechnicalAccounts();
         }
 
         public void AddAccount(Account account) => _accounts.Add(account);
         public void AddCategory(Category category) => _categories.Add(category);
+
+        private void CreateTechnicalAccounts()
+        {
+            foreach (var cat in _categories)
+            {
+                var expAcc = new Account
+                {
+                    Name = $"Расходы: {cat.Name}",
+                    CurrencyCode = "RUB",
+                    Balance = 0,
+                    Type = AccountType.Expenses
+                };
+                _accounts.Add(expAcc);
+                _expenseAccountByCategoryId[cat.Id] = expAcc.Id;
+
+                var incAcc = new Account
+                {
+                    Name = $"Доходы: {cat.Name}",
+                    CurrencyCode = "RUB",
+                    Balance = 0,
+                    Type = AccountType.Income
+                };
+                _accounts.Add(incAcc);
+                _incomeAccountByCategoryId[cat.Id] = incAcc.Id;
+            }
+        }
+
+        public Account GetExpenseAccountForCatefory(Guid categoryId)
+        {
+            var accId = _expenseAccountByCategoryId[categoryId];
+            return _accounts.Single(a => a.Id == accId);
+        }
+
+        public Account GetIncomeAccountForCatefory(Guid categoryId)
+        {
+            var accId = _incomeAccountByCategoryId[categoryId];
+            return _accounts.Single(a => a.Id == accId);
+        }
 
         public void PostTransaction(Transaction tx) 
         {
@@ -45,8 +88,11 @@ namespace Client.Services
                 if (acc.CurrencyCode != e.Amount.CurrencyCode)
                     throw new InvalidOperationException("Валюта проводки не совпадает с валютой счета");
 
-                var d = e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount;
-                acc.Balance += d;
+                if (acc.Type == AccountType.Assets)
+                {
+                    var d = e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount;
+                    acc.Balance += d;
+                }
             }
 
             _tx.Insert(0, tx);
