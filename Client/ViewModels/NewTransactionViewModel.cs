@@ -52,7 +52,7 @@ namespace Client.ViewModels
         [RelayCommand]
         private void Post()
         {
-            if (_fromAccount != null) 
+            if (_fromAccount == null) 
                 throw new InvalidOperationException("Не выбран счет");
 
             if (_amount <= 0) 
