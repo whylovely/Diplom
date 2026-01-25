@@ -16,7 +16,7 @@
 
     <StackPanel Orientation="Horizontal" Spacing="10">
       <TextBlock Text="Дата:" Width="80"/>
-      <DatePicker SelectedDate="{Binding Date}" Width="200"/>
+      <DatePicker SelectedDate="{Binding Date}" Width="300"/>
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="10">
