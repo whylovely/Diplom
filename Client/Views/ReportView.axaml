@@ -1,0 +1,37 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Client.ViewModels"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="Client.Views.ReportView"
+             x:DataType="vm:ReportViewModel">
+
+  <StackPanel Spacing="12">
+    <TextBlock Text="Отчёт по категориям" FontSize="22"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="С:" VerticalAlignment="Center"/>
+      <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
+
+      <TextBlock Text="По:" VerticalAlignment="Center"/>
+      <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
+
+      <Button Content="Обновить" Command="{Binding RefreshCommand}" />
+    </StackPanel>
+
+    <TextBlock Text="Расходы" FontSize="18"/>
+    <DataGrid ItemsSource="{Binding ExpenseRows}" AutoGenerateColumns="False" Height="220">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+        <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <TextBlock Text="Доходы" FontSize="18"/>
+    <DataGrid ItemsSource="{Binding IncomeRows}" AutoGenerateColumns="False" Height="220">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+        <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
+      </DataGrid.Columns>
+    </DataGrid>
+  </StackPanel>
+</UserControl>

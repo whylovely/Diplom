@@ -46,7 +46,7 @@ namespace Client.Services
                     Name = $"Расходы: {cat.Name}",
                     CurrencyCode = "RUB",
                     Balance = 0,
-                    Type = AccountType.Expenses
+                    Type = AccountType.Expense
                 };
                 _accounts.Add(expAcc);
                 _expenseAccountByCategoryId[cat.Id] = expAcc.Id;
