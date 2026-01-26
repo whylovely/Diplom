@@ -54,3 +54,6 @@ coverage.xml
 Client/obj/Debug/net8.0/Client.AssemblyInfo.cs
 Client/obj/Debug/net8.0/Client.AssemblyInfoInputs.cache
 /Client/obj/Debug/net8.0
+/Client/bin/Debug/net8.0
+/Client/obj
+/Client/obj/Debug/net8.0
