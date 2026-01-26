@@ -1501,23 +1501,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\viner\\.nuget\\packages\\": {},
+    "C:\\Users\\viner_xni4qwc\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\viner\\OneDrive\\Рабочий стол\\diplom\\Diplom\\Client\\Client.csproj",
+      "projectUniqueName": "C:\\Users\\viner_xni4qwc\\Desktop\\Diplom\\Client\\Client.csproj",
       "projectName": "Client",
-      "projectPath": "C:\\Users\\viner\\OneDrive\\Рабочий стол\\diplom\\Diplom\\Client\\Client.csproj",
-      "packagesPath": "C:\\Users\\viner\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\viner\\OneDrive\\Рабочий стол\\diplom\\Diplom\\Client\\obj\\",
+      "projectPath": "C:\\Users\\viner_xni4qwc\\Desktop\\Diplom\\Client\\Client.csproj",
+      "packagesPath": "C:\\Users\\viner_xni4qwc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\viner_xni4qwc\\Desktop\\Diplom\\Client\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\viner\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\viner_xni4qwc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
