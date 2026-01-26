@@ -2,6 +2,7 @@
 using Client.Services;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Client.ViewModels
 {
@@ -14,13 +15,21 @@ namespace Client.ViewModels
         public AccountsViewModel(IDataService data)
         {
             _data = data;
-            Accounts = new ObservableCollection<Account>(_data.Accounts);
+            Accounts = new ObservableCollection<Account>(
+                _data.Accounts.Where(a => a.Type == AccountType.Assets)
+                );
         }
 
         [RelayCommand]
         private void AddAccount()
         {
-            var acc = new Account { Name = "Новый счет", CurrencyCode = "RUB", Balance = 0 };
+            var acc = new Account 
+            { 
+                Name = "Новый счет", 
+                CurrencyCode = "RUB",
+                Type = AccountType.Assets,
+                Balance = 0 
+            };
             _data.AddAccount(acc);
             Accounts.Insert(0, acc);
         }
