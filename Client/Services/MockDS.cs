@@ -20,8 +20,8 @@ namespace Client.Services
 
         public MockDS()
         {
-            var acc1 = new Account { Name = "Наличные", CurrencyCode = "RUB", Balance = 250 };
-            var acc2 = new Account { Name = "Карта", CurrencyCode = "RUB", Balance = 1250 };
+            var acc1 = new Account { Name = "Наличные", CurrencyCode = "RUB", Balance = 250, InitialBalance = 250 };
+            var acc2 = new Account { Name = "Карта", CurrencyCode = "RUB", Balance = 1250, InitialBalance = 1250 };
             _accounts.AddRange([acc1, acc2]);
 
             _categories.AddRange([
@@ -34,7 +34,14 @@ namespace Client.Services
             CreateTechnicalAccounts();
         }
 
-        public void AddAccount(Account account) => _accounts.Add(account);
+        public void AddAccount(Account account) 
+        { 
+            if (account.Type == AccountType.Assets)
+                account.InitialBalance = account.Balance;
+
+            _accounts.Add(account); 
+        }
+
         public void AddCategory(Category category) => _categories.Add(category);
 
         private void CreateTechnicalAccounts()
