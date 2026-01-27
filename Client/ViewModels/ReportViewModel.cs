@@ -19,6 +19,7 @@ namespace Client.ViewModels
         public ObservableCollection<MonthlyTotalRow> MothlyRows { get; } = new();
         public ObservableCollection<CategoryShareRow> ExpenseShareRows { get; } = new();
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
+        public ObservableCollection<AccountBalanceRow> BalanceRows { get; } = new();
 
         public ObservableCollection<ISeries> ExpensePieSeries { get; } = new(); // Свойство графика
 
@@ -32,6 +33,9 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topExpensesSum;
         [ObservableProperty] private decimal _topExpensesShare;
 
+        [ObservableProperty] private DateTimeOffset _balanceDate = DateTimeOffset.Now;  // Баланс на дату
+        [ObservableProperty] private decimal _totalAssetsAtDate;
+
         public ReportViewModel(IDataService data)
         {
             _data = data;
@@ -43,6 +47,44 @@ namespace Client.ViewModels
             if (value < 1)
                 TopN = 1;
             Refresh();
+        }
+
+        partial void OnBalanceDateChanged(DateTimeOffset Value)
+        {
+            RefreshBalance();
+        }
+
+        [RelayCommand]
+        public void RefreshBalance()
+        {
+            BalanceRows.Clear();
+            
+            var assetAccounts = _data.Accounts
+                .Where(a => a.Type == AccountType.Assets)
+                .ToList();
+
+            var txUpToDate = _data.Transactions
+                .Where(t => t.Date <= BalanceDate)
+                .ToList();
+
+            foreach (var acc in assetAccounts)
+            {
+                var d = txUpToDate
+                    .SelectMany(t => t.Entries)
+                    .Where(e => e.AccountId == acc.Id)
+                    .Sum(e => e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount);
+
+                var bal = acc.InitialBalance + d;
+
+                BalanceRows.Add(new AccountBalanceRow
+                {
+                    AccountName =  acc.Name,
+                    CurrencyCode = acc.CurrencyCode,
+                    Balance = bal
+                });
+
+                TotalAssetsAtDate = BalanceRows.Sum(r => r.Balance);
+            }
         }
 
         [RelayCommand]
@@ -223,6 +265,8 @@ namespace Client.ViewModels
                     Closing = closing
                 });
             }
+
+            RefreshBalance();
         }
     }
 }

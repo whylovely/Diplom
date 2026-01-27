@@ -31,6 +31,23 @@
         </StackPanel>
     </Border>
 
+    <TextBlock Text="Баланс на дату" FontSize="18"/>
+    <StackPanel Orientation="Horizontal" Spacing="10">
+      <TextBlock Text="Дата:" VerticalAlignment="Center"/>
+      <DatePicker SelectedDate="{Binding BalanceDate}" Width="160"/>
+      <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
+      <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
+    </StackPanel>
+
+    <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" Height="200">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
+        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
+        <DataGridTextColumn Header="Остаток" Binding="{Binding Balance}" Width="140"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+
     <TextBlock Text="Динамика по месяцам" FontSize="18"/>
     <DataGrid ItemsSource="{Binding MothlyRows}" AutoGenerateColumns="False" Height="220">
       <DataGrid.Columns>
