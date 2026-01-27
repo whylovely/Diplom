@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using CommunityToolkit.Mvvm.Input;
 using System.Linq;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 
 namespace Client.ViewModels
 {
@@ -15,6 +17,9 @@ namespace Client.ViewModels
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
         public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
         public ObservableCollection<MonthlyTotalRow> MothlyRows { get; } = new();
+        public ObservableCollection<CategoryShareRow> ExpenseShareRows { get; } = new();
+
+        public ObservableCollection<ISeries> ExpensePieSeries { get; } = new(); // Свойство графика
 
         [ObservableProperty] private DateTimeOffset _dateFrom = DateTimeOffset.Now.AddMonths(-1);
         [ObservableProperty] private DateTimeOffset _dateTo = DateTimeOffset.Now;
@@ -22,9 +27,20 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _totalIncome;
         [ObservableProperty] private decimal _net;
 
+        [ObservableProperty] private int _topN = 5; // количество показываемых категорий
+        [ObservableProperty] private decimal _topExpensesSum;
+        [ObservableProperty] private decimal _topExpensesShare;
+
         public ReportViewModel(IDataService data)
         {
             _data = data;
+            Refresh();
+        }
+
+        partial void OnTopNChanged(int value)
+        {
+            if (value < 1)
+                TopN = 1;
             Refresh();
         }
 
@@ -120,6 +136,44 @@ namespace Client.ViewModels
                     Month = $"{mg.Key.Year:D4}-{mg.Key.Month:D2}",
                     Income = income,
                     Expense = expense
+                });
+            }
+
+            // Расчет долей расходов по категориям
+            ExpenseShareRows.Clear();
+
+            if (TotalExpense <=0)
+            {
+                TopExpensesSum = 0;
+                TopExpensesShare = 0;
+                return;
+            }
+
+            var top = ExpenseRows
+                .OrderByDescending(r => r.Total)
+                .Take(TopN)
+                .Select(r => new CategoryShareRow
+                {
+                    CategoryName = r.CategoryName,
+                    Total = r.Total,
+                    SharePercent = r.Total / TotalExpense
+                }).ToList();
+
+            foreach (var row in top)
+                ExpenseShareRows.Add(row);
+
+            TopExpensesSum = top.Sum(r => r.Total);
+            TopExpensesShare = Math.Round((TopExpensesSum / TotalExpense) * 100m, 2);
+
+            // Построение графика
+            ExpensePieSeries.Clear();
+
+            foreach (var r in ExpenseShareRows)
+            {
+                ExpensePieSeries.Add(new PieSeries<decimal>
+                {
+                    Values = new [] { r.Total },
+                    Name = r.CategoryName
                 });
             }
         }
