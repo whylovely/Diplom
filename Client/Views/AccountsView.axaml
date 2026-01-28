@@ -15,7 +15,7 @@
               Height="420">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
-        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="120"/>
+        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="100"/>
         <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
       </DataGrid.Columns>
     </DataGrid>

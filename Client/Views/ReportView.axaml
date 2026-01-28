@@ -34,7 +34,7 @@
     <TextBlock Text="Баланс на дату" FontSize="18"/>
     <StackPanel Orientation="Horizontal" Spacing="10">
       <TextBlock Text="Дата:" VerticalAlignment="Center"/>
-      <DatePicker SelectedDate="{Binding BalanceDate}" Width="160"/>
+      <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
       <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
       <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
     </StackPanel>
@@ -43,7 +43,7 @@
       <DataGrid.Columns>
         <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
         <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-        <DataGridTextColumn Header="Остаток" Binding="{Binding Balance}" Width="140"/>
+        <DataGridTextColumn Header="Остаток" Binding="{Binding Balance}" Width="250"/>
       </DataGrid.Columns>
     </DataGrid>
 
@@ -63,26 +63,26 @@
       <DataGrid.Columns>
         <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
         <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-        <DataGridTextColumn Header="Начало" Binding="{Binding Opening}" Width="120"/>
-        <DataGridTextColumn Header="Дебет" Binding="{Binding DebitTurnOver}" Width="120"/>
-        <DataGridTextColumn Header="Кредит" Binding="{Binding CreditTurnOver}" Width="120"/>
-        <DataGridTextColumn Header="Изм." Binding="{Binding NetChange}" Width="120"/>
-        <DataGridTextColumn Header="Конец" Binding="{Binding Closing}" Width="120"/>
+        <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver}" Width="120"/>
+        <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver}" Width="120"/>
+        <DataGridTextColumn Header="Изменения" Binding="{Binding NetChange}" Width="120"/>
+        <DataGridTextColumn Header="Начало" Binding="{Binding Opening}" Width="100"/>
+        <DataGridTextColumn Header="Конец" Binding="{Binding Closing}" Width="100"/>
       </DataGrid.Columns>
     </DataGrid>
 
     <TextBlock Text="Структура расходов (Top-N)" FontSize="18"/>
     <StackPanel Orientation="Horizontal" Spacing="10">
       <TextBlock Text="Топ:" VerticalAlignment="Center"/>
-      <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="80"/>
+      <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
       <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма Top-N: {0}}" VerticalAlignment="Center"/>
       <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
     </StackPanel>
     <DataGrid ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" Height="220">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-        <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
-        <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent}" Width="120"/>
+        <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="150"/>
+        <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent}" Width="100"/>
       </DataGrid.Columns>
     </DataGrid>
 
