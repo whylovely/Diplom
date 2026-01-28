@@ -38,7 +38,6 @@
       <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
       <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
     </StackPanel>
-
     <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" Height="200">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
@@ -49,7 +48,7 @@
 
 
     <TextBlock Text="Динамика по месяцам" FontSize="18"/>
-    <DataGrid ItemsSource="{Binding MothlyRows}" AutoGenerateColumns="False" Height="220">
+    <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" Height="220">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="180"/>
         <DataGridTextColumn Header="Доходы" Binding="{Binding Income}" Width="*"/>
@@ -57,6 +56,12 @@
         <DataGridTextColumn Header="Итог" Binding="{Binding Net}" Width="*"/>
       </DataGrid.Columns>
     </DataGrid>
+
+    <TextBlock Text="График по месяцам" FontSize="18"/>
+    <lvc:CartesianChart Series="{Binding MonthlySeries}"
+                        XAxes="{Binding XAxes}"
+                        YAxes="{Binding YAxes}"
+                        Height="320"/>
 
     <TextBlock Text="Отчёт по счетам" FontSize="18"/>
     <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" Height="240">
@@ -105,5 +110,7 @@
         <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
       </DataGrid.Columns>
     </DataGrid>
+   
+    <Button Content="Экспорт CSV" Command="{Binding ExportCSVCommand}" />
   </StackPanel>
 </UserControl>

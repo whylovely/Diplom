@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Linq;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.Kernel.Sketches;
 
 namespace Client.ViewModels
 {
@@ -14,14 +15,21 @@ namespace Client.ViewModels
     {
         private readonly IDataService _data;
 
+        public event Action<string, string>? ExportCSVRequested;
+
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
         public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
-        public ObservableCollection<MonthlyTotalRow> MothlyRows { get; } = new();
+        public ObservableCollection<MonthlyTotalRow> MonthlyRows { get; } = new();
         public ObservableCollection<CategoryShareRow> ExpenseShareRows { get; } = new();
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         public ObservableCollection<AccountBalanceRow> BalanceRows { get; } = new();
 
-        public ObservableCollection<ISeries> ExpensePieSeries { get; } = new(); // Свойство графика
+        public ObservableCollection<ISeries> ExpensePieSeries { get; } = new(); // Свойство графика по категориям (только расходы)
+
+        public ObservableCollection<ISeries> MonthlySeries { get; } = new(); // Свойство графика по месяцам
+        public ObservableCollection<string> MonthlyLabels { get; } = new();
+        public Axis[] XAxes { get; private set; } = Array.Empty<Axis>();
+        public Axis[] YAxes { get; private set; } = Array.Empty<Axis>();
 
         [ObservableProperty] private DateTimeOffset _dateFrom = DateTimeOffset.Now.AddMonths(-1);
         [ObservableProperty] private DateTimeOffset _dateTo = DateTimeOffset.Now;
@@ -52,6 +60,49 @@ namespace Client.ViewModels
         partial void OnBalanceDateChanged(DateTimeOffset Value)
         {
             RefreshBalance();
+        }
+
+        private string BuildCSVReport()
+        {
+            var sb = new System.Text.StringBuilder();
+
+            sb.AppendLine($"Период: {DateFrom:yyyy-MM-dd}-{DateTo:yyyy-MM-dd}");
+            sb.AppendLine($"Итог доходов: {TotalIncome}");
+            sb.AppendLine($"Итог расдоходов: {TotalExpense}");
+            sb.AppendLine($"Итог: {Net}");
+            sb.AppendLine();
+
+            sb.AppendLine("Расходы по категориям");
+            sb.AppendLine("Категория;Сумма");
+            foreach (var r in ExpenseRows)
+                sb.AppendLine($"{r.CategoryName};{r.Total}");
+            sb.AppendLine();
+
+            sb.AppendLine("Доходы по категориям");
+            sb.AppendLine("Категория;Сумма");
+            foreach (var r in IncomeRows)
+                sb.AppendLine($"{r.CategoryName};{r.Total}");
+            sb.AppendLine();
+
+            sb.AppendLine("По месяцам");
+            sb.AppendLine("Месяц;Доходы;Расходы;Итог");
+            foreach (var r in MonthlyRows)
+                sb.AppendLine($"{r.Month};{r.Income};{r.Expense};{r.Net}");
+            sb.AppendLine();
+
+            sb.AppendLine("Счета (Assets)");
+            sb.AppendLine("Счет;Валюта;Начало;Дебет;Кредит;Изм.;Конец");
+            foreach (var r in AccountRows)
+                sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.Opening};{r.DebitTurnOver};{r.CreditTurnOver};{r.NetChange};{r.Closing}");
+            sb.AppendLine();
+
+            sb.AppendLine("Баланс на дату");
+            sb.AppendLine($"Дата;{BalanceDate:yyyy-MM-dd}");
+            sb.AppendLine("Счет;Валюта;Остаток");
+            foreach (var r in BalanceRows)
+                sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.Balance}");
+
+            return sb.ToString();
         }
 
         [RelayCommand]
@@ -85,6 +136,15 @@ namespace Client.ViewModels
 
                 TotalAssetsAtDate = BalanceRows.Sum(r => r.Balance);
             }
+        }
+
+        [RelayCommand]
+        private void ExportCSV()
+        {
+            var csv = BuildCSVReport();
+            var fName = $"report_{DateFrom:yyMMdd}_{DateTo:yyMMdd}.csv";
+
+            ExportCSVRequested?.Invoke(fName, csv);
         }
 
         [RelayCommand]
@@ -148,7 +208,7 @@ namespace Client.ViewModels
             _net = _totalIncome - _totalExpense;
 
             // Расчет помесячных итогов
-            MothlyRows.Clear();
+            MonthlyRows.Clear();
 
             var mothlyGroups = txInRange
                 .GroupBy(t => new { t.Date.Year, t.Date.Month })
@@ -174,13 +234,40 @@ namespace Client.ViewModels
                     })
                     .Sum(e => e.Amount.Amount);
 
-                MothlyRows.Add(new MonthlyTotalRow
+                MonthlyRows.Add(new MonthlyTotalRow
                 {
                     Month = $"{mg.Key.Year:D4}-{mg.Key.Month:D2}",
                     Income = income,
                     Expense = expense
                 });
             }
+               
+            // Расчет графика по месяцам
+            MonthlySeries.Clear();
+            MonthlyLabels.Clear();
+
+            foreach (var r in MonthlyRows)
+                MonthlyLabels.Add(r.Month);
+
+            var incomeValues = MonthlyRows.Select(r => r.Income).ToArray();
+            var expenseValues = MonthlyRows.Select(r => r.Expense).ToArray();
+
+            MonthlySeries.Add(new ColumnSeries<decimal>
+            {
+                Name = "Доходы",
+                Values = incomeValues
+            });
+            MonthlySeries.Add(new ColumnSeries<decimal>
+            {
+                Name = "Расходы",
+                Values = expenseValues
+            });
+
+            XAxes = new[] { new Axis { Labels = MonthlyLabels.ToArray() } };
+            YAxes = new[] { new Axis() };
+            OnPropertyChanged(nameof(XAxes));
+            OnPropertyChanged(nameof(YAxes));
+
 
             // Расчет долей расходов по категориям
             ExpenseShareRows.Clear();
