@@ -14,7 +14,11 @@ public sealed partial class AddCategoryDialogViewModel : ObservableObject
     [ObservableProperty]
     private string _name = "";
 
-    public AddCategoryDialogViewModel(Window wnd) => _wnd = wnd;
+    public AddCategoryDialogViewModel(Window wnd, string? initialName)
+    {
+        _wnd = wnd;
+        Name = initialName ?? "";
+    }
 
     private bool CanOk() => !string.IsNullOrWhiteSpace(Name);
 

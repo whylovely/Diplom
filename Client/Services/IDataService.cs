@@ -12,6 +12,7 @@ namespace Client.Services
 
         void AddAccount(Account account);
         void AddCategory(Category category);
+        void RemoveCatergory(Category category);
 
         Account GetExpenseAccountForCatefory(Guid categoryId);
         Account GetIncomeAccountForCatefory(Guid categoryId);

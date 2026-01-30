@@ -10,19 +10,13 @@
             Command="{Binding AddAccountCommand}"
             Width="160"/>
 
-    <Button Content="Добавить категорию"
-            Command="{Binding AddCategoryCommand}"
-            Width="160"/>
-
-
-    <DataGrid ItemsSource="{Binding Accounts}"
-              AutoGenerateColumns="False"
-              Height="420">
+    <DataGrid ItemsSource="{Binding Accounts}" AutoGenerateColumns="False" Height="420">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
         <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="100"/>
         <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
       </DataGrid.Columns>
     </DataGrid>
+
   </StackPanel>
 </UserControl>

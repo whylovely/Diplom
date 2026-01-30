@@ -16,6 +16,10 @@
       <views:AccountsView/>
     </DataTemplate>
 
+    <DataTemplate DataType="vm:CategoriesViewModel">
+      <views:CategoriesView/>
+    </DataTemplate>
+
     <DataTemplate DataType="vm:JournalViewModel">
       <views:JournalView/>
     </DataTemplate>
@@ -33,6 +37,7 @@
     <StackPanel DockPanel.Dock="Left" Width="200" Spacing="8" Margin="12">
       <TextBlock Text="Навигация" FontSize="18"/>
       <Button Content="Счета" Command="{Binding NavigateAccountsCommand}"/>
+      <Button Content="Категории" Command="{Binding NavigateCategoriesCommand}"/>
       <Button Content="Журнал" Command="{Binding NavigateJournalCommand}"/>
       <Button Content="Отчеты" Command="{Binding NavigateReportCommand}"/>
       <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>

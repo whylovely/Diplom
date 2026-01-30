@@ -7,9 +7,9 @@ namespace Client.Views;
 
 public partial class AddCategoryDialog : Window
 {
-    public AddCategoryDialog()
+    public AddCategoryDialog(string? initialName)
     {
         InitializeComponent();
-        DataContext = new AddCategoryDialogViewModel(this);
+        DataContext = new AddCategoryDialogViewModel(this, initialName);
     }
 }

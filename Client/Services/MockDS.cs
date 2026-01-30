@@ -44,6 +44,8 @@ namespace Client.Services
 
         public void AddCategory(Category category) => _categories.Add(category);
 
+        public void RemoveCatergory(Category category) => _categories.RemoveAll(c => c.Id == category.Id);
+
         private void CreateTechnicalAccounts()
         {
             foreach (var cat in _categories)

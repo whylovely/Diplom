@@ -16,6 +16,7 @@ namespace Client.ViewModels
         public JournalViewModel JournalVm { get; }
         public NewTransactionViewModel NewTxVm { get; }
         public ReportViewModel ReportVm { get; }
+        public CategoriesViewModel CategoriesVm { get; }
 
         public MainWindowViewModel()
         {
@@ -31,6 +32,7 @@ namespace Client.ViewModels
                 Current = JournalVm;
             });
             ReportVm = new ReportViewModel(_data);
+            CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
 
             _current = AccountsVm;
         }
@@ -39,5 +41,6 @@ namespace Client.ViewModels
         [RelayCommand] private void NavigateJournal() => Current = JournalVm;
         [RelayCommand] private void NavigateNewTransaction() => Current = NewTxVm;
         [RelayCommand] private void NavigateReport() => Current = ReportVm;
+        [RelayCommand] private void NavigateCategories() => Current = CategoriesVm;
     }
 }

@@ -5,6 +5,6 @@ namespace Client.Services
 {
     public interface ICategoryDialogService
     {
-        Task<Category?> ShowAddCategoryDialogAsync();
+        Task<Category?> ShowAddCategoryDialogAsync(string? initialName = null);
     }
 }
