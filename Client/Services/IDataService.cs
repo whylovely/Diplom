@@ -6,6 +6,8 @@ namespace Client.Services
 {
     public interface IDataService
     {
+        event Action? DataChanged;
+
         IReadOnlyList<Account> Accounts { get; }
         IReadOnlyList<Category> Categories { get; }
         IReadOnlyList<Transaction> Transactions { get; }

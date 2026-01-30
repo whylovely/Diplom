@@ -7,6 +7,9 @@ namespace Client.Services
 {
     public sealed class MockDS : IDataService // по сути заглушка
     {
+        public event Action? DataChanged;
+        private void RaiseChanged() => DataChanged?.Invoke();
+
         private readonly List<Account> _accounts = new();
         private readonly List<Category> _categories = new();
         private readonly List<Transaction> _tx = new();
@@ -36,15 +39,24 @@ namespace Client.Services
 
         public void AddAccount(Account account) 
         { 
-            if (account.Type == AccountType.Assets)
-                account.InitialBalance = account.Balance;
+            if (account.Type == AccountType.Assets) account.InitialBalance = account.Balance;
 
-            _accounts.Add(account); 
+            _accounts.Add(account);
+
+            RaiseChanged();
         }
 
-        public void AddCategory(Category category) => _categories.Add(category);
+        public void AddCategory(Category category)
+        {
+            _categories.Add(category);
+            RaiseChanged();
+        }
 
-        public void RemoveCatergory(Category category) => _categories.RemoveAll(c => c.Id == category.Id);
+        public void RemoveCatergory(Category category)
+        {
+            _categories.RemoveAll(c => c.Id == category.Id);
+            RaiseChanged();
+        }
 
         private void CreateTechnicalAccounts()
         {
@@ -105,6 +117,7 @@ namespace Client.Services
             }
 
             _tx.Insert(0, tx);
+            RaiseChanged();
         }
     }
 }

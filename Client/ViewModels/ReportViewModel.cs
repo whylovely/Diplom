@@ -47,7 +47,10 @@ namespace Client.ViewModels
         public ReportViewModel(IDataService data)
         {
             _data = data;
-            Refresh();
+            _data.DataChanged += () =>
+            {
+                Refresh();
+            };
         }
 
         partial void OnTopNChanged(int value)

@@ -50,6 +50,14 @@ namespace Client.ViewModels
             _fromAccount = Accounts.FirstOrDefault();
             _toAccount = Accounts.Skip(1).FirstOrDefault();
             _category = Categories.FirstOrDefault();
+
+            _data.DataChanged += OnDataChanged;
+        }
+
+        private void OnDataChanged()
+        {
+            ReloadCategories();
+            ReloadAccounts();
         }
 
         [RelayCommand]
@@ -181,14 +189,23 @@ namespace Client.ViewModels
             _onPosted();
         }
 
+        public void ReloadAccounts()
+        {
+            Accounts.Clear();
+            foreach (var a in _data.Accounts.Where(x => x.Type == AccountType.Assets))
+                Accounts.Add(a);
+
+            FromAccount ??= Accounts.FirstOrDefault();
+            ToAccount ??= Accounts.Skip(1).FirstOrDefault();
+        }
+
         public void ReloadCategories()
         {
             Categories.Clear();
-            foreach (var cat in _data.Categories)
-                Categories.Add(cat);
+            foreach (var c in _data.Categories.OrderBy(x => x.Name))
+                Categories.Add(c);
 
-            if (Categories.Count > 0 && Category is null)
-                Category = Categories[0];
+            Category ??= Categories.FirstOrDefault();
         }
     }
 }

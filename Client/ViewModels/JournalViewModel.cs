@@ -14,6 +14,7 @@ namespace Client.ViewModels
         {
             _data = data;
             Transactions = new ObservableCollection<Transaction>(_data.Transactions);
+            _data.DataChanged += Refresh;
         }
 
         public void Refresh()
