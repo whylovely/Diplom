@@ -1,0 +1,29 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Client.ViewModels"
+        x:Class="Client.Views.AddCategoryDialog"
+        x:DataType="vm:AddCategoryDialogViewModel"
+        Width="420" Height="145"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Title="Добавить категорию">
+
+  <StackPanel Margin="16" Spacing="12">
+    <TextBlock Text="Название категории:"/>
+
+    <TextBox Text="{Binding Name}" Watermark="Например: Коммуналка" />
+
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+      <Button Content="Отмена"
+              Command="{Binding CancelCommand}"
+              Width="100"/>
+
+      <Button Content="Добавить"
+              Command="{Binding OkCommand}"
+              Width="100"
+              IsDefault="True"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

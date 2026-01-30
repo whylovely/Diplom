@@ -7,6 +7,7 @@ namespace Client.ViewModels
     public sealed partial class MainWindowViewModel : ViewModelBase
     {
         private readonly IDataService _data;
+        private readonly INotificationService _notify;
 
         [ObservableProperty]
         private ViewModelBase _current;
@@ -19,10 +20,12 @@ namespace Client.ViewModels
         public MainWindowViewModel()
         {
             _data = new MockDS();
+            _notify = new NotificationService();
+            var catDialog = new CategoryDialogService();
 
-            AccountsVm = new AccountsViewModel(_data);
+            AccountsVm = new AccountsViewModel(_data, _notify, catDialog, onCatAdded: () => NewTxVm.ReloadCategories());  
             JournalVm = new JournalViewModel(_data);
-            NewTxVm = new NewTransactionViewModel(_data, onPosted: () =>
+            NewTxVm = new NewTransactionViewModel(_data, _notify, onPosted: () =>
             {
                 JournalVm.Refresh();
                 Current = JournalVm;

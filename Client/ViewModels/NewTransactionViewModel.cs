@@ -1,6 +1,7 @@
 ﻿using Client.Models;
 using Client.Services;
 using Client.ViewModels;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -19,6 +20,7 @@ namespace Client.ViewModels
     public sealed partial class NewTransactionViewModel : ViewModelBase
     {
         private readonly IDataService _data;
+        private readonly INotificationService _notify;
         private readonly Action _onPosted;
 
         public Array KindValues => Enum.GetValues(typeof(TXKind));
@@ -36,9 +38,10 @@ namespace Client.ViewModels
 
         [ObservableProperty] private decimal _amount;
 
-        public NewTransactionViewModel(IDataService data, Action onPosted)
+        public NewTransactionViewModel(IDataService data, INotificationService notify, Action onPosted)
         {
             _data = data;
+            _notify = notify;
             _onPosted = onPosted;
 
             Accounts = new ObservableCollection<Account>(_data.Accounts);
@@ -50,22 +53,37 @@ namespace Client.ViewModels
         }
 
         [RelayCommand]
-        private void Post()
+        private async Task PostAsync()
         {
-            if (_fromAccount == null) 
-                throw new InvalidOperationException("Не выбран счет");
+            if (_fromAccount == null)
+            {
+                await _notify.ShowErrorAsync("Не выбран счет");
+                return;
+            }
 
-            if (_amount <= 0) 
-                throw new InvalidOperationException("Сумма должна быть больше нуля");
+            if (_amount <= 0)
+            {
+                await _notify.ShowErrorAsync("Сумма должна быть больше нуля");
+                return;
+            }
 
             if (_kind != TXKind.Transfer && _category is null)
-                throw new InvalidOperationException("Не выбрана категория");
+            {
+                await _notify.ShowErrorAsync("Не выбрана категория");
+                return;
+            }
 
             if (_kind != TXKind.Transfer && _toAccount is null)
-                throw new InvalidOperationException("Не выбран счет назначения");
+            {
+                await _notify.ShowErrorAsync("Не выбран счет назначения");
+                return;
+            }
 
             if (_kind != TXKind.Transfer && _toAccount.Id == _fromAccount.Id)
-                throw new InvalidOperationException("Счета должны отличаться");
+            {
+                await _notify.ShowErrorAsync("Счета должны отличаться");
+                return;
+            }
 
             var tx = new Transaction
             {
@@ -161,6 +179,16 @@ namespace Client.ViewModels
             _description = "";
 
             _onPosted();
+        }
+
+        public void ReloadCategories()
+        {
+            Categories.Clear();
+            foreach (var cat in _data.Categories)
+                Categories.Add(cat);
+
+            if (Categories.Count > 0 && Category is null)
+                Category = Categories[0];
         }
     }
 }

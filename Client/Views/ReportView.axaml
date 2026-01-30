@@ -22,7 +22,6 @@
     <Border Padding="10" CornerRadius="8">
         <StackPanel Spacing="6">
 			<TextBlock Text="Итог за период" FontSize="18"/>
-
             <StackPanel Orientation="Horizontal" Spacing="20">
 				<TextBlock Text="{Binding TotalIncome, StringFormat=Доходы: {0}}" />
 				<TextBlock Text="{Binding TotalExpense, StringFormat=Расходы: {0}}" />
@@ -46,7 +45,6 @@
       </DataGrid.Columns>
     </DataGrid>
 
-
     <TextBlock Text="Динамика по месяцам" FontSize="18"/>
     <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" Height="220">
       <DataGrid.Columns>
@@ -58,10 +56,7 @@
     </DataGrid>
 
     <TextBlock Text="График по месяцам" FontSize="18"/>
-    <lvc:CartesianChart Series="{Binding MonthlySeries}"
-                        XAxes="{Binding XAxes}"
-                        YAxes="{Binding YAxes}"
-                        Height="320"/>
+    <lvc:CartesianChart Series="{Binding MonthlySeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" Height="320"/>
 
     <TextBlock Text="Отчёт по счетам" FontSize="18"/>
     <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" Height="240">
@@ -93,7 +88,6 @@
 
     <TextBlock Text="Диаграмма расходов (Top-N)" FontSize="18"/>
     <lvc:PieChart Series="{Binding ExpensePieSeries}" Height="260"/>
-
 
     <TextBlock Text="Расходы" FontSize="18"/>
     <DataGrid ItemsSource="{Binding ExpenseRows}" AutoGenerateColumns="False" Height="220">

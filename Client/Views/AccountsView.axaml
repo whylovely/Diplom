@@ -10,6 +10,11 @@
             Command="{Binding AddAccountCommand}"
             Width="160"/>
 
+    <Button Content="Добавить категорию"
+            Command="{Binding AddCategoryCommand}"
+            Width="160"/>
+
+
     <DataGrid ItemsSource="{Binding Accounts}"
               AutoGenerateColumns="False"
               Height="420">

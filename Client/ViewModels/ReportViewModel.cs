@@ -52,15 +52,11 @@ namespace Client.ViewModels
 
         partial void OnTopNChanged(int value)
         {
-            if (value < 1)
-                TopN = 1;
+            if (value < 1) TopN = 1;
             Refresh();
         }
 
-        partial void OnBalanceDateChanged(DateTimeOffset Value)
-        {
-            RefreshBalance();
-        }
+        partial void OnBalanceDateChanged(DateTimeOffset Value) => RefreshBalance();
 
         private string BuildCSVReport()
         {
@@ -91,13 +87,13 @@ namespace Client.ViewModels
             sb.AppendLine();
 
             sb.AppendLine("Счета (Assets)");
-            sb.AppendLine("Счет;Валюта;Начало;Дебет;Кредит;Изм.;Конец");
+            sb.AppendLine("Счет;Валюта;Доход;Расход;Изменения;Начало;Конец");
             foreach (var r in AccountRows)
-                sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.Opening};{r.DebitTurnOver};{r.CreditTurnOver};{r.NetChange};{r.Closing}");
+                sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.DebitTurnOver};{r.CreditTurnOver};{r.NetChange};{r.Opening};{r.Closing}");
             sb.AppendLine();
 
             sb.AppendLine("Баланс на дату");
-            sb.AppendLine($"Дата;{BalanceDate:yyyy-MM-dd}");
+            sb.AppendLine($"Дата: {BalanceDate:yyyy-MM-dd}");
             sb.AppendLine("Счет;Валюта;Остаток");
             foreach (var r in BalanceRows)
                 sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.Balance}");
@@ -159,6 +155,7 @@ namespace Client.ViewModels
 
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
 
+            // Подсчет расходов
             var expenseGroups = txInRange
                 .SelectMany(t => t.Entries)
                 .Where(e =>
@@ -176,11 +173,12 @@ namespace Client.ViewModels
                         Total = g.Sum(x => x.Amount.Amount)
                     };
                 })
-                .OrderByDescending(r => r.Total);   // Подсчет расходов
+                .OrderByDescending(r => r.Total);   
 
             foreach (var row in expenseGroups)
                 ExpenseRows.Add(row);
 
+            // Подсчет доходов
             var incomeGroups = txInRange
                 .SelectMany(t => t.Entries)
                 .Where(e =>
@@ -198,7 +196,7 @@ namespace Client.ViewModels
                         Total = g.Sum(x => x.Amount.Amount)
                     };
                 })
-                .OrderByDescending(r => r.Total);   // Подсчет доходов
+                .OrderByDescending(r => r.Total);   
 
             foreach (var row in incomeGroups)
                 IncomeRows.Add(row);
@@ -246,28 +244,18 @@ namespace Client.ViewModels
             MonthlySeries.Clear();
             MonthlyLabels.Clear();
 
-            foreach (var r in MonthlyRows)
-                MonthlyLabels.Add(r.Month);
+            foreach (var r in MonthlyRows) MonthlyLabels.Add(r.Month);
 
             var incomeValues = MonthlyRows.Select(r => r.Income).ToArray();
             var expenseValues = MonthlyRows.Select(r => r.Expense).ToArray();
 
-            MonthlySeries.Add(new ColumnSeries<decimal>
-            {
-                Name = "Доходы",
-                Values = incomeValues
-            });
-            MonthlySeries.Add(new ColumnSeries<decimal>
-            {
-                Name = "Расходы",
-                Values = expenseValues
-            });
+            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Доходы", Values = incomeValues });
+            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Расходы", Values = expenseValues });
 
             XAxes = new[] { new Axis { Labels = MonthlyLabels.ToArray() } };
             YAxes = new[] { new Axis() };
             OnPropertyChanged(nameof(XAxes));
             OnPropertyChanged(nameof(YAxes));
-
 
             // Расчет долей расходов по категориям
             ExpenseShareRows.Clear();
@@ -295,17 +283,10 @@ namespace Client.ViewModels
             TopExpensesSum = top.Sum(r => r.Total);
             TopExpensesShare = Math.Round((TopExpensesSum / TotalExpense) * 100m, 2);
 
-            // Построение графика
+            // Построение графика расходов по категориям
             ExpensePieSeries.Clear();
-
             foreach (var r in ExpenseShareRows)
-            {
-                ExpensePieSeries.Add(new PieSeries<decimal>
-                {
-                    Values = new [] { r.Total },
-                    Name = r.CategoryName
-                });
-            }
+                ExpensePieSeries.Add(new PieSeries<decimal> { Values = new [] { r.Total }, Name = r.CategoryName });
 
             // Расчет остатков и оборотов
             AccountRows.Clear();
