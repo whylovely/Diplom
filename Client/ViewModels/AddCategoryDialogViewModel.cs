@@ -1,37 +1,33 @@
-﻿using Avalonia.Controls;
-using Client.Models;
+﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Xml.Linq;
+using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddCategoryDialogViewModel : ObservableObject
+public sealed partial class AddCategoryDialogViewModel : ViewModelBase
 {
-    private readonly Window _wnd;
+    public sealed record KindItem(CategoryKind Kind, string Title);
 
-    [ObservableProperty]
-    private string _name = "";
-
-    public AddCategoryDialogViewModel(Window wnd, string? initialName)
+    public KindItem[] KindItems { get; } =
     {
-        _wnd = wnd;
-        Name = initialName ?? "";
+        new(CategoryKind.Expense, "Расход"),
+        new(CategoryKind.Income,  "Доход"),
+    };
+
+    [ObservableProperty] private string _name = "";
+    [ObservableProperty] private KindItem _selectedKind;
+
+    public bool CanOk => !string.IsNullOrWhiteSpace(Name);
+
+    public Action<bool>? Close { get; set; }
+
+    public AddCategoryDialogViewModel(string? initialName = null)
+    {
+        _name = initialName ?? "";
+        _selectedKind = KindItems[0];
     }
 
-    private bool CanOk() => !string.IsNullOrWhiteSpace(Name);
+    partial void OnNameChanged(string value) => OnPropertyChanged(nameof(CanOk));
 
-    [RelayCommand(CanExecute = nameof(CanOk))]
-    private void Ok()
-    {
-        var clean = Name.Trim();
-
-        _wnd.Close(new Category { Name = clean });
-    }
-
-    [RelayCommand]
-    private void Cancel() => _wnd.Close(null);
-
-    partial void OnNameChanged(string value) => OkCommand.NotifyCanExecuteChanged();
+    public CategoryKind Kind => SelectedKind.Kind;
 }

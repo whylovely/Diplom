@@ -3,7 +3,7 @@
         xmlns:vm="using:Client.ViewModels"
         x:Class="Client.Views.AddCategoryDialog"
         x:DataType="vm:AddCategoryDialogViewModel"
-        Width="420" Height="145"
+        Width="420" Height="200"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Title="Добавить категорию">
@@ -13,17 +13,20 @@
 
     <TextBox Text="{Binding Name}" Watermark="Например: Коммуналка" />
 
-    <StackPanel Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                Spacing="8">
-      <Button Content="Отмена"
-              Command="{Binding CancelCommand}"
-              Width="100"/>
+    <TextBlock Text="Тип категории" />
+    <ComboBox ItemsSource="{Binding KindItems}"
+              SelectedItem="{Binding SelectedKind}"
+              Width="220">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:AddCategoryDialogViewModel+KindItem">
+          <TextBlock Text="{Binding Title}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
 
-      <Button Content="Добавить"
-              Command="{Binding OkCommand}"
-              Width="100"
-              IsDefault="True"/>
-    </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,-56,0,0">
+    <Button Content="OK" IsEnabled="{Binding CanOk}" Click="OnOkClick" />
+    <Button Content="Отмена" Click="OnCancelClick" />
   </StackPanel>
+      </StackPanel>
 </Window>

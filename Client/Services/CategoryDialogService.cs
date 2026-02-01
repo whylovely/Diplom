@@ -15,7 +15,7 @@ public sealed class CategoryDialogService : ICategoryDialogService
         if (owner is null)
             return null;
 
-        var dlg = new AddCategoryDialog(initialName);
-        return await dlg.ShowDialog<Category?>(owner);
+        var dlg = new AddCategoryDialog();
+        return await dlg.ShowDialogAsync(owner, initialName);
     }
 }
