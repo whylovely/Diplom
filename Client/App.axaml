@@ -1,7 +1,12 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
+             xmlns:conv="using:Client.Converters"
              x:Class="Client.App">
+
+  <Application.Resources>
+      <conv:EnumToBoolCon x:Key="EnumToBool"/>
+  </Application.Resources>
 
   <Application.Styles>
     <fluent:FluentTheme />

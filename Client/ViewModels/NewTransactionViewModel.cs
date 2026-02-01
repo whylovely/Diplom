@@ -10,13 +10,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public enum TXKind
-    {
-        Expense = 1,
-        Income = 2,
-        Transfer = 3
-    }
-
     public sealed partial class NewTransactionViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -28,6 +21,8 @@ namespace Client.ViewModels
         public ObservableCollection<Account> Accounts { get; }
         public ObservableCollection<Category> Categories { get; }
 
+        public ObservableCollection<Category> FilteredCategories { get; } = new();
+
         [ObservableProperty] private TXKind _kind = TXKind.Expense;
         [ObservableProperty] private DateTimeOffset _date = DateTimeOffset.Now;
         [ObservableProperty] private string _description = "";
@@ -38,13 +33,20 @@ namespace Client.ViewModels
 
         [ObservableProperty] private decimal _amount;
 
+        [ObservableProperty] TxKindChoice _choice = TxKindChoice.None;
+        public bool IsExpense => Choice == TxKindChoice.Expense;
+        public bool IsIncome => Choice == TxKindChoice.Income;
+        public bool IsTransfer => Choice == TxKindChoice.Transfer;
+        public bool IsSingleAccount => IsExpense || IsIncome;
+        public bool IsCategoryRequire => IsExpense || IsIncome;
+
         public NewTransactionViewModel(IDataService data, INotificationService notify, Action onPosted)
         {
             _data = data;
             _notify = notify;
             _onPosted = onPosted;
 
-            Accounts = new ObservableCollection<Account>(_data.Accounts);
+            Accounts = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
             Categories = new ObservableCollection<Category>(_data.Categories);
 
             _fromAccount = Accounts.FirstOrDefault();
@@ -52,12 +54,36 @@ namespace Client.ViewModels
             _category = Categories.FirstOrDefault();
 
             _data.DataChanged += OnDataChanged;
+
+        }
+
+        partial void OnChoiceChanged(TxKindChoice value)
+        {
+            OnPropertyChanged(nameof(IsExpense));
+            OnPropertyChanged(nameof(IsIncome));
+            OnPropertyChanged(nameof(IsTransfer));
+            OnPropertyChanged(nameof(IsSingleAccount));
+            OnPropertyChanged(nameof(IsCategoryRequire));
+
+            ResetIrrelevantFields();
+            ReloadCategories();
         }
 
         private void OnDataChanged()
         {
             ReloadCategories();
             ReloadAccounts();
+        }
+
+        private void ResetIrrelevantFields()
+        {
+            Category = null;
+
+            if (Choice != TxKindChoice.Transfer)
+                ToAccount = null;
+
+            if (Choice == TxKindChoice.Transfer)
+                Category = null;
         }
 
         [RelayCommand]
@@ -153,8 +179,11 @@ namespace Client.ViewModels
 
                 case TXKind.Transfer:
                     {
-                        if (_toAccount.CurrencyCode != _fromAccount.CurrencyCode) 
-                            throw new InvalidOperationException("Счета должны быть в одной валюте");
+                        if (_toAccount.CurrencyCode != _fromAccount.CurrencyCode)
+                        {
+                            await _notify.ShowErrorAsync("Счета должны быть в одной валюте");
+                            return;
+                        }
 
                         var catId = _category?.Id ?? _data.Categories.First().Id;
 
@@ -201,11 +230,20 @@ namespace Client.ViewModels
 
         public void ReloadCategories()
         {
-            Categories.Clear();
-            foreach (var c in _data.Categories.OrderBy(x => x.Name))
-                Categories.Add(c);
+            FilteredCategories.Clear();
 
-            Category ??= Categories.FirstOrDefault();
+            if (Choice == TxKindChoice.Transfer)
+            {
+                Category = null;
+                return;
+            }
+
+            var needKind = Choice == TxKindChoice.Income ? CategoryKind.Income : CategoryKind.Expense;
+
+            foreach (var c in _data.Categories.Where(x => x.Kind == needKind).OrderBy(x => x.Name))
+                FilteredCategories.Add(c);
+
+            Category = FilteredCategories.FirstOrDefault();
         }
     }
 }

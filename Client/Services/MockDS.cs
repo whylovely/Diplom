@@ -28,10 +28,10 @@ namespace Client.Services
             _accounts.AddRange([acc1, acc2]);
 
             _categories.AddRange([
-                new Category{ Name = "Еда" },
-                new Category{ Name = "Транспорт" },
-                new Category{ Name = "Зарплата" },
-                new Category{ Name = "Подарки" },
+                new Category{ Name = "Еда", Kind = CategoryKind.Expense},
+                new Category{ Name = "Транспорт", Kind = CategoryKind.Expense },
+                new Category{ Name = "Зарплата", Kind = CategoryKind.Income },
+                new Category{ Name = "Подарок", Kind = CategoryKind.Income },
             ]);
 
             CreateTechnicalAccounts();

@@ -10,4 +10,19 @@ namespace Client.Models
         public string Description { get; set; } = string.Empty;
         public List<Entry> Entries { get; set; } = new();
     }
+
+    public enum TXKind
+    {
+        Expense = 1,
+        Income = 2,
+        Transfer = 3
+    }
+
+    public enum TxKindChoice
+    {
+        None,
+        Expense,
+        Income,
+        Transfer
+    }
 }
