@@ -51,6 +51,6 @@ appsettings.Local.json
 
 coverage/
 coverage.xml
-/Client/bin/Debug/net8.0
-/Client/obj
-/Client/obj/Debug/net8.0
+\Client\bin\Debug\net8.0
+\Client\obj
+\Client\obj\Debug\net8.0
