@@ -12,14 +12,16 @@
       <Button Content="Переименовать" Command="{Binding RenameCommand}"/>
       <Button Content="Удалить" Command="{Binding DeleteCommand}"/>
     </StackPanel>
-
-    <dg:DataGrid ItemsSource="{Binding Categories}"
-                 SelectedItem="{Binding Selected}"
-                 AutoGenerateColumns="False"
-                 Height="420">
-      <dg:DataGrid.Columns>
-        <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
-      </dg:DataGrid.Columns>
-    </dg:DataGrid>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <dg:DataGrid ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding Selected}"
+                     AutoGenerateColumns="False"
+                     Height="420">
+          <dg:DataGrid.Columns>
+            <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
+          </dg:DataGrid.Columns>
+        </dg:DataGrid>
+    </ScrollViewer>
   </DockPanel>
 </UserControl>

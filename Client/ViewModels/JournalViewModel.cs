@@ -21,9 +21,7 @@ namespace Client.ViewModels
         {
             Transactions.Clear();
             foreach (var tx in _data.Transactions)
-            {
                 Transactions.Add(tx);
-            }
         }
     }
 }
