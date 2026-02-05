@@ -52,7 +52,8 @@
           <TextBlock Text="Баланс на дату" FontSize="18"/>
           <StackPanel Orientation="Horizontal" Spacing="10">
             <TextBlock Text="Дата:" VerticalAlignment="Center"/>
-            <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
+            <DatePicker SelectedDate="{Binding 
+            }" Width="300"/>
             <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
             <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
           </StackPanel>

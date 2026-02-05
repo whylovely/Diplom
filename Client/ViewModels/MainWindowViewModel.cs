@@ -33,7 +33,6 @@ namespace Client.ViewModels
                 _notify, 
                 catDialog,
                 input, 
-                onCatAdded: () => NewTxVm.ReloadCategories(), 
                 onQuickTx: openQuickTx);
 
             JournalVm = new JournalViewModel(_data);

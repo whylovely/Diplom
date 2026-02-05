@@ -15,4 +15,18 @@ namespace Client.Models
         Expense,
         Income
     }
+
+    // Расчет процентов на категории
+    public sealed class CategoryShareRow
+    {
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+        public decimal SharePercent { get; set; }
+    }
+
+    public sealed class CategoryTotalRow
+    {
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+    }
 }

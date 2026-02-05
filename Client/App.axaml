@@ -4,10 +4,6 @@
              xmlns:conv="using:Client.Converters"
              x:Class="Client.App">
 
-  <Application.Resources>
-      <conv:EnumToBoolCon x:Key="EnumToBool"/>
-  </Application.Resources>
-
   <Application.Styles>
     <fluent:FluentTheme />
 

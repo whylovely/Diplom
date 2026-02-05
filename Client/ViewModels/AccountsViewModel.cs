@@ -15,7 +15,6 @@ namespace Client.ViewModels
         private readonly IDataService _data;
         private readonly INotificationService _notify;
         private readonly ICategoryDialogService _catDialog;
-        private readonly Action _onCatAdded;
 
         private readonly IInputDialogService _input;
         private readonly Action<Account, TxKindChoice> _onQuickTx;
@@ -36,7 +35,6 @@ namespace Client.ViewModels
             INotificationService notify, 
             ICategoryDialogService catDialog,
             IInputDialogService input,
-            Action onCatAdded,
             Action<Account, TxKindChoice> onQuickTx
             )
         {
@@ -44,7 +42,6 @@ namespace Client.ViewModels
             _notify = notify;
             _input = input;
             _catDialog = catDialog;
-            _onCatAdded = onCatAdded;
             _onQuickTx = onQuickTx;
 
             Accounts = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
@@ -83,24 +80,6 @@ namespace Client.ViewModels
             Accounts.Insert(0, acc);
 
             await _notify.ShowInfoAsync($"Счет \"{name}\" добавлен.");
-        }
-
-        [RelayCommand]  // Убрать в другое vm
-        private async Task AddCategoryAsync()
-        {
-            var created = await _catDialog.ShowAddCategoryDialogAsync();
-            if (created is null) return;
-
-            if (_data.Categories.Any(c => c.Name.Equals(created.Name, StringComparison.OrdinalIgnoreCase)))
-            {
-                await _notify.ShowErrorAsync("Категория с таким названием уже существует.");
-                return;
-            }
-
-            _data.AddCategory(created);
-            _onCatAdded();
-
-            await _notify.ShowInfoAsync("Категория добавлена");
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
