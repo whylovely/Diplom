@@ -10,13 +10,29 @@
                 Command="{Binding AddAccountCommand}"
                 Width="160"/>
 
-        <DataGrid ItemsSource="{Binding Accounts}" AutoGenerateColumns="False" Height="420">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="400"/>
-            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="100"/>
-            <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
-          </DataGrid.Columns>
-        </DataGrid>
+            <DataGrid x:Name="AccountsGrid"
+                      ItemsSource="{Binding Accounts}"
+                      SelectedItem="{Binding SelectedAccount}"
+                      AutoGenerateColumns="False"
+                      Height="420"
+                      IsReadOnly="True">
+
+              <DataGrid.ContextMenu>
+                <ContextMenu x:CompileBindings="False">
+                  <MenuItem Header="Переименовать" Command="{Binding RenameAccountCommand}" />
+                  <MenuItem Header="Удалить" Command="{Binding DeleteAccountCommand}" />
+                  <Separator/>
+                  <MenuItem Header="Быстрый расход" Command="{Binding QuickExpenseCommand}" />
+                  <MenuItem Header="Быстрый доход" Command="{Binding QuickIncomeCommand}" />
+                </ContextMenu>
+              </DataGrid.ContextMenu>
+
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="400"/>
+                <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="100"/>
+                <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
+              </DataGrid.Columns>
+            </DataGrid>
 
       </StackPanel>
     </ScrollViewer>

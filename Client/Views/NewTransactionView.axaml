@@ -11,14 +11,17 @@
                FontWeight="Bold"/>
 
     <StackPanel Orientation="Horizontal" Spacing="16">
-      <RadioButton Content="Расход"
-                   IsChecked="{Binding Choice, Converter={StaticResource EnumToBool}, ConverterParameter=Expense}" />
+        <RadioButton Content="Расход"
+                     IsChecked="{Binding IsExpense}"
+                     Command="{Binding SetExpenseCommand}" />
 
-      <RadioButton Content="Доход"
-                   IsChecked="{Binding Choice, Converter={StaticResource EnumToBool}, ConverterParameter=Income}" />
+        <RadioButton Content="Доход"
+                     IsChecked="{Binding IsIncome}"
+                     Command="{Binding SetIncomeCommand}" />
 
-      <RadioButton Content="Перевод"
-                   IsChecked="{Binding Choice, Converter={StaticResource EnumToBool}, ConverterParameter=Transfer}" />
+        <RadioButton Content="Перевод"
+                     IsChecked="{Binding IsTransfer}"
+                     Command="{Binding SetTransferCommand}" />
     </StackPanel>
 
     <Separator/>

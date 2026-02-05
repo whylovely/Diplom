@@ -5,7 +5,7 @@ using Client.Models;
 
 namespace Client.Services
 {
-    public sealed class MockDS : IDataService // по сути заглушка
+    public sealed class MockDS : IDataService // по сути заглушка (пока не написал сервер)
     {
         public event Action? DataChanged;
         private void RaiseChanged() => DataChanged?.Invoke();
@@ -52,11 +52,35 @@ namespace Client.Services
             RaiseChanged();
         }
 
+        public void RenameAccount(Guid id, string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+                return;
+
+            var acc = Accounts.FirstOrDefault(a => a.Id == id);
+            if (acc is null)
+                return;
+
+            acc.Name = newName.Trim();
+
+            DataChanged?.Invoke();
+        }
+
         public void RemoveCatergory(Category category)
         {
             _categories.RemoveAll(c => c.Id == category.Id);
             RaiseChanged();
         }
+
+        public void RemoveAccount(Guid id)
+        {
+            var acc = _accounts.FirstOrDefault(a => a.Id == id);
+            if (acc is null) return;
+            _accounts.Remove(acc);
+            DataChanged?.Invoke();
+        }
+
+        public bool IsAccountUsed(Guid Id) => Transactions.Any(tx => tx.Entries.Any(e => e.AccountId == Id));
 
         private void CreateTechnicalAccounts()
         {

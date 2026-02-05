@@ -1,6 +1,8 @@
-﻿using Client.Services;
+﻿using Client.Models;
+using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 
 namespace Client.ViewModels
 {
@@ -22,10 +24,20 @@ namespace Client.ViewModels
         {
             _data = new MockDS();
             _notify = new NotificationService();
-            var catDialog = new CategoryDialogService();
 
-            AccountsVm = new AccountsViewModel(_data, _notify, catDialog, onCatAdded: () => NewTxVm.ReloadCategories());  
+            var catDialog = new CategoryDialogService();
+            var input = new InputDialogService();
+
+            AccountsVm = new AccountsViewModel(
+                _data, 
+                _notify, 
+                catDialog,
+                input, 
+                onCatAdded: () => NewTxVm.ReloadCategories(), 
+                onQuickTx: openQuickTx);
+
             JournalVm = new JournalViewModel(_data);
+
             NewTxVm = new NewTransactionViewModel(_data, _notify, onPosted: () =>
             {
                 JournalVm.Refresh();
@@ -35,6 +47,12 @@ namespace Client.ViewModels
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
 
             _current = AccountsVm;
+        }
+
+        private void openQuickTx(Account account, TxKindChoice choice)
+        {
+            Current = NewTxVm;
+            NewTxVm.PresetForQuickTx(account, choice);
         }
 
         [RelayCommand] private void NavigateAccounts() => Current = AccountsVm;

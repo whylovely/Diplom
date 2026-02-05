@@ -15,6 +15,9 @@ namespace Client.Services
         void AddAccount(Account account);
         void AddCategory(Category category);
         void RemoveCatergory(Category category);
+        void RenameAccount(Guid id, string newName);
+        void RemoveAccount(Guid id);
+        bool IsAccountUsed(Guid id);
 
         Account GetExpenseAccountForCatefory(Guid categoryId);
         Account GetIncomeAccountForCatefory(Guid categoryId);

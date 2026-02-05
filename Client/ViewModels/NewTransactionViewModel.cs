@@ -86,6 +86,24 @@ namespace Client.ViewModels
                 Category = null;
         }
 
+        public void PresetForQuickTx(Account account, TxKindChoice choice)
+        {
+            Choice = choice;
+
+            FromAccount = Accounts.FirstOrDefault(a => a.Id == account.Id) ?? Accounts.FirstOrDefault();
+
+            Amount = 0;
+            Description = "";
+
+            ResetIrrelevantFields();
+            ReloadCategories();
+            OnPropertyChanged(nameof(IsExpense));
+            OnPropertyChanged(nameof(IsIncome));
+            OnPropertyChanged(nameof(IsTransfer));
+            OnPropertyChanged(nameof(IsSingleAccount));
+            OnPropertyChanged(nameof(IsCategoryRequire));
+        }
+
         [RelayCommand]
         private async Task PostAsync()
         {
@@ -245,5 +263,9 @@ namespace Client.ViewModels
 
             Category = FilteredCategories.FirstOrDefault();
         }
+
+        [RelayCommand] private void SetExpense() => Choice = TxKindChoice.Expense;
+        [RelayCommand] private void SetIncome() => Choice = TxKindChoice.Income;
+        [RelayCommand] private void SetTransfer() => Choice = TxKindChoice.Transfer;
     }
 }
