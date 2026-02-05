@@ -51,6 +51,8 @@ namespace Client.ViewModels
             {
                 Refresh();
             };
+
+            _selectedSectionItem = SectionItems[0];
         }
 
         partial void OnTopNChanged(int value)
@@ -102,6 +104,49 @@ namespace Client.ViewModels
                 sb.AppendLine($"{r.AccountName};{r.CurrencyCode};{r.Balance}");
 
             return sb.ToString();
+        }
+
+        public Array SectionValues => Enum.GetValues(typeof(ReportSelection));
+
+        [ObservableProperty]
+        private SectionItem _selectedSectionItem;
+
+        public ReportSelection SelectedSection => SelectedSectionItem.Value;
+
+        public bool IsSummary => SelectedSection == ReportSelection.Summary;
+        public bool IsBalanceAtDate => SelectedSection == ReportSelection.BalanceAtDate;
+        public bool IsMonthlyDynamics => SelectedSection == ReportSelection.MothlyDinamics;
+        public bool IsAccountsTurnover => SelectedSection == ReportSelection.AccountsTurnover;
+        public bool IsExpenseTop => SelectedSection == ReportSelection.ExpenseTop;
+        public bool IsExpenseByCategory => SelectedSection == ReportSelection.ExpenseByCategory;
+        public bool IsIncomeByCategory => SelectedSection == ReportSelection.IncomeByCategory;
+        public sealed record SectionItem(ReportSelection Value, string Title);
+
+        public string SelectedTitle => SelectedSectionItem.Title;
+
+        public SectionItem[] SectionItems { get; } =
+        {
+            new(ReportSelection.Summary, "Сводный отчет"),
+            new(ReportSelection.BalanceAtDate, "Баланс на дату"),
+            new(ReportSelection.MothlyDinamics, "Помесячная динамика"),
+            new(ReportSelection.AccountsTurnover, "Обороты по счетам"),
+            new(ReportSelection.ExpenseTop, "Топ расходов по категориям"),
+            new(ReportSelection.ExpenseByCategory, "Расходы по категориям"),
+            new(ReportSelection.IncomeByCategory, "Доходы по категориям"),
+        };
+
+        partial void OnSelectedSectionItemChanged(SectionItem value)
+        {
+            OnPropertyChanged(nameof(SelectedTitle));
+            OnPropertyChanged(nameof(SelectedSection));
+
+            OnPropertyChanged(nameof(IsSummary));
+            OnPropertyChanged(nameof(IsBalanceAtDate));
+            OnPropertyChanged(nameof(IsMonthlyDynamics));
+            OnPropertyChanged(nameof(IsAccountsTurnover));
+            OnPropertyChanged(nameof(IsExpenseTop));
+            OnPropertyChanged(nameof(IsExpenseByCategory));
+            OnPropertyChanged(nameof(IsIncomeByCategory));
         }
 
         [RelayCommand]
@@ -339,5 +384,16 @@ namespace Client.ViewModels
 
             RefreshBalance();
         }
+    }
+
+    public enum ReportSelection
+    {
+        Summary,
+        BalanceAtDate,
+        MothlyDinamics,
+        AccountsTurnover,
+        ExpenseTop, // сделать тоже самое для доходов
+        ExpenseByCategory,
+        IncomeByCategory
     }
 }

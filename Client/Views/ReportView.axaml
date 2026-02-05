@@ -7,103 +7,139 @@
              x:DataType="vm:ReportViewModel">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
       <StackPanel Spacing="12">
-        <TextBlock Text="Отчёт по категориям" FontSize="22"/>
 
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="С:" VerticalAlignment="Center"/>
-          <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
+          <TextBlock Text="Отчёты" FontSize="22"/>
 
-          <TextBlock Text="По:" VerticalAlignment="Center"/>
-          <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Раздел:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding SectionItems}"
+                      SelectedItem="{Binding SelectedSectionItem}"
+                      Width="260">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:ReportViewModel+SectionItem">
+                  <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
 
-          <Button Content="Обновить" Command="{Binding RefreshCommand}" />
-        </StackPanel>
+        <StackPanel IsVisible="{Binding IsSummary}" Spacing="10">
+          <TextBlock Text="Отчёт по категориям" FontSize="22"/>
 
-        <Border Padding="10" CornerRadius="8">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="С:" VerticalAlignment="Center"/>
+            <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
+
+            <TextBlock Text="По:" VerticalAlignment="Center"/>
+            <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
+
+            <Button Content="Обновить" Command="{Binding RefreshCommand}" />
+          </StackPanel>
+
+          <Border Padding="10" CornerRadius="8">
             <StackPanel Spacing="6">
-			    <TextBlock Text="Итог за период" FontSize="18"/>
-                <StackPanel Orientation="Horizontal" Spacing="20">
-				    <TextBlock Text="{Binding TotalIncome, StringFormat=Доходы: {0}}" />
-				    <TextBlock Text="{Binding TotalExpense, StringFormat=Расходы: {0}}" />
-				    <TextBlock Text="{Binding Net, StringFormat=Итог: {0}}" />
-                </StackPanel>
+              <TextBlock Text="Итог за период" FontSize="18"/>
+              <StackPanel Orientation="Horizontal" Spacing="20">
+                <TextBlock Text="{Binding TotalIncome, StringFormat=Доходы: {0}}" />
+                <TextBlock Text="{Binding TotalExpense, StringFormat=Расходы: {0}}" />
+                <TextBlock Text="{Binding Net, StringFormat=Итог: {0}}" />
+              </StackPanel>
             </StackPanel>
-        </Border>
-
-        <TextBlock Text="Баланс на дату" FontSize="18"/>
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="Дата:" VerticalAlignment="Center"/>
-          <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
-          <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
-          <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
+          </Border>
         </StackPanel>
-        <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" Height="200">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
-            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-            <DataGridTextColumn Header="Остаток" Binding="{Binding Balance}" Width="250"/>
-          </DataGrid.Columns>
-        </DataGrid>
 
-        <TextBlock Text="Динамика по месяцам" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" Height="220">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="180"/>
-            <DataGridTextColumn Header="Доходы" Binding="{Binding Income}" Width="*"/>
-            <DataGridTextColumn Header="Расходы" Binding="{Binding Expense}" Width="*"/>
-            <DataGridTextColumn Header="Итог" Binding="{Binding Net}" Width="*"/>
-          </DataGrid.Columns>
-        </DataGrid>
+        <StackPanel IsVisible="{Binding IsBalanceAtDate}" Spacing="10">
+          <TextBlock Text="Баланс на дату" FontSize="18"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Дата:" VerticalAlignment="Center"/>
+            <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
+            <Button Content="Пересчитать" Command="{Binding RefreshBalanceCommand}" />
+            <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0}}" VerticalAlignment="Center"/>
+          </StackPanel>
 
-        <TextBlock Text="График по месяцам" FontSize="18"/>
-        <lvc:CartesianChart Series="{Binding MonthlySeries}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" Height="320"/>
-
-        <TextBlock Text="Отчёт по счетам" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" Height="240">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
-            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-            <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver}" Width="120"/>
-            <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver}" Width="120"/>
-            <DataGridTextColumn Header="Изменения" Binding="{Binding NetChange}" Width="120"/>
-            <DataGridTextColumn Header="Начало" Binding="{Binding Opening}" Width="100"/>
-            <DataGridTextColumn Header="Конец" Binding="{Binding Closing}" Width="100"/>
-          </DataGrid.Columns>
-        </DataGrid>
-
-        <TextBlock Text="Структура расходов (Top-N)" FontSize="18"/>
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="Топ:" VerticalAlignment="Center"/>
-          <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
-          <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма Top-N: {0}}" VerticalAlignment="Center"/>
-          <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
+          <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" Height="200">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
+              <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
+              <DataGridTextColumn Header="Остаток" Binding="{Binding Balance}" Width="250"/>
+            </DataGrid.Columns>
+          </DataGrid>
         </StackPanel>
-        <DataGrid ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" Height="220">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-            <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="150"/>
-            <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent}" Width="100"/>
-          </DataGrid.Columns>
-        </DataGrid>
 
-        <TextBlock Text="Диаграмма расходов (Top-N)" FontSize="18"/>
-        <lvc:PieChart Series="{Binding ExpensePieSeries}" Height="260"/>
+        <StackPanel IsVisible="{Binding IsMonthlyDynamics}" Spacing="10">
+          <TextBlock Text="Динамика по месяцам" FontSize="18"/>
 
-        <TextBlock Text="Расходы" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding ExpenseRows}" AutoGenerateColumns="False" Height="220">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-            <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
-          </DataGrid.Columns>
-        </DataGrid>
+          <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" Height="220">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="180"/>
+              <DataGridTextColumn Header="Доходы" Binding="{Binding Income}" Width="*"/>
+              <DataGridTextColumn Header="Расходы" Binding="{Binding Expense}" Width="*"/>
+              <DataGridTextColumn Header="Итог" Binding="{Binding Net}" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
 
-        <TextBlock Text="Доходы" FontSize="18"/>
-        <DataGrid ItemsSource="{Binding IncomeRows}" AutoGenerateColumns="False" Height="220">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-            <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
-          </DataGrid.Columns>
-        </DataGrid>
+          <TextBlock Text="График по месяцам" FontSize="18"/>
+          <lvc:CartesianChart Series="{Binding MonthlySeries}"
+                             XAxes="{Binding XAxes}"
+                             YAxes="{Binding YAxes}"
+                             Height="320"/>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsAccountsTurnover}" Spacing="10">
+          <TextBlock Text="Отчёт по счетам" FontSize="18"/>
+          <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" Height="240">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
+              <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
+              <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver}" Width="120"/>
+              <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver}" Width="120"/>
+              <DataGridTextColumn Header="Изменения" Binding="{Binding NetChange}" Width="120"/>
+              <DataGridTextColumn Header="Начало" Binding="{Binding Opening}" Width="100"/>
+              <DataGridTextColumn Header="Конец" Binding="{Binding Closing}" Width="100"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsExpenseTop}" Spacing="10">
+          <TextBlock Text="Структура расходов (Top-N)" FontSize="18"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Топ:" VerticalAlignment="Center"/>
+            <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
+            <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма Top-N: {0}}" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <DataGrid ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" Height="220">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+              <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="150"/>
+              <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent}" Width="100"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Диаграмма расходов (Top-N)" FontSize="18"/>
+          <lvc:PieChart Series="{Binding ExpensePieSeries}" Height="260"/>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsExpenseByCategory}" Spacing="10">
+          <TextBlock Text="Расходы" FontSize="18"/>
+          <DataGrid ItemsSource="{Binding ExpenseRows}" AutoGenerateColumns="False" Height="220">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+              <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsIncomeByCategory}" Spacing="10">
+          <TextBlock Text="Доходы" FontSize="18"/>
+          <DataGrid ItemsSource="{Binding IncomeRows}" AutoGenerateColumns="False" Height="220">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+              <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </StackPanel>
    
         <Button Content="Экспорт CSV" Command="{Binding ExportCSVCommand}" />
       </StackPanel>
