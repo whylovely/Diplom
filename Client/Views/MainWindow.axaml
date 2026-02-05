@@ -4,6 +4,7 @@
         xmlns:views="using:Client.Views"
         x:Class="Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        MinWidth="1000" MinHeight="650"
         Width="1000" Height="650"
         Title="FinanceApp">
 
@@ -11,29 +12,38 @@
     <vm:MainWindowViewModel/>
   </Window.DataContext>
 
+  <Window.DataTemplates>
+    <DataTemplate DataType="vm:AccountsViewModel">
+      <views:AccountsView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:CategoriesViewModel">
+      <views:CategoriesView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:JournalViewModel">
+      <views:JournalView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:NewTransactionViewModel">
+      <views:NewTransactionView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:ReportViewModel">
+      <views:ReportView/>
+    </DataTemplate>
+  </Window.DataTemplates>
+
   <DockPanel>
-    <StackPanel DockPanel.Dock="Left" Width="220" Spacing="8" Margin="12">
+    <StackPanel DockPanel.Dock="Left" Width="200" Spacing="8" Margin="12">
       <TextBlock Text="Навигация" FontSize="18"/>
       <Button Content="Счета" Command="{Binding NavigateAccountsCommand}"/>
+      <Button Content="Категории" Command="{Binding NavigateCategoriesCommand}"/>
       <Button Content="Журнал" Command="{Binding NavigateJournalCommand}"/>
+      <Button Content="Отчеты" Command="{Binding NavigateReportCommand}"/>
       <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>
     </StackPanel>
 
-
-    <Border Margin="12" Padding="12" CornerRadius="8">
-      <ContentControl Content="{Binding Current}">
-        <ContentControl.DataTemplates>
-          <DataTemplate DataType="{x:Type vm:AccountsViewModel}">
-            <views:AccountsView/>
-          </DataTemplate>
-          <DataTemplate DataType="{x:Type vm:JournalViewModel}">
-            <views:JournalView/>
-          </DataTemplate>
-          <DataTemplate DataType="{x:Type vm:NewTransactionViewModel}">
-            <views:NewTransactionView/>
-          </DataTemplate>
-        </ContentControl.DataTemplates>
-      </ContentControl>
-    </Border>
+    <ContentControl Content="{Binding Current}" />
   </DockPanel>
 </Window>

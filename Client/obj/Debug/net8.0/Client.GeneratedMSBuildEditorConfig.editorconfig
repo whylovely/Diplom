@@ -17,23 +17,23 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Client
-build_property.ProjectDir = C:\Users\viner\OneDrive\Рабочий стол\diplom\Diplom\Client\
+build_property.ProjectDir = C:\Users\viner_xni4qwc\Desktop\Diplom\Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/App.axaml]
+[C:/Users/viner_xni4qwc/Desktop/Diplom/Client/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/AccountsView.axaml]
+[C:/Users/viner_xni4qwc/Desktop/Diplom/Client/Views/AccountsView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/JournalView.axaml]
+[C:/Users/viner_xni4qwc/Desktop/Diplom/Client/Views/JournalView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/MainWindow.axaml]
+[C:/Users/viner_xni4qwc/Desktop/Diplom/Client/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/viner/OneDrive/Рабочий стол/diplom/Diplom/Client/Views/NewTransactionView.axaml]
+[C:/Users/viner_xni4qwc/Desktop/Diplom/Client/Views/NewTransactionView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

@@ -1,32 +1,93 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Client.ViewModels"
-             xmlns:models="using:Client.Models"
              x:Class="Client.Views.NewTransactionView"
              x:DataType="vm:NewTransactionViewModel">
-  <StackPanel Spacing="10">
-    <TextBlock Text="Новая операция" FontSize="22"/>
+
+  <StackPanel Spacing="12">
+
+    <TextBlock Text="Новая операция"
+               FontSize="22"
+               FontWeight="Bold"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="16">
+        <RadioButton Content="Расход"
+                     IsChecked="{Binding IsExpense}"
+                     Command="{Binding SetExpenseCommand}" />
+
+        <RadioButton Content="Доход"
+                     IsChecked="{Binding IsIncome}"
+                     Command="{Binding SetIncomeCommand}" />
+
+        <RadioButton Content="Перевод"
+                     IsChecked="{Binding IsTransfer}"
+                     Command="{Binding SetTransferCommand}" />
+    </StackPanel>
+
+    <Separator/>
 
     <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Тип:" Width="80"/>
-      <ComboBox ItemsSource="{Binding KindValues}" 
-                SelectedItem="{Binding Kind}"
-                Width="200"/>
+      <TextBlock Text="Дата:" Width="90"/>
+      <DatePicker SelectedDate="{Binding Date}" Width="300"/>
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Дата:" Width="80"/>
-      <DatePicker SelectedDate="{Binding Date}" Width="200"/>
+      <TextBlock Text="Описание:" Width="90"/>
+      <TextBox Text="{Binding Description}" Width="400"/>
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Описание:" Width="80"/>
-      <TextBox Text="{Binding Description}" Width="420"/>
+    <StackPanel Orientation="Horizontal"
+                Spacing="10"
+                IsVisible="{Binding IsSingleAccount}">
+      <TextBlock Text="Счет:" Width="90"/>
+      <ComboBox ItemsSource="{Binding Accounts}"
+                SelectedItem="{Binding FromAccount}"
+                Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Счет:" Width="80"/>
-      <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding FromAccount}" Width="260">
+    <StackPanel Orientation="Horizontal"
+                Spacing="10"
+                IsVisible="{Binding IsTransfer}">
+      <TextBlock Text="Откуда:" Width="90"/>
+      <ComboBox ItemsSource="{Binding Accounts}"
+                SelectedItem="{Binding FromAccount}"
+                Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal"
+                Spacing="10"
+                IsVisible="{Binding IsTransfer}">
+      <TextBlock Text="Куда:" Width="90"/>
+      <ComboBox ItemsSource="{Binding Accounts}"
+                SelectedItem="{Binding ToAccount}"
+                Width="260">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal"
+                Spacing="10"
+                IsVisible="{Binding IsCategoryRequire}">
+      <TextBlock Text="Категория:" Width="90"/>
+      <ComboBox ItemsSource="{Binding FilteredCategories}"
+                SelectedItem="{Binding Category}"
+                Width="260">
         <ComboBox.ItemTemplate>
           <DataTemplate>
             <TextBlock Text="{Binding Name}"/>
@@ -36,32 +97,16 @@
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Куда:" Width="80"/>
-      <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding ToAccount}" Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Категория:" Width="80"/>
-      <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Сумма:" Width="80"/>
+      <TextBlock Text="Сумма:" Width="90"/>
       <TextBox Text="{Binding Amount}" Width="200"/>
     </StackPanel>
 
-    <Button Content="Провести" Command="{Binding PostCommand}" Width="140"/>
+    <Separator/>
+
+    <Button Content="Провести"
+            Command="{Binding PostCommand}"
+            Width="160"
+            HorizontalAlignment="Left"/>
+
   </StackPanel>
 </UserControl>

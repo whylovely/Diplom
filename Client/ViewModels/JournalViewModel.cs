@@ -14,15 +14,14 @@ namespace Client.ViewModels
         {
             _data = data;
             Transactions = new ObservableCollection<Transaction>(_data.Transactions);
+            _data.DataChanged += Refresh;
         }
 
         public void Refresh()
         {
             Transactions.Clear();
             foreach (var tx in _data.Transactions)
-            {
                 Transactions.Add(tx);
-            }
         }
     }
 }

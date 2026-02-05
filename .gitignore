@@ -1,1 +1,56 @@
+Client\bin\
+Client\obj\
+out/
+.idea/
 .vs/
+.vscode/
+
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.dotCover
+.nuget/
+
+# Avalonia compiled XAML cache
+*.axaml.cache
+*.axaml.g.cs
+
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+.nfs*
+
+# macOS
+.DS_Store
+
+#
+
+publish/
+artifacts/
+
+TestResults/
+
+appsettings.Development.json
+appsettings.Local.json
+
+*.db
+*.sqlite
+*.sqlite3
+
+coverage/
+coverage.xml
+\Client\bin\Debug\net8.0
+\Client\obj
+\Client\obj\Debug\net8.0

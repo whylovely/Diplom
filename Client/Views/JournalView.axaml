@@ -15,7 +15,6 @@
             <StackPanel>
               <TextBlock Text="{Binding Date}" />
               <TextBlock Text="{Binding Description}" FontSize="16"/>
-              <TextBlock Text="{Binding Entries.Count, StringFormat=Проводок: {0}}" />
             </StackPanel>
           </Border>
         </DataTemplate>
