@@ -4,24 +4,30 @@
              xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
              x:Class="Client.Views.CategoriesView"
              x:DataType="vm:CategoriesViewModel">
-
-  <DockPanel LastChildFill="True" Margin="0">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+  
     <StackPanel Spacing="10" >
       <TextBlock Text="Категории" FontSize="22"/>
       <Button Content="Добавить" Command="{Binding AddCommand}"/>
-      <Button Content="Переименовать" Command="{Binding RenameCommand}"/>
-      <Button Content="Удалить" Command="{Binding DeleteCommand}"/>
-    </StackPanel>
-    
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <dg:DataGrid ItemsSource="{Binding Categories}"
-                     SelectedItem="{Binding Selected}"
-                     AutoGenerateColumns="False"
-                     Height="420">
-          <dg:DataGrid.Columns>
-            <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
-          </dg:DataGrid.Columns>
-        </dg:DataGrid>
-    </ScrollViewer>
-  </DockPanel>
+   
+      <dg:DataGrid x:Name="CategoriesGrid"
+                   ItemsSource="{Binding Categories}"
+                   SelectedItem="{Binding Selected}"
+                   AutoGenerateColumns="False"
+                   Height="420"
+                   IsReadOnly="True">
+
+        <dg:DataGrid.ContextMenu>
+          <ContextMenu x:CompileBindings="False">
+            <MenuItem Header="Переименовать" Command="{Binding RenameCommand}" />
+            <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" />
+          </ContextMenu>
+        </dg:DataGrid.ContextMenu>
+
+        <dg:DataGrid.Columns>
+          <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
+        </dg:DataGrid.Columns>
+      </dg:DataGrid>
+        </StackPanel>
+  </ScrollViewer>
 </UserControl>

@@ -95,7 +95,7 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _totalExpense;
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
 
-        [RelayCommand]
+        //[RelayCommand]
         private decimal RefreshExpenseRows()
         {
             ExpenseRows.Clear();
@@ -131,7 +131,7 @@ namespace Client.ViewModels
         public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
         [ObservableProperty] private decimal _totalIncome;
 
-        [RelayCommand]
+        //[RelayCommand]
         private decimal RefreshIncomeRows()
         {
             IncomeRows.Clear();
