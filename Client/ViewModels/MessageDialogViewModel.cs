@@ -1,22 +1,26 @@
-﻿using Avalonia.Controls;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Avalonia.Controls;
 
 namespace Client.ViewModels;
 
-public sealed class MessageDialogViewModel
+public sealed partial class MessageDialogViewModel : ViewModelBase
 {
-    private readonly Window _wnd;
-
     public string Title { get; }
     public string Message { get; }
 
-    public IRelayCommand CloseCommand { get; }
+    private readonly Window _window;
 
-    public MessageDialogViewModel(Window wnd, string title, string message)
+    public MessageDialogViewModel(Window window, string title, string message)
     {
-        _wnd = wnd;
+        _window = window;
         Title = title;
         Message = message;
-        CloseCommand = new RelayCommand(() => _wnd.Close());
+    }
+
+    [RelayCommand]
+    private void Close()
+    {
+        _window.Close();
     }
 }

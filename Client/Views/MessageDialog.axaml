@@ -2,16 +2,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Client.ViewModels"
         x:Class="Client.Views.MessageDialog"
-        Width="420" Height="200"
+        x:DataType="vm:MessageDialogViewModel"
+        Width="420"
+        Height="200"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        Title="{Binding Title}"
-        x:DataType="vm:MessageDialogViewModel">
+        Title="{Binding Title}">
 
   <StackPanel Margin="16" Spacing="12">
-    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14"/>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-      <Button Content="OK" Width="90" IsDefault="True" Command="{Binding CloseCommand}"/>
+
+    <TextBlock Text="{Binding Message}"
+               TextWrapping="Wrap"
+               FontSize="14"/>
+
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+
+      <Button Content="OK"
+              Width="90"
+              IsDefault="True"
+              Command="{Binding CloseCommand}" />
     </StackPanel>
+
   </StackPanel>
 </Window>
