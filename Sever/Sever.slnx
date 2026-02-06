@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="Server.csproj" />
-  <Project Path="Shared/Shared.csproj" />
-</Solution>
