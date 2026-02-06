@@ -1,7 +1,6 @@
-﻿namespace Server.DTO;
+﻿namespace Shared;
 
 public sealed record AccountDto(Guid Id, string Name, string CurrencyCode, int Type, decimal InitialBalance);
-public sealed record CategoryDto(Guid Id, string Name);
 
 public sealed record MoneyDto(decimal Amount, string CurrencyCode);
 
@@ -20,7 +19,6 @@ public sealed record TransactionDto(
     IReadOnlyList<EntryDto> Entries
 );
 
-// запрос на создание транзакции
 public sealed record CreateTransactionRequest(
     DateTimeOffset Date,
     string Description,

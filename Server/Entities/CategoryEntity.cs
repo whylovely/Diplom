@@ -1,9 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Server.Entities;
+﻿namespace Server.Entities;
 
 public sealed class CategoryEntity
 {
-    [Key] public Guid Id { get; set; } = Guid.NewGuid();
-    [Required] public string Name { get; set; } = "";
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; } = default!;
+
+    public string Name { get; set; } = default!;
+
+    // Soft delete
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 }

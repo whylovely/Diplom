@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Entities;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace Server.Data;
 
@@ -9,19 +7,32 @@ public sealed class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
+    public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<CategoryEntity> Categories => Set<CategoryEntity>();
-    public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
-    public DbSet<EntryEntity> Entries => Set<EntryEntity>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder b)
     {
-        modelBuilder.Entity<TransactionEntity>()
-            .HasMany(t => t.Entries)
-            .WithOne(e => e.Transaction!)
-            .HasForeignKey(e => e.TransactionId)
-            .OnDelete(DeleteBehavior.Cascade);
+        base.OnModelCreating(b);
 
-        base.OnModelCreating(modelBuilder);
+        b.Entity<UserEntity>(e =>
+        {
+            e.HasIndex(x => x.Email).IsUnique();
+            e.Property(x => x.Email).HasMaxLength(256).IsRequired();
+            e.Property(x => x.PasswordHash).IsRequired();
+        });
+
+        b.Entity<CategoryEntity>(e =>
+        {
+            e.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasIndex(x => new { x.UserId, x.Name })
+             .IsUnique()
+             .HasFilter("\"IsDeleted\" = false");
+        });
     }
 }
