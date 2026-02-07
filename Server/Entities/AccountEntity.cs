@@ -1,23 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Server.Entities;
-
-public enum AccountType
-{
-    Assets = 1,
-    Income = 2,
-    Expenses = 3,
-    Liability = 4,
-}
+﻿namespace Server.Entities;
 
 public sealed class AccountEntity
 {
-    [Key] public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    [Required] public string Name { get; set; } = "";
-    [Required] public string CurrencyCode { get; set; } = "RUB";
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; } = default!;
 
-    public AccountType Type { get; set; } = AccountType.Assets;
+    public string Name { get; set; } = default!;
+    public int Kind { get; set; }          
+    public string Currency { get; set; } = "RUB"; 
 
-    public decimal InitialBalance { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 }

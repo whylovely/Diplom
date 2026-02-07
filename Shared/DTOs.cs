@@ -1,6 +1,4 @@
-﻿namespace Shared;
-
-public sealed record AccountDto(Guid Id, string Name, string CurrencyCode, int Type, decimal InitialBalance);
+namespace Shared;
 
 public sealed record MoneyDto(decimal Amount, string CurrencyCode);
 
