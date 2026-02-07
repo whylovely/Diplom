@@ -1,14 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Server.Entities;
+﻿namespace Server.Entities;
 
 public sealed class TransactionEntity
 {
-    [Key] public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; } = default!;
 
-    public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
-
-    public string Description { get; set; } = "";
+    public DateTimeOffset Date { get; set; }
+    public string? Description { get; set; }
 
     public List<EntryEntity> Entries { get; set; } = new();
 }

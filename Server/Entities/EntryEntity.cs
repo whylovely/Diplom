@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Server.Entities;
+﻿namespace Server.Entities;
 
 public enum EntryDirection
 {
@@ -11,16 +8,21 @@ public enum EntryDirection
 
 public sealed class EntryEntity
 {
-    [Key] public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    [ForeignKey(nameof(Transaction))] public Guid TransactionId { get; set; }
-    public TransactionEntity? Transaction { get; set; }
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; } = default!;
+
+    public Guid TransactionId { get; set; }
+    public TransactionEntity Transaction { get; set; } = default!;
 
     public Guid AccountId { get; set; }
-    public Guid CategoryId { get; set; }
+    public AccountEntity Account { get; set; } = default!;
 
-    public EntryDirection Direction { get; set; }
+    public Guid? CategoryId { get; set; }
+    public CategoryEntity? Category { get; set; }
 
+    public int Direction { get; set; }
     public decimal Amount { get; set; }
-    public string CurrencyCode { get; set; } = "RUB";
+    public string Currency { get; set; } = default!;
 }

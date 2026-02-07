@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Server.Data;
 using Server.Entities;
+using Shared.Auth;
 
 namespace Server.Controllers;
 

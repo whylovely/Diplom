@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Server.Auth;
 using Server.Data;
 using Server.Entities;
+using Shared.Categories;
+using Shared.Accounts;
+using Shared.Auth;
 
 namespace Server.Controllers;
 

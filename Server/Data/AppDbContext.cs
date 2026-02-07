@@ -49,5 +49,29 @@ public sealed class AppDbContext : DbContext
              .IsUnique()
              .HasFilter("\"IsDeleted\" = false");
         });
+
+        b.Entity<TransactionEntity>(e =>
+        {
+            e.Property(x => x.Description).HasMaxLength(500);
+            e.HasMany(x => x.Entries)
+             .WithOne(x => x.Transaction)
+             .HasForeignKey(x => x.TransactionId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasIndex(x => new { x.UserId, x.Date });
+        });
+
+        b.Entity<EntryEntity>(e =>
+        {
+            e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
+            e.HasIndex(x => new { x.UserId, x.AccountId });
+            e.HasIndex(x => new { x.UserId, x.CategoryId });
+            e.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(x => x.Category).WithMany().HasForeignKey(x => x.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
     }
 }
