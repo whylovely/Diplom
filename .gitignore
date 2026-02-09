@@ -1,5 +1,7 @@
-Client\bin\
-Client\obj\
+./Client/bin/
+./Client/obj/
+./Server/bin/
+./Server/obj/
 out/
 .idea/
 .vs/
