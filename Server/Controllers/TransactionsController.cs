@@ -5,6 +5,7 @@ using Server.Auth;
 using Server.Data;
 using Server.Entities;
 using Shared.Transactions;
+using EntryDirection = Shared.Transactions.EntryDirection;
 
 namespace Server.Controllers;
 

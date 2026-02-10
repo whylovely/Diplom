@@ -25,7 +25,9 @@ public sealed class AccountsController : ControllerBase
         var items = await _db.Accounts
             .Where(x => x.UserId == userId && !x.IsDeleted)
             .OrderBy(x => x.Name)
-            .Select(x => new AccountDto(x.Id, x.Name, (AccountKind)x.Kind, x.Currency))
+            .Select(x => new AccountDto(
+                x.Id, x.Name, (AccountKind)x.Kind, x.Currency,
+                (MultiCurrencyType)x.AccountType, x.SecondaryCurrency, x.ExchangeRate))
             .ToListAsync(ct);
 
         return Ok(items);
@@ -38,7 +40,9 @@ public sealed class AccountsController : ControllerBase
 
         var item = await _db.Accounts
             .Where(x => x.UserId == userId && !x.IsDeleted && x.Id == id)
-            .Select(x => new AccountDto(x.Id, x.Name, (AccountKind)x.Kind, x.Currency))
+            .Select(x => new AccountDto(
+                x.Id, x.Name, (AccountKind)x.Kind, x.Currency,
+                (MultiCurrencyType)x.AccountType, x.SecondaryCurrency, x.ExchangeRate))
             .SingleOrDefaultAsync(ct);
 
         return item is null ? NotFound() : Ok(item);
@@ -60,6 +64,28 @@ public sealed class AccountsController : ControllerBase
         if (!Enum.IsDefined(typeof(AccountKind), req.Kind))
             return BadRequest("Invalid account kind.");
 
+        // Валидация мультивалютного счёта
+        if (!Enum.IsDefined(typeof(MultiCurrencyType), req.AccountType))
+            return BadRequest("Invalid account type.");
+
+        string? secondaryCurrency = null;
+        decimal? exchangeRate = null;
+
+        if (req.AccountType == MultiCurrencyType.MultiCurrency)
+        {
+            secondaryCurrency = (req.SecondaryCurrency ?? "").Trim().ToUpperInvariant();
+            if (secondaryCurrency.Length != 3)
+                return BadRequest("SecondaryCurrency must be a 3-letter ISO code.");
+
+            if (secondaryCurrency == currency)
+                return BadRequest("SecondaryCurrency must differ from the primary Currency.");
+
+            if (req.ExchangeRate is null or <= 0)
+                return BadRequest("ExchangeRate must be greater than 0 for multi-currency accounts.");
+
+            exchangeRate = req.ExchangeRate;
+        }
+
         var exists = await _db.Accounts.AnyAsync(
             x => x.UserId == userId && !x.IsDeleted && x.Name == name, ct);
 
@@ -70,13 +96,19 @@ public sealed class AccountsController : ControllerBase
             UserId = userId,
             Name = name,
             Kind = (int)req.Kind,
-            Currency = currency
+            Currency = currency,
+            AccountType = (int)req.AccountType,
+            SecondaryCurrency = secondaryCurrency,
+            ExchangeRate = exchangeRate
         };
 
         _db.Accounts.Add(entity);
         await _db.SaveChangesAsync(ct);
 
-        var dto = new AccountDto(entity.Id, entity.Name, (AccountKind)entity.Kind, entity.Currency);
+        var dto = new AccountDto(
+            entity.Id, entity.Name, (AccountKind)entity.Kind, entity.Currency,
+            (MultiCurrencyType)entity.AccountType, entity.SecondaryCurrency, entity.ExchangeRate);
+
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, dto);
     }
 
@@ -101,6 +133,28 @@ public sealed class AccountsController : ControllerBase
         if (!Enum.IsDefined(typeof(AccountKind), req.Kind))
             return BadRequest("Invalid account kind.");
 
+        // Валидация мультивалютного счёта
+        if (!Enum.IsDefined(typeof(MultiCurrencyType), req.AccountType))
+            return BadRequest("Invalid account type.");
+
+        string? secondaryCurrency = null;
+        decimal? exchangeRate = null;
+
+        if (req.AccountType == MultiCurrencyType.MultiCurrency)
+        {
+            secondaryCurrency = (req.SecondaryCurrency ?? "").Trim().ToUpperInvariant();
+            if (secondaryCurrency.Length != 3)
+                return BadRequest("SecondaryCurrency must be a 3-letter ISO code.");
+
+            if (secondaryCurrency == currency)
+                return BadRequest("SecondaryCurrency must differ from the primary Currency.");
+
+            if (req.ExchangeRate is null or <= 0)
+                return BadRequest("ExchangeRate must be greater than 0 for multi-currency accounts.");
+
+            exchangeRate = req.ExchangeRate;
+        }
+
         var exists = await _db.Accounts.AnyAsync(
             x => x.UserId == userId && !x.IsDeleted && x.Name == name && x.Id != id, ct);
 
@@ -109,10 +163,15 @@ public sealed class AccountsController : ControllerBase
         entity.Name = name;
         entity.Kind = (int)req.Kind;
         entity.Currency = currency;
+        entity.AccountType = (int)req.AccountType;
+        entity.SecondaryCurrency = secondaryCurrency;
+        entity.ExchangeRate = exchangeRate;
 
         await _db.SaveChangesAsync(ct);
 
-        return Ok(new AccountDto(entity.Id, entity.Name, (AccountKind)entity.Kind, entity.Currency));
+        return Ok(new AccountDto(
+            entity.Id, entity.Name, (AccountKind)entity.Kind, entity.Currency,
+            (MultiCurrencyType)entity.AccountType, entity.SecondaryCurrency, entity.ExchangeRate));
     }
 
     // Soft delete

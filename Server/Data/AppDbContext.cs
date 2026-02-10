@@ -9,6 +9,9 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<CategoryEntity> Categories => Set<CategoryEntity>();
+    public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
+    public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
+    public DbSet<EntryEntity> Entries => Set<EntryEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -39,6 +42,8 @@ public sealed class AppDbContext : DbContext
         {
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
             e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
+            e.Property(x => x.SecondaryCurrency).HasMaxLength(3);
+            e.Property(x => x.ExchangeRate).HasColumnType("decimal(18,6)");
 
             e.HasOne(x => x.User)
              .WithMany()
