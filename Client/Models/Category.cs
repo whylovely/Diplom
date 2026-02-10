@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Client.Models
 {
@@ -28,5 +29,21 @@ namespace Client.Models
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Total { get; set; }
+    }
+
+    /// <summary>Строка детализации по дню внутри категории.</summary>
+    public sealed class DailyDetailRow
+    {
+        public string Date { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string? Description { get; set; }
+    }
+
+    /// <summary>Группа: категория → итого + развёрнутые дни.</summary>
+    public sealed class CategoryDetailGroup
+    {
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+        public List<DailyDetailRow> Days { get; set; } = new();
     }
 }

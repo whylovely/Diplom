@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Client.ViewModels"
+             xmlns:m="using:Client.Models"
              xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
              x:Class="Client.Views.ReportView"
@@ -123,26 +124,62 @@
         </StackPanel>
 
         <StackPanel IsVisible="{Binding IsExpenseByCategory}" Spacing="10">
-          <TextBlock Text="Расходы" FontSize="18"/>
-          <DataGrid ItemsSource="{Binding ExpenseRows}" AutoGenerateColumns="False" Height="220">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-              <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
-            </DataGrid.Columns>
-          </DataGrid>
+          <TextBlock Text="Расходы по категориям" FontSize="18"/>
+          <TextBlock Text="{Binding TotalExpense, StringFormat=Итого расходов: {0:N2}}" FontSize="14" Margin="0,0,0,4"/>
+          <ItemsControl ItemsSource="{Binding ExpenseGroups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="m:CategoryDetailGroup">
+                <Expander Margin="0,2" HorizontalAlignment="Stretch">
+                  <Expander.Header>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                  </Expander.Header>
+                  <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
+                            IsReadOnly="True" HeadersVisibility="Column"
+                            MaxHeight="300">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
+                      <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                      <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                    </DataGrid.Columns>
+                  </DataGrid>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
         </StackPanel>
 
         <StackPanel IsVisible="{Binding IsIncomeByCategory}" Spacing="10">
-          <TextBlock Text="Доходы" FontSize="18"/>
-          <DataGrid ItemsSource="{Binding IncomeRows}" AutoGenerateColumns="False" Height="220">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-              <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="200"/>
-            </DataGrid.Columns>
-          </DataGrid>
+          <TextBlock Text="Доходы по категориям" FontSize="18"/>
+          <TextBlock Text="{Binding TotalIncome, StringFormat=Итого доходов: {0:N2}}" FontSize="14" Margin="0,0,0,4"/>
+          <ItemsControl ItemsSource="{Binding IncomeGroups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="m:CategoryDetailGroup">
+                <Expander Margin="0,2" HorizontalAlignment="Stretch">
+                  <Expander.Header>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                  </Expander.Header>
+                  <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
+                            IsReadOnly="True" HeadersVisibility="Column"
+                            MaxHeight="300">
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
+                      <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                      <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                    </DataGrid.Columns>
+                  </DataGrid>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
         </StackPanel>
    
-        <Button Content="Экспорт CSV" Command="{Binding ExportCSVCommand}" />
+        <Button Content="Экспорт отчета" Command="{Binding ExportCSVCommand}" />
       </StackPanel>
     </ScrollViewer>
 </UserControl>

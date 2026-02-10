@@ -7,6 +7,7 @@ using LiveChartsCore;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -41,6 +42,8 @@ namespace Client.ViewModels
             TotalExpense = RefreshExpenseRows();
             TotalIncome = RefreshIncomeRows();
             Net = TotalIncome - TotalExpense;
+            RefreshExpenseGroups();
+            RefreshIncomeGroups();
             RefreshMonthlyRows();
             RefreshMonthlyChart();
             RefreshExpenseChart();
@@ -125,6 +128,49 @@ namespace Client.ViewModels
 
             return ExpenseRows.Sum(r => r.Total);
         }
+
+        // Группировка расходов по категориям с детализацией по дням
+        public ObservableCollection<CategoryDetailGroup> ExpenseGroups { get; } = new();
+
+        private void RefreshExpenseGroups()
+        {
+            ExpenseGroups.Clear();
+            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            var accountById = _data.Accounts.ToDictionary(a => a.Id);
+
+            var groups = txInRange
+                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
+                .Where(x =>
+                {
+                    var acc = accountById[x.Entry.AccountId];
+                    return acc.Type == AccountType.Expense && x.Entry.Direction == EntryDirection.Debit;
+                })
+                .GroupBy(x => x.Entry.CategoryId)
+                .Select(g =>
+                {
+                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                    var days = g
+                        .GroupBy(x => x.Tx.Date.Date)
+                        .OrderBy(d => d.Key)
+                        .Select(d => new DailyDetailRow
+                        {
+                            Date = d.Key.ToString("dd.MM.yyyy"),
+                            Amount = d.Sum(x => x.Entry.Amount.Amount),
+                            Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
+                        })
+                        .ToList();
+
+                    return new CategoryDetailGroup
+                    {
+                        CategoryName = catName,
+                        Total = g.Sum(x => x.Entry.Amount.Amount),
+                        Days = days
+                    };
+                })
+                .OrderByDescending(r => r.Total);
+
+            foreach (var group in groups) ExpenseGroups.Add(group);
+        }
         //
 
         // Подсчет Доходов
@@ -160,6 +206,49 @@ namespace Client.ViewModels
             foreach (var row in incomeGroups) IncomeRows.Add(row);
 
             return IncomeRows.Sum(r => r.Total);
+        }
+
+        // Группировка доходов по категориям с детализацией по дням
+        public ObservableCollection<CategoryDetailGroup> IncomeGroups { get; } = new();
+
+        private void RefreshIncomeGroups()
+        {
+            IncomeGroups.Clear();
+            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            var accountById = _data.Accounts.ToDictionary(a => a.Id);
+
+            var groups = txInRange
+                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
+                .Where(x =>
+                {
+                    var acc = accountById[x.Entry.AccountId];
+                    return acc.Type == AccountType.Income && x.Entry.Direction == EntryDirection.Credit;
+                })
+                .GroupBy(x => x.Entry.CategoryId)
+                .Select(g =>
+                {
+                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                    var days = g
+                        .GroupBy(x => x.Tx.Date.Date)
+                        .OrderBy(d => d.Key)
+                        .Select(d => new DailyDetailRow
+                        {
+                            Date = d.Key.ToString("dd.MM.yyyy"),
+                            Amount = d.Sum(x => x.Entry.Amount.Amount),
+                            Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
+                        })
+                        .ToList();
+
+                    return new CategoryDetailGroup
+                    {
+                        CategoryName = catName,
+                        Total = g.Sum(x => x.Entry.Amount.Amount),
+                        Days = days
+                    };
+                })
+                .OrderByDescending(r => r.Total);
+
+            foreach (var group in groups) IncomeGroups.Add(group);
         }
         //
 
