@@ -12,7 +12,7 @@ public class ObligationEntity
     public required string Counterparty { get; set; }
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "RUB";
-    public int Type { get; set; } // 0 = Debt, 1 = Credit
+    public int Type { get; set; } // 0 = я должен, 1 = мне должны
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? DueDate { get; set; }
