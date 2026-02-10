@@ -12,6 +12,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
     public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
     public DbSet<EntryEntity> Entries => Set<EntryEntity>();
+    public DbSet<ObligationEntity> Obligations => Set<ObligationEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -76,6 +77,19 @@ public sealed class AppDbContext : DbContext
 
             e.HasOne(x => x.Category).WithMany().HasForeignKey(x => x.CategoryId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        b.Entity<ObligationEntity>(e =>
+        {
+            e.Property(x => x.Counterparty).HasMaxLength(200).IsRequired();
+            e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
+            
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasQueryFilter(x => !x.IsDeleted);
         });
 
     }
