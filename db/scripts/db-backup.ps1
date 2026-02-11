@@ -1,4 +1,3 @@
-# Сохраняет текущую базу в db/backup/seed.dump
 $container = "finance_pg"
 $db = "finance"
 $user = "finance_user"

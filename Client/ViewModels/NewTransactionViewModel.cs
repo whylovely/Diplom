@@ -225,7 +225,8 @@ namespace Client.ViewModels
                     }
 
                 default:
-                    throw new InvalidOperationException("Неизвестный тип операции");    // Изменить на async
+                    await _notify.ShowErrorAsync("Неизвестный тип операции");
+                    return;
             }
 
             _data.PostTransaction(tx);

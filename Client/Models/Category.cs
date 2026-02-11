@@ -31,7 +31,7 @@ namespace Client.Models
         public decimal Total { get; set; }
     }
 
-    /// <summary>Строка детализации по дню внутри категории.</summary>
+    // Детализация внутри категории по дню
     public sealed class DailyDetailRow
     {
         public string Date { get; set; } = string.Empty;
@@ -39,7 +39,7 @@ namespace Client.Models
         public string? Description { get; set; }
     }
 
-    /// <summary>Группа: категория → итого + развёрнутые дни.</summary>
+    // Группировка по категории
     public sealed class CategoryDetailGroup
     {
         public string CategoryName { get; set; } = string.Empty;

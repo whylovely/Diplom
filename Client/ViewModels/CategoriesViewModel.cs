@@ -21,7 +21,10 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     [ObservableProperty]
     private Category? _selected;
 
-    public CategoriesViewModel(IDataService data, INotificationService notify, ICategoryDialogService catDialog)
+    public CategoriesViewModel(
+        IDataService data, 
+        INotificationService notify, 
+        ICategoryDialogService catDialog)
     {
         _data = data;
         _notify = notify;
@@ -42,7 +45,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     private bool HasSelection() => Selected is not null;
 
     [RelayCommand]
-    private async Task AddAsync()
+    private async Task AddAsync()   // Добавление категории
     {
         var created = await _catDialog.ShowAddCategoryDialogAsync();
         if (created is null) return;
@@ -60,7 +63,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task RenameAsync()
+    private async Task RenameAsync()    // Переименование ктегории
     {
         if (Selected is null) return;
 
@@ -82,7 +85,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task DeleteAsync()
+    private async Task DeleteAsync()    // Удаление категории
     {
         if (Selected is null) return;
 

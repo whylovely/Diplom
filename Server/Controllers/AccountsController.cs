@@ -64,7 +64,6 @@ public sealed class AccountsController : ControllerBase
         if (!Enum.IsDefined(typeof(AccountKind), req.Kind))
             return BadRequest("Invalid account kind.");
 
-        // Валидация мультивалютного счёта
         if (!Enum.IsDefined(typeof(MultiCurrencyType), req.AccountType))
             return BadRequest("Invalid account type.");
 
@@ -133,7 +132,6 @@ public sealed class AccountsController : ControllerBase
         if (!Enum.IsDefined(typeof(AccountKind), req.Kind))
             return BadRequest("Invalid account kind.");
 
-        // Валидация мультивалютного счёта
         if (!Enum.IsDefined(typeof(MultiCurrencyType), req.AccountType))
             return BadRequest("Invalid account type.");
 
@@ -185,7 +183,6 @@ public sealed class AccountsController : ControllerBase
 
         if (entity is null) return NotFound();
 
-        // TODO: запрет удаления, если счет используется в Entries/Transactions.
         entity.IsDeleted = true;
         entity.DeletedAt = DateTimeOffset.UtcNow;
 

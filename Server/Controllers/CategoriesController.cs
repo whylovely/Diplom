@@ -108,7 +108,6 @@ public sealed class CategoriesController : ControllerBase
 
         if (entity is null) return NotFound();
 
-        // позже: запрет удаления, если категория используется в проводках.
         entity.IsDeleted = true;
         entity.DeletedAt = DateTimeOffset.UtcNow;
 

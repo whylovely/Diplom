@@ -48,7 +48,7 @@ namespace Client.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddAccount()
+        private async Task AddAccount() // Добавления счета
         {
             var name = "Новый счет";
             var currency = "RUB";
@@ -83,7 +83,7 @@ namespace Client.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task RenameAccountAsync()
+        private async Task RenameAccountAsync() // Переименование счета
         {
             var acc = SelectedAccount;
 
@@ -111,7 +111,7 @@ namespace Client.ViewModels
             _data.RenameAccount(acc.Id, newName);
             acc.Name = newName;
 
-            var idx = Accounts.ToList().FindIndex(a => a.Id == acc.Id); // Подумать почему не обновляется на экране (обновляется только если уйти в другой экран и вернуться)
+            var idx = Accounts.ToList().FindIndex(a => a.Id == acc.Id); 
             if (idx >= 0)
             {
                 await _notify.ShowInfoAsync($"idx={idx}, count={Accounts.Count}");
@@ -123,7 +123,7 @@ namespace Client.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task DeleteAccountAsync()
+        private async Task DeleteAccountAsync() // Удаление счета
         {
             var acc = SelectedAccount;
 
@@ -142,14 +142,14 @@ namespace Client.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickExpense()
+        private void QuickExpense() // кнопка "Быстрый расход"
         {
             if (_onQuickTx is null) return;
             _onQuickTx(SelectedAccount!, TxKindChoice.Expense);
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickIncome()
+        private void QuickIncome()  // кнопка "Быстрый доход"
         {
             if (_onQuickTx is null) return;
             _onQuickTx(SelectedAccount!, TxKindChoice.Income);

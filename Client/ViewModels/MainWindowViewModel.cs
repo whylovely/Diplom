@@ -37,12 +37,17 @@ namespace Client.ViewModels
 
             JournalVm = new JournalViewModel(_data);
 
-            NewTxVm = new NewTransactionViewModel(_data, _notify, onPosted: () =>
+            NewTxVm = new NewTransactionViewModel(
+                _data, 
+                _notify, 
+                onPosted: () =>
             {
                 JournalVm.Refresh();
                 Current = JournalVm;
             });
+
             ReportVm = new ReportViewModel(_data);
+            
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
 
             _current = AccountsVm;

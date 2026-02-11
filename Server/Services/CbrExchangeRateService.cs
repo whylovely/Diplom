@@ -48,7 +48,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
         catch (Exception ex)
         {
              Console.WriteLine($"Error fetching crypto rates: {ex.Message}");
-             // Fallback to approximate values if API fails
              var usdRate = rates.FirstOrDefault(r => r.Currency == "USD")?.Rate ?? 95m;
              rates.Add(new ExchangeRateDto("USDT", usdRate, DateTimeOffset.UtcNow));
              rates.Add(new ExchangeRateDto("BTC", 96000 * usdRate, DateTimeOffset.UtcNow));
@@ -63,7 +62,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
     {
         var rates = await GetRatesAsync(ct);
         
-        // RUB is the base currency (Rate = 1)
         if (!rates.Any(r => r.Currency == "RUB"))
         {
             rates.Add(new ExchangeRateDto("RUB", 1m, DateTimeOffset.UtcNow));
@@ -74,11 +72,10 @@ public sealed class CbrExchangeRateService : IExchangeRateService
 
         if (fromRate is null || toRate is null || toRate == 0) return null;
 
-        // Formula: Amount * FromRate (to RUB) / ToRate (to Target)
+        //Формула = Amount * FromRate / ToRate
         return (amount * fromRate.Value) / toRate.Value;
     }
 
-    // New helper to fetch raw USD prices
     private async Task<Dictionary<string, decimal>> FetchCryptoUsdPricesAsync(CancellationToken ct)
     {
         // Using CoinGecko Public API

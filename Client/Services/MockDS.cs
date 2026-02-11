@@ -14,7 +14,7 @@ namespace Client.Services
         private readonly List<Category> _categories = new();
         private readonly List<Transaction> _tx = new();
             
-        private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();    // быстрый поиск без перебора
+        private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();   
         private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId = new();
 
         public IReadOnlyList<Account> Accounts => _accounts;
@@ -120,7 +120,7 @@ namespace Client.Services
             return _accounts.Single(a => a.Id == accId);
         }
 
-        public void PostTransaction(Transaction tx) 
+        public void PostTransaction(Transaction tx) // Переписать под сервер
         {
             // пока что минимальная проверка
             if (tx.Entries.Count < 2) throw new InvalidOperationException("Транзакция не содержит двух проводок"); 

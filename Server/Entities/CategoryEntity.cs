@@ -9,7 +9,6 @@ public sealed class CategoryEntity
 
     public string Name { get; set; } = default!;
 
-    // Soft delete
     public bool IsDeleted { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
 }

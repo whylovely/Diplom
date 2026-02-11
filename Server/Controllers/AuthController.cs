@@ -68,7 +68,7 @@ public sealed class AuthController : ControllerBase
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()) // удобно доставать UserId
+            new(ClaimTypes.NameIdentifier, user.Id.ToString())
         };
 
         var creds = new SigningCredentials(
