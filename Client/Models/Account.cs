@@ -13,6 +13,11 @@ namespace Client.Models
         public decimal Balance { get; set; } // Пока хранится в памяти, позже изменить на серверное хранении
 
         public AccountType Type { get; set; } = AccountType.Assets;
+
+        // Многовалютность
+        public bool IsMultiCurrency { get; set; }
+        public string? SecondaryCurrencyCode { get; set; }
+        public decimal SecondaryBalance { get; set; }
     }
 
     public enum AccountType

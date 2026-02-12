@@ -28,9 +28,11 @@
               </DataGrid.ContextMenu>
 
               <DataGrid.Columns>
-                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="400"/>
-                <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="100"/>
-                <DataGridTextColumn Header="Баланс" Binding="{Binding Balance}" Width="140"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="300"/>
+                <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
+                <DataGridTextColumn Header="Баланс" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="140"/>
+                <DataGridTextColumn Header="Доп. валюта" Binding="{Binding SecondaryCurrencyCode}" Width="100"/>
+                <DataGridTextColumn Header="Доп. баланс" Binding="{Binding SecondaryBalance, StringFormat={}{0:N2}}" Width="120"/>
               </DataGrid.Columns>
             </DataGrid>
 

@@ -33,7 +33,8 @@ namespace Client.ViewModels
                 _notify, 
                 catDialog,
                 input, 
-                onQuickTx: openQuickTx);
+                onQuickTx: openQuickTx,
+                getWindow: () => App.MainWindow!);
 
             JournalVm = new JournalViewModel(_data);
 

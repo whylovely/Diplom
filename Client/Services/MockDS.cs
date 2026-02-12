@@ -25,7 +25,17 @@ namespace Client.Services
         {
             var acc1 = new Account { Name = "Наличные", CurrencyCode = "RUB", Balance = 250, InitialBalance = 250 };
             var acc2 = new Account { Name = "Карта", CurrencyCode = "RUB", Balance = 1250, InitialBalance = 1250 };
-            _accounts.AddRange([acc1, acc2]);
+            var acc3 = new Account
+            {
+                Name = "Крипто-кошелёк",
+                CurrencyCode = "USD",
+                Balance = 500,
+                InitialBalance = 500,
+                IsMultiCurrency = true,
+                SecondaryCurrencyCode = "BTC",
+                SecondaryBalance = 0.015m
+            };
+            _accounts.AddRange([acc1, acc2, acc3]);
 
             _categories.AddRange([
                 new Category{ Name = "Еда", Kind = CategoryKind.Expense},

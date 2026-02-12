@@ -1,11 +1,11 @@
 ﻿using Client.Models;
 using Client.Services;
+using Client.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Client.ViewModels
@@ -18,6 +18,7 @@ namespace Client.ViewModels
 
         private readonly IInputDialogService _input;
         private readonly Action<Account, TxKindChoice> _onQuickTx;
+        private readonly Func<Avalonia.Controls.Window> _getWindow;
 
         public ObservableCollection<Account> Accounts { get; }
 
@@ -35,7 +36,8 @@ namespace Client.ViewModels
             INotificationService notify, 
             ICategoryDialogService catDialog,
             IInputDialogService input,
-            Action<Account, TxKindChoice> onQuickTx
+            Action<Account, TxKindChoice> onQuickTx,
+            Func<Avalonia.Controls.Window> getWindow
             )
         {
             _data = data;
@@ -43,43 +45,29 @@ namespace Client.ViewModels
             _input = input;
             _catDialog = catDialog;
             _onQuickTx = onQuickTx;
+            _getWindow = getWindow;
 
             Accounts = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
         }
 
         [RelayCommand]
-        private async Task AddAccount() // Добавления счета
+        private async Task AddAccount()
         {
-            var name = "Новый счет";
-            var currency = "RUB";
+            var dlg = new AddAccountDialog();
+            var acc = await dlg.ShowDialogAsync(_getWindow());
 
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                await _notify.ShowErrorAsync("Название счета не может быть пустым.");
-                return;
-            }
+            if (acc is null) return; // пользователь отменил
 
-            name = name.Trim();
-
-            if (Accounts.Any(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            if (Accounts.Any(a => a.Name.Equals(acc.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 await _notify.ShowErrorAsync("Счет с таким названием уже существует.");
                 return;
             }
 
-            var acc = new Account
-            {
-                Name = name,
-                CurrencyCode = currency,
-                Type = AccountType.Assets,
-                Balance = 0,
-                InitialBalance = 0
-            };
-
             _data.AddAccount(acc);
             Accounts.Insert(0, acc);
 
-            await _notify.ShowInfoAsync($"Счет \"{name}\" добавлен.");
+            await _notify.ShowInfoAsync($"Счет \"{acc.Name}\" добавлен.");
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]

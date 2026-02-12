@@ -11,6 +11,8 @@ namespace Client
 {
     public partial class App : Application
     {
+        public static Avalonia.Controls.Window? MainWindow { get; private set; }
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -20,10 +22,12 @@ namespace Client
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
+                var win = new MainWindow
                 {
                     DataContext = new MainWindowViewModel()
                 };
+                desktop.MainWindow = win;
+                MainWindow = win;
             }
 
             base.OnFrameworkInitializationCompleted();

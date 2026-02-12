@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Client.ViewModels"
+        x:Class="Client.Views.AddAccountDialog"
+        x:DataType="vm:AddAccountDialogViewModel"
+        Width="460" Height="380"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Title="Добавить счёт">
+
+  <StackPanel Margin="20" Spacing="12">
+
+    <!-- Название -->
+    <TextBlock Text="Название счёта:" />
+    <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
+
+    <!-- Основная валюта -->
+    <TextBlock Text="Основная валюта:" />
+    <ComboBox ItemsSource="{Binding Currencies}"
+              SelectedItem="{Binding SelectedCurrency}"
+              Width="220" />
+
+    <!-- Начальный баланс -->
+    <TextBlock Text="Начальный баланс:" />
+    <TextBox Text="{Binding InitialBalance}" Watermark="0" />
+
+    <!-- Многовалютный -->
+    <CheckBox Content="Многовалютный счёт"
+              IsChecked="{Binding IsMultiCurrency}" />
+
+    <!-- Дополнительная валюта (видна только при IsMultiCurrency) -->
+    <StackPanel Spacing="6" IsVisible="{Binding IsMultiCurrency}">
+      <TextBlock Text="Дополнительная валюта:" />
+      <ComboBox ItemsSource="{Binding Currencies}"
+                SelectedItem="{Binding SelectedSecondaryCurrency}"
+                Width="220" />
+    </StackPanel>
+
+    <!-- Кнопки -->
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+      <Button Content="OK" IsEnabled="{Binding CanOk}" Click="OnOkClick" />
+      <Button Content="Отмена" Click="OnCancelClick" />
+    </StackPanel>
+
+  </StackPanel>
+</Window>
