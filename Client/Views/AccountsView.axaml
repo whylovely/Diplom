@@ -31,8 +31,26 @@
                 <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="300"/>
                 <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
                 <DataGridTextColumn Header="Баланс" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="140"/>
-                <DataGridTextColumn Header="Доп. валюта" Binding="{Binding SecondaryCurrencyCode}" Width="100"/>
-                <DataGridTextColumn Header="Доп. баланс" Binding="{Binding SecondaryBalance, StringFormat={}{0:N2}}" Width="120"/>
+
+                <DataGridTemplateColumn Header="Доп. валюта" Width="100">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding SecondaryCurrencyCode}"
+                                 IsVisible="{Binding IsMultiCurrency}"
+                                 VerticalAlignment="Center" Margin="4,0"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Доп. баланс" Width="120">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding SecondaryBalance, StringFormat={}{0:N2}}"
+                                 IsVisible="{Binding IsMultiCurrency}"
+                                 VerticalAlignment="Center" Margin="4,0"/>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
               </DataGrid.Columns>
             </DataGrid>
 
