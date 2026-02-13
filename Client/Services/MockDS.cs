@@ -22,6 +22,9 @@ namespace Client.Services
         public IReadOnlyList<Category> Categories => _categories;
         public IReadOnlyList<Transaction> Transactions => _tx;
 
+        private readonly List<Obligation> _obligations = new();
+        public IReadOnlyList<Obligation> Obligations => _obligations;
+
         public MockDS()
         {
             var acc1 = new Account { Name = "Наличные", CurrencyCode = "RUB", Balance = 250, InitialBalance = 250 };
@@ -43,6 +46,12 @@ namespace Client.Services
                 new Category{ Name = "Транспорт", Kind = CategoryKind.Expense },
                 new Category{ Name = "Зарплата", Kind = CategoryKind.Income },
                 new Category{ Name = "Подарок", Kind = CategoryKind.Income },
+            ]);
+
+            _obligations.AddRange([
+                new Obligation { Counterparty = "Иван Иванов", Amount = 5000, Type = Shared.Obligations.ObligationType.Debt, DueDate = DateTimeOffset.Now.AddDays(5), Note = "Вернуть до пятницы" },
+                new Obligation { Counterparty = "Петр Петров", Amount = 2000, Type = Shared.Obligations.ObligationType.Credit, DueDate = DateTimeOffset.Now.AddDays(-2), Note = "Обещал вернуть вчера" }, // Просрочено
+                new Obligation { Counterparty = "Банк", Amount = 10000, Type = Shared.Obligations.ObligationType.Debt, IsPaid = true, PaidAt = DateTimeOffset.Now.AddDays(-10) }
             ]);
 
             CreateTechnicalAccounts();
@@ -153,6 +162,48 @@ namespace Client.Services
 
             _tx.Insert(0, tx);
             RaiseChanged();
+            return Task.CompletedTask;
+        }
+
+        public Task AddObligationAsync(Obligation obligation)
+        {
+            _obligations.Add(obligation);
+            RaiseChanged();
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateObligationAsync(Obligation obligation)
+        {
+            var existing = _obligations.FirstOrDefault(o => o.Id == obligation.Id);
+            if (existing != null)
+            {
+                var index = _obligations.IndexOf(existing);
+                _obligations[index] = obligation;
+                RaiseChanged();
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteObligationAsync(Guid id)
+        {
+            var existing = _obligations.FirstOrDefault(o => o.Id == id);
+            if (existing != null)
+            {
+                _obligations.Remove(existing);
+                RaiseChanged();
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task MarkObligationPaidAsync(Guid id, bool isPaid)
+        {
+            var existing = _obligations.FirstOrDefault(o => o.Id == id);
+            if (existing != null)
+            {
+                existing.IsPaid = isPaid;
+                existing.PaidAt = isPaid ? DateTimeOffset.Now : null;
+                RaiseChanged();
+            }
             return Task.CompletedTask;
         }
     }

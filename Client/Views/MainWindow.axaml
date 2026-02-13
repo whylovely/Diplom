@@ -32,6 +32,10 @@
     <DataTemplate DataType="vm:ReportViewModel">
       <views:ReportView/>
     </DataTemplate>
+
+    <DataTemplate DataType="vm:ObligationsViewModel">
+      <views:ObligationsView/>
+    </DataTemplate>
   </Window.DataTemplates>
 
   <DockPanel>
@@ -41,6 +45,7 @@
       <Button Content="Категории" Command="{Binding NavigateCategoriesCommand}"/>
       <Button Content="Журнал" Command="{Binding NavigateJournalCommand}"/>
       <Button Content="Отчеты" Command="{Binding NavigateReportCommand}"/>
+      <Button Content="Долги" Command="{Binding NavigateObligationsCommand}"/>
       <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>
     </StackPanel>
 
