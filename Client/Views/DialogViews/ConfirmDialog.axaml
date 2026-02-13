@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Client.ViewModels"
+        x:Class="Client.Views.ConfirmDialog"
+        x:DataType="vm:ConfirmDialogViewModel"
+        Width="440"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Title="{Binding Title}">
+
+  <StackPanel Margin="24" Spacing="16">
+
+    <StackPanel Orientation="Horizontal" Spacing="14">
+
+      <Viewbox Width="28" Height="28" VerticalAlignment="Top">
+        <Path Data="{Binding IconPath}"
+              Fill="{Binding IconColor}"
+              Stretch="Uniform"/>
+      </Viewbox>
+
+      <TextBlock Text="{Binding Message}"
+                 TextWrapping="Wrap"
+                 FontSize="14"
+                 VerticalAlignment="Center"
+                 MaxWidth="340"/>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+
+      <Button Content="Удалить"
+              Width="100"
+              IsDefault="True"
+              HorizontalContentAlignment="Center"
+              Command="{Binding ConfirmCommand}" />
+
+      <Button Content="Отмена"
+              Width="100"
+              IsCancel="True"
+              HorizontalContentAlignment="Center"
+              Command="{Binding CancelCommand}" />
+    </StackPanel>
+
+  </StackPanel>
+</Window>

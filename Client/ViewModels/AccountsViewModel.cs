@@ -115,10 +115,14 @@ namespace Client.ViewModels
                 return;
             }
 
+            var confirmed = await _notify.ShowConfirmAsync(
+                $"Вы уверены, что хотите удалить счёт «{acc.Name}»?",
+                "Удаление счёта");
+
+            if (!confirmed) return;
+
             _data.RemoveAccount(acc.Id); 
             Accounts.Remove(acc);
-
-            await _notify.ShowInfoAsync("Счёт удалён.");
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]

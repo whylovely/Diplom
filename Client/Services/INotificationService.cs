@@ -7,5 +7,6 @@ namespace Client.Services
         Task ShowErrorAsync(string message, string title = "Ошибка");
         Task ShowWarningAsync(string message, string title = "Предупреждение");
         Task ShowInfoAsync(string message, string title = "Информация");
+        Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение");
     }
 }

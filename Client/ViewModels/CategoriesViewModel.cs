@@ -97,10 +97,14 @@ public sealed partial class CategoriesViewModel : ViewModelBase
             return;
         }
 
-        _data.RemoveCategory(Selected);
+        var confirmed = await _notify.ShowConfirmAsync(
+            $"Вы уверены, что хотите удалить категорию «{Selected.Name}»?",
+            "Удаление категории");
 
+        if (!confirmed) return;
+
+        _data.RemoveCategory(Selected);
         Refresh();
-        await _notify.ShowInfoAsync("Категория удалена.");
     }
 
     partial void OnSelectedChanged(Category? value)

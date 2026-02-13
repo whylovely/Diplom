@@ -17,6 +17,16 @@ namespace Client.Services
         public Task ShowInfoAsync(string message, string title = "Информация")
             => ShowAsync(title, message, MessageLevel.Info);
 
+        public async Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение")
+        {
+            var lifetime = (IClassicDesktopStyleApplicationLifetime)Application.Current!.ApplicationLifetime!;
+            var owner = lifetime.MainWindow;
+
+            var dialog = new ConfirmDialog(title, message);
+            var result = await dialog.ShowDialog<bool>(owner!);
+            return result;
+        }
+
         private async Task ShowAsync(string title, string message, MessageLevel level)
         {
             var lifetime = (IClassicDesktopStyleApplicationLifetime)Application.Current!.ApplicationLifetime!;
