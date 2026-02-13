@@ -99,14 +99,6 @@ namespace Client.ViewModels
             _data.RenameAccount(acc.Id, newName);
             acc.Name = newName;
 
-            var idx = Accounts.ToList().FindIndex(a => a.Id == acc.Id); 
-            if (idx >= 0)
-            {
-                await _notify.ShowInfoAsync($"idx={idx}, count={Accounts.Count}");
-                Accounts.RemoveAt(idx);
-                Accounts.Insert(idx, acc);
-            }
-
             await _notify.ShowInfoAsync("Счёт переименован.");
         }
 

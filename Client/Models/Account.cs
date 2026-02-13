@@ -1,23 +1,30 @@
 ﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.Models
 {
-    public sealed class Account
+    public sealed partial class Account : ObservableObject
     {
         public Guid Id { get; init; } = Guid.NewGuid();
 
-        public string Name { get; set; } = "";
+        [ObservableProperty]
+        private string _name = "";
+
         public string CurrencyCode { get; set; } = "RUB";
 
         public decimal InitialBalance { get; set; } 
-        public decimal Balance { get; set; } // Пока хранится в памяти, позже изменить на серверное хранении
+
+        [ObservableProperty]
+        private decimal _balance; // Пока хранится в памяти, позже изменить на серверное хранение
 
         public AccountType Type { get; set; } = AccountType.Assets;
 
         // Многовалютность
         public bool IsMultiCurrency { get; set; }
         public string? SecondaryCurrencyCode { get; set; }
-        public decimal SecondaryBalance { get; set; }
+
+        [ObservableProperty]
+        private decimal _secondaryBalance;
     }
 
     public enum AccountType
