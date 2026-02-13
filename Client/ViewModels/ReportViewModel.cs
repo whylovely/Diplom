@@ -98,7 +98,6 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _totalExpense;
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
 
-        //[RelayCommand]
         private decimal RefreshExpenseRows()
         {
             ExpenseRows.Clear();
@@ -177,7 +176,6 @@ namespace Client.ViewModels
         public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
         [ObservableProperty] private decimal _totalIncome;
 
-        //[RelayCommand]
         private decimal RefreshIncomeRows()
         {
             IncomeRows.Clear();
@@ -255,7 +253,6 @@ namespace Client.ViewModels
         // Подсчет помесячных итогов
         public ObservableCollection<MonthlyTotalRow> MonthlyRows { get; } = new();
 
-        [RelayCommand]
         private void RefreshMonthlyRows()
         {
             MonthlyRows.Clear();
@@ -302,7 +299,6 @@ namespace Client.ViewModels
         public Axis[] XAxes { get; private set; } = Array.Empty<Axis>();
         public Axis[] YAxes { get; private set; } = Array.Empty<Axis>();
 
-        [RelayCommand]
         private void RefreshMonthlyChart()
         {
             MonthlySeries.Clear();
@@ -330,7 +326,6 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topExpensesSum;
         [ObservableProperty] private decimal _topExpensesShare;
 
-        [RelayCommand]
         private void RefreshExpenseChart()
         {
             ExpenseShareRows.Clear();
@@ -366,7 +361,6 @@ namespace Client.ViewModels
         // Подсчет остатков и оборотов
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         
-        [RelayCommand]
         private void RefreshAccountsRows()
         {
             AccountRows.Clear();
