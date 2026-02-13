@@ -97,7 +97,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
             return;
         }
 
-        _data.RemoveCatergory(Selected);
+        _data.RemoveCategory(Selected);
 
         Refresh();
         await _notify.ShowInfoAsync("Категория удалена.");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Client.Models;
 
 namespace Client.Services
@@ -14,14 +15,14 @@ namespace Client.Services
 
         void AddAccount(Account account);
         void AddCategory(Category category);
-        void RemoveCatergory(Category category);
+        void RemoveCategory(Category category);
         void RenameAccount(Guid id, string newName);
         void RemoveAccount(Guid id);
         bool IsAccountUsed(Guid id);
 
-        Account GetExpenseAccountForCatefory(Guid categoryId);
-        Account GetIncomeAccountForCatefory(Guid categoryId);
+        Account GetExpenseAccountForCategory(Guid categoryId);
+        Account GetIncomeAccountForCategory(Guid categoryId);
 
-        void PostTransaction(Transaction tx); // Пока заглушка
+        Task PostTransactionAsync(Transaction tx);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 using Client.Models;
 
 namespace Client.Services
@@ -76,7 +77,7 @@ namespace Client.Services
             DataChanged?.Invoke();
         }
 
-        public void RemoveCatergory(Category category)
+        public void RemoveCategory(Category category)
         {
             _categories.RemoveAll(c => c.Id == category.Id);
             RaiseChanged();
@@ -118,22 +119,22 @@ namespace Client.Services
             }
         }
 
-        public Account GetExpenseAccountForCatefory(Guid categoryId)
+        public Account GetExpenseAccountForCategory(Guid categoryId)
         {
             var accId = _expenseAccountByCategoryId[categoryId];
             return _accounts.Single(a => a.Id == accId);
         }
 
-        public Account GetIncomeAccountForCatefory(Guid categoryId)
+        public Account GetIncomeAccountForCategory(Guid categoryId)
         {
             var accId = _incomeAccountByCategoryId[categoryId];
             return _accounts.Single(a => a.Id == accId);
         }
 
-        public void PostTransaction(Transaction tx) // Переписать под сервер
+        public Task PostTransactionAsync(Transaction tx)
         {
-            // пока что минимальная проверка
-            if (tx.Entries.Count < 2) throw new InvalidOperationException("Транзакция не содержит двух проводок"); 
+            if (tx.Entries.Count < 2)
+                throw new InvalidOperationException("Транзакция не содержит двух проводок");
 
             // Обновление счета на основе проводки (+дебит, -кредит)
             foreach (var e in tx.Entries)
@@ -152,6 +153,7 @@ namespace Client.Services
 
             _tx.Insert(0, tx);
             RaiseChanged();
+            return Task.CompletedTask;
         }
     }
 }

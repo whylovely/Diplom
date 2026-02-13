@@ -125,13 +125,13 @@ namespace Client.ViewModels
                 return;
             }
 
-            if (_kind != TXKind.Transfer && _toAccount is null)
+            if (_kind == TXKind.Transfer && _toAccount is null)
             {
                 await _notify.ShowErrorAsync("Не выбран счет назначения");
                 return;
             }
 
-            if (_kind != TXKind.Transfer && _toAccount.Id == _fromAccount.Id)
+            if (_kind == TXKind.Transfer && _toAccount!.Id == _fromAccount.Id)
             {
                 await _notify.ShowErrorAsync("Счета должны отличаться");
                 return;
@@ -149,7 +149,7 @@ namespace Client.ViewModels
             {
                 case TXKind.Expense:
                 {
-                    var expAcc = _data.GetExpenseAccountForCatefory(_category!.Id);
+                    var expAcc = _data.GetExpenseAccountForCategory(_category!.Id);
 
                     tx.Entries.Add(new Entry
                     {
@@ -173,7 +173,7 @@ namespace Client.ViewModels
 
                 case TXKind.Income:
                     {
-                        var incAcc =  _data.GetIncomeAccountForCatefory(_category!.Id);
+                        var incAcc = _data.GetIncomeAccountForCategory(_category!.Id);
 
                         tx.Entries.Add(new Entry
                         {
@@ -203,20 +203,18 @@ namespace Client.ViewModels
                             return;
                         }
 
-                        var catId = _category?.Id ?? _data.Categories.First().Id;
-
                         tx.Entries.Add(new Entry
                         {
                             AccountId = _fromAccount.Id,
-                            CategoryId = catId,
+                            CategoryId = null,
                             Direction = EntryDirection.Credit,
                             Amount = money
                         });
 
                         tx.Entries.Add(new Entry
                         {
-                            AccountId = _toAccount.Id,
-                            CategoryId = catId,
+                            AccountId = _toAccount!.Id,
+                            CategoryId = null,
                             Direction = EntryDirection.Debit,
                             Amount = money
                         });
@@ -229,7 +227,7 @@ namespace Client.ViewModels
                     return;
             }
 
-            _data.PostTransaction(tx);
+            await _data.PostTransactionAsync(tx);
 
             _amount = 0;
             _description = "";
