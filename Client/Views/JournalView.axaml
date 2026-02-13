@@ -8,17 +8,73 @@
   <StackPanel Spacing="10">
     <TextBlock Text="Журнал операций" FontSize="22"/>
 
-    <ItemsControl ItemsSource="{Binding Transactions}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate x:DataType="models:Transaction">
-          <Border Padding="10" Margin="0,0,0,8" CornerRadius="8">
-            <StackPanel>
-              <TextBlock Text="{Binding Date}" />
-              <TextBlock Text="{Binding Description}" FontSize="16"/>
-            </StackPanel>
-          </Border>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <!-- Поиск -->
+    <TextBox Watermark="Поиск по описанию, счёту, категории..."
+             Text="{Binding SearchText}"
+             Width="400"
+             HorizontalAlignment="Left"/>
+
+    <!-- Таблица -->
+    <DataGrid ItemsSource="{Binding FilteredRows}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              Height="500"
+              GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+
+        <DataGridTextColumn Header="Дата"
+                            Binding="{Binding DateFormatted}"
+                            Width="100"/>
+
+        <!-- Тип с цветом -->
+        <DataGridTemplateColumn Header="Тип" Width="90">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:JournalRow">
+              <TextBlock Text="{Binding TypeLabel}"
+                         VerticalAlignment="Center"
+                         Margin="4,0"
+                         FontWeight="SemiBold"/>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTextColumn Header="Описание"
+                            Binding="{Binding Description}"
+                            Width="*"/>
+
+        <DataGridTextColumn Header="Счёт"
+                            Binding="{Binding AccountName}"
+                            Width="150"/>
+
+        <DataGridTemplateColumn Header="Куда" Width="120">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:JournalRow">
+              <TextBlock Text="{Binding ToAccountName}"
+                         IsVisible="{Binding IsTransfer}"
+                         VerticalAlignment="Center"
+                         Margin="4,0"/>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTextColumn Header="Категория"
+                            Binding="{Binding CategoryName}"
+                            Width="130"/>
+
+        <!-- Сумма с цветом -->
+        <DataGridTemplateColumn Header="Сумма" Width="160">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate x:DataType="models:JournalRow">
+              <TextBlock Text="{Binding FormattedAmount}"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
+                         Margin="4,0"
+                         FontWeight="SemiBold"/>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+      </DataGrid.Columns>
+    </DataGrid>
   </StackPanel>
 </UserControl>
