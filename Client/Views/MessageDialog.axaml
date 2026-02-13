@@ -3,17 +3,28 @@
         xmlns:vm="using:Client.ViewModels"
         x:Class="Client.Views.MessageDialog"
         x:DataType="vm:MessageDialogViewModel"
-        Width="420"
-        Height="200"
+        Width="440"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Title="{Binding Title}">
 
-  <StackPanel Margin="16" Spacing="12">
+  <StackPanel Margin="24" Spacing="16">
 
-    <TextBlock Text="{Binding Message}"
-               TextWrapping="Wrap"
-               FontSize="14"/>
+    <StackPanel Orientation="Horizontal" Spacing="14">
+
+      <Viewbox Width="28" Height="28" VerticalAlignment="Top">
+        <Path Data="{Binding IconPath}"
+              Fill="{Binding IconColor}"
+              Stretch="Uniform"/>
+      </Viewbox>
+
+      <TextBlock Text="{Binding Message}"
+                 TextWrapping="Wrap"
+                 FontSize="14"
+                 VerticalAlignment="Center"
+                 MaxWidth="340"/>
+    </StackPanel>
 
     <StackPanel Orientation="Horizontal"
                 HorizontalAlignment="Right"
@@ -22,6 +33,7 @@
       <Button Content="OK"
               Width="90"
               IsDefault="True"
+              HorizontalContentAlignment="Center"
               Command="{Binding CloseCommand}" />
     </StackPanel>
 
