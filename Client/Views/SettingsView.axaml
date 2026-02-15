@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Client.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Client.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <StackPanel Spacing="20" Margin="20">
+    <TextBlock Text="Настройки" FontSize="24" FontWeight="Bold"/>
+
+    <StackPanel Spacing="10">
+      <TextBlock Text="Базовая валюта" FontWeight="SemiBold"/>
+      <TextBlock Text="Валюта, которая будет использоваться по умолчанию для новых счетов и в отчетах (в будущем)." 
+                 FontSize="12" Foreground="Gray" TextWrapping="Wrap"/>
+      <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                SelectedItem="{Binding SelectedCurrency}"
+                Width="200"/>
+    </StackPanel>
+    
+  </StackPanel>
+</UserControl>

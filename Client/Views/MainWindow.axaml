@@ -36,6 +36,10 @@
     <DataTemplate DataType="vm:ObligationsViewModel">
       <views:ObligationsView/>
     </DataTemplate>
+
+    <DataTemplate DataType="vm:SettingsViewModel">
+      <views:SettingsView/>
+    </DataTemplate>
   </Window.DataTemplates>
 
   <DockPanel>
@@ -47,6 +51,8 @@
       <Button Content="Отчеты" Command="{Binding NavigateReportCommand}"/>
       <Button Content="Долги" Command="{Binding NavigateObligationsCommand}"/>
       <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>
+      <Separator />
+      <Button Content="Настройки" Command="{Binding NavigateSettingsCommand}"/>
     </StackPanel>
 
     <ContentControl Content="{Binding Current}" />

@@ -8,7 +8,14 @@ public sealed partial class AddAccountDialogViewModel : ViewModelBase
     {
         "RUB", "USD", "EUR", "GBP", "CNY",
         "BTC", "ETH", "USDT"
-    }; 
+    };
+
+    public AddAccountDialogViewModel() : this("RUB") { }
+
+    public AddAccountDialogViewModel(string defaultCurrency)
+    {
+        SelectedCurrency = defaultCurrency;
+    } 
 
     [ObservableProperty] private string _name = "";
     [ObservableProperty] private bool _isMultiCurrency;
