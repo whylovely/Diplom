@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Client.ViewModels.DialogWindow"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        Width="400" Height="300"
+        x:Class="Client.Views.DialogViews.FirstRunDialog"
+        x:DataType="vm:FirstRunDialogViewModel"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        Title="Добро пожаловать">
+
+  <Border BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="5">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+      <TextBlock Grid.Row="0" Text="Добро пожаловать в FinanceApp!" 
+                 FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"/>
+      
+      <StackPanel Grid.Row="1" Spacing="15" VerticalAlignment="Center">
+        <TextBlock Text="Выберите базовую валюту для учета:" 
+                   HorizontalAlignment="Center"/>
+        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                  SelectedItem="{Binding SelectedCurrency}"
+                  HorizontalAlignment="Center" Width="200"/>
+        <TextBlock Text="Вы сможете изменить это позже в настройках."
+                   FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
+      </StackPanel>
+
+      <Button Grid.Row="2" Content="Начать работу" 
+              Command="{Binding ConfirmCommand}"
+              HorizontalAlignment="Center" Width="150" Height="35"/>
+    </Grid>
+  </Border>
+</Window>

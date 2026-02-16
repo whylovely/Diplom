@@ -10,6 +10,7 @@ namespace Client.ViewModels
     {
         private readonly IDataService _data;
         private readonly INotificationService _notify;
+        private readonly SettingsService _settings;
 
         [ObservableProperty]
         private ViewModelBase _current;
@@ -20,11 +21,13 @@ namespace Client.ViewModels
         public ReportViewModel ReportVm { get; }
         public CategoriesViewModel CategoriesVm { get; }
         public ObligationsViewModel ObligationsVm { get; }
+        public SettingsViewModel SettingsVm { get; }
 
         public MainWindowViewModel()
         {
             _data = new MockDS();
             _notify = new NotificationService();
+            _settings = new SettingsService();
 
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
@@ -34,6 +37,7 @@ namespace Client.ViewModels
                 _notify, 
                 catDialog,
                 input, 
+                _settings,
                 onQuickTx: openQuickTx,
                 getWindow: () => App.MainWindow!);
 
@@ -49,12 +53,32 @@ namespace Client.ViewModels
             });
 
             ReportVm = new ReportViewModel(_data);
-            
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
-
             ObligationsVm = new ObligationsViewModel(_data, _notify);
+            SettingsVm = new SettingsViewModel(_settings);
 
             _current = AccountsVm;
+        }
+
+        public async Task OnWindowLoaded()
+        {
+            if (_settings.IsFirstRun)
+            {
+                var vm = new Client.ViewModels.DialogWindow.FirstRunDialogViewModel();
+                var dialog = new Client.Views.DialogViews.FirstRunDialog
+                {
+                    DataContext = vm
+                };
+
+                vm.OnConfirmed += (currency) =>
+                {
+                    _settings.BaseCurrency = currency;
+                    _settings.CompleteFirstRun();
+                    dialog.Close();
+                };
+
+                await dialog.ShowDialog(App.MainWindow!);
+            }
         }
 
         private void openQuickTx(Account account, TxKindChoice choice)
@@ -69,5 +93,6 @@ namespace Client.ViewModels
         [RelayCommand] private void NavigateReport() => Current = ReportVm;
         [RelayCommand] private void NavigateCategories() => Current = CategoriesVm;
         [RelayCommand] private void NavigateObligations() => Current = ObligationsVm;
+        [RelayCommand] private void NavigateSettings() => Current = SettingsVm;
     }
 }
