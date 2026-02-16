@@ -39,15 +39,12 @@ namespace Client.ViewModels
         [RelayCommand]
         public void Refresh()
         {
-            TotalExpense = RefreshExpenseRows();
-            TotalIncome = RefreshIncomeRows();
-            Net = TotalIncome - TotalExpense;
-            RefreshExpenseGroups();
-            RefreshIncomeGroups();
-            RefreshMonthlyRows();
-            RefreshMonthlyChart();
-            RefreshExpenseChart();
-            RefreshAccountsRows();
+            RefreshSummary();
+            RefreshMonthly();
+            RefreshExpenseTop();
+            RefreshExpenseCategory();
+            RefreshIncomeCategory();
+            RefreshAccounts();
             RefreshBalance();
         }
 
@@ -98,6 +95,14 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _totalExpense;
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
 
+        [RelayCommand] 
+        public void RefreshSummary()
+        {
+            TotalExpense = RefreshExpenseRows();
+            TotalIncome = RefreshIncomeRows();
+            Net = TotalIncome - TotalExpense;
+        }
+
         private decimal RefreshExpenseRows()
         {
             ExpenseRows.Clear();
@@ -130,6 +135,9 @@ namespace Client.ViewModels
 
         // Группировка расходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> ExpenseGroups { get; } = new();
+
+        [RelayCommand]
+        public void RefreshExpenseCategory() => RefreshExpenseGroups();
 
         private void RefreshExpenseGroups()
         {
@@ -209,6 +217,9 @@ namespace Client.ViewModels
         // Группировка доходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> IncomeGroups { get; } = new();
 
+        [RelayCommand]
+        public void RefreshIncomeCategory() => RefreshIncomeGroups();
+
         private void RefreshIncomeGroups()
         {
             IncomeGroups.Clear();
@@ -252,6 +263,13 @@ namespace Client.ViewModels
 
         // Подсчет помесячных итогов
         public ObservableCollection<MonthlyTotalRow> MonthlyRows { get; } = new();
+
+        [RelayCommand]
+        public void RefreshMonthly()
+        {
+             RefreshMonthlyRows();
+             RefreshMonthlyChart();
+        }
 
         private void RefreshMonthlyRows()
         {
@@ -326,6 +344,9 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topExpensesSum;
         [ObservableProperty] private decimal _topExpensesShare;
 
+        [RelayCommand]
+        public void RefreshExpenseTop() => RefreshExpenseChart();
+
         private void RefreshExpenseChart()
         {
             ExpenseShareRows.Clear();
@@ -361,6 +382,9 @@ namespace Client.ViewModels
         // Подсчет остатков и оборотов
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         
+        [RelayCommand]
+        public void RefreshAccounts() => RefreshAccountsRows();
+
         private void RefreshAccountsRows()
         {
             AccountRows.Clear();

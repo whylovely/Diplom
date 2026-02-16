@@ -66,14 +66,14 @@ namespace Client.ViewModels
 
         private IEnumerable<JournalRow> ConvertToRows(Transaction tx)
         {
-            // Находим проводку по активному (пользовательскому) счёту
+            // Находим проводку по активному счёту
             var assetEntries = tx.Entries
                 .Where(e => FindAccount(e.AccountId)?.Type == AccountType.Assets)
                 .ToList();
 
             if (assetEntries.Count == 0)
             {
-                // Нет проводок по активным счетам — показываем как есть
+                // Нет проводок 
                 var first = tx.Entries.FirstOrDefault();
                 if (first is null) yield break;
 
@@ -90,7 +90,7 @@ namespace Client.ViewModels
                 yield break;
             }
 
-            // Два Assets-счёта → перевод
+            // Перевод
             if (assetEntries.Count >= 2)
             {
                 var debitEntry = assetEntries.FirstOrDefault(e => e.Direction == EntryDirection.Debit);
@@ -115,7 +115,7 @@ namespace Client.ViewModels
                 yield break;
             }
 
-            // Один Assets-счёт: расход или доход
+            // расход или доход
             foreach (var entry in assetEntries)
             {
                 var acc = FindAccount(entry.AccountId);

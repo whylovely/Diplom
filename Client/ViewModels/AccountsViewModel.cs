@@ -56,7 +56,7 @@ namespace Client.ViewModels
             var dlg = new AddAccountDialog();
             var acc = await dlg.ShowDialogAsync(_getWindow());
 
-            if (acc is null) return; // пользователь отменил
+            if (acc is null) return;
 
             if (Accounts.Any(a => a.Name.Equals(acc.Name, StringComparison.OrdinalIgnoreCase)))
             {

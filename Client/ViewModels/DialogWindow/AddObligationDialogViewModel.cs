@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Client.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Shared.Obligations;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +20,7 @@ public partial class AddObligationDialogViewModel : ViewModelBase
 
     [ObservableProperty] private string _title = "Новое обязательство";
 
-    public List<string> Currencies { get; } = new() { "RUB", "USD", "EUR", "KZT" };
+    public List<string> Currencies { get; } = new() { "RUB", "USD", "EUR" };
     public List<ObligationType> Types { get; } = new() { ObligationType.Debt, ObligationType.Credit };
 
     public Obligation? Result { get; private set; }
@@ -39,14 +38,14 @@ public partial class AddObligationDialogViewModel : ViewModelBase
             Type = existing.Type;
             DueDate = existing.DueDate;
             Note = existing.Note;
-            Result = existing; // Keep original ID if editing
+            Result = existing; 
         }
     }
 
     [RelayCommand]
     private void Save()
     {
-        if (string.IsNullOrWhiteSpace(Counterparty)) return; // Validation
+        if (string.IsNullOrWhiteSpace(Counterparty)) return; 
         if (Amount <= 0) return;
 
         if (Result == null) Result = new Obligation();
@@ -57,8 +56,7 @@ public partial class AddObligationDialogViewModel : ViewModelBase
         Result.Type = Type;
         Result.DueDate = DueDate;
         Result.Note = Note;
-        Result.CreatedAt = DateTimeOffset.Now; // Should only set on create ideally, but ok for now
-
+        Result.CreatedAt = DateTimeOffset.Now; 
         _window.Close(Result);
     }
 

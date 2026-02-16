@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddAccountDialogViewModel : ViewModelBase
+public sealed partial class AddAccountDialogViewModel : ViewModelBase   // Сделать чтобы была закрпелена валюта базовая, а если многовалютный тогда можно указать другую валюту, но вторая оязательно должна быть базовой
 {
     public static string[] Currencies { get; } =
     {

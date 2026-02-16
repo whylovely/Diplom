@@ -8,13 +8,11 @@
   <StackPanel Spacing="10">
     <TextBlock Text="Журнал операций" FontSize="22"/>
 
-    <!-- Поиск -->
     <TextBox Watermark="Поиск по описанию, счёту, категории..."
              Text="{Binding SearchText}"
              Width="400"
              HorizontalAlignment="Left"/>
 
-    <!-- Таблица -->
     <DataGrid ItemsSource="{Binding FilteredRows}"
               AutoGenerateColumns="False"
               IsReadOnly="True"
@@ -26,7 +24,6 @@
                             Binding="{Binding DateFormatted}"
                             Width="100"/>
 
-        <!-- Тип с цветом -->
         <DataGridTemplateColumn Header="Тип" Width="90">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:JournalRow">
@@ -61,7 +58,6 @@
                             Binding="{Binding CategoryName}"
                             Width="130"/>
 
-        <!-- Сумма с цветом -->
         <DataGridTemplateColumn Header="Сумма" Width="160">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate x:DataType="models:JournalRow">

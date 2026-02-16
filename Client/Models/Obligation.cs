@@ -30,3 +30,9 @@ public partial class Obligation : ObservableObject
         }
     }
 }
+
+public enum ObligationType
+{
+    Debt = 0,
+    Credit = 1
+}
