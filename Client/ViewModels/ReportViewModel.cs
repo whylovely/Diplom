@@ -20,15 +20,10 @@ namespace Client.ViewModels
         public ReportViewModel(IDataService data)
         {
             _data = data;
-            _data.DataChanged += () =>
-            {
-                Refresh();
-            };
+            _data.DataChanged += () => Refresh();
 
             _selectedSectionItem = SectionItems[0];
         }
-
-        [ObservableProperty] private decimal _net;
 
         partial void OnTopNChanged(int value)
         {
@@ -93,249 +88,52 @@ namespace Client.ViewModels
         }
         //
 
-        // Подсчет Расходов
+        // Подсчет Расходов и Доходов
         [ObservableProperty] private DateTimeOffset _dateFrom = DateTimeOffset.Now.AddMonths(-1);
         [ObservableProperty] private DateTimeOffset _dateTo = DateTimeOffset.Now;
         [ObservableProperty] private decimal _totalExpense;
+        [ObservableProperty] private decimal _net;
         public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
+        public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
+        [ObservableProperty] private decimal _totalIncome;
 
         [RelayCommand] 
         public void RefreshSummary()
         {
-            TotalExpense = RefreshExpenseRows();
-            TotalIncome = RefreshIncomeRows();
+            TotalExpense = ExpenseReport.RefreshExpenseRows(_data, DateFrom, DateTo, ExpenseRows);
+            TotalIncome = IncomeReport.RefreshIncomeRows(_data, DateFrom, DateTo, IncomeRows);
             Net = TotalIncome - TotalExpense;
         }
-
-        private decimal RefreshExpenseRows()
-        {
-            ExpenseRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
-
-            var expenseGroups = txInRange
-                .SelectMany(t => t.Entries)
-                .Where(e =>
-                {
-                    var acc = accountById[e.AccountId];
-                    return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
-                })
-                .GroupBy(e => e.CategoryId)
-                .Select(g =>
-                {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key).Name;
-                    return new CategoryTotalRow
-                    {
-                        CategoryName = catName,
-                        Total = g.Sum(x => x.Amount.Amount)
-                    };
-                })
-                .OrderByDescending(r => r.Total);
-
-            foreach (var row in expenseGroups) ExpenseRows.Add(row);
-
-            return ExpenseRows.Sum(r => r.Total);
-        }
+        //
 
         // Группировка расходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> ExpenseGroups { get; } = new();
 
         [RelayCommand]
-        public void RefreshExpenseCategory() => RefreshExpenseGroups();
-
-        private void RefreshExpenseGroups()
-        {
-            ExpenseGroups.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
-
-            var groups = txInRange
-                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
-                .Where(x =>
-                {
-                    var acc = accountById[x.Entry.AccountId];
-                    return acc.Type == AccountType.Expense && x.Entry.Direction == EntryDirection.Debit;
-                })
-                .GroupBy(x => x.Entry.CategoryId)
-                .Select(g =>
-                {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
-                    var days = g
-                        .GroupBy(x => x.Tx.Date.Date)
-                        .OrderBy(d => d.Key)
-                        .Select(d => new DailyDetailRow
-                        {
-                            Date = d.Key.ToString("dd.MM.yyyy"),
-                            Amount = d.Sum(x => x.Entry.Amount.Amount),
-                            Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
-                        })
-                        .ToList();
-
-                    return new CategoryDetailGroup
-                    {
-                        CategoryName = catName,
-                        Total = g.Sum(x => x.Entry.Amount.Amount),
-                        Days = days
-                    };
-                })
-                .OrderByDescending(r => r.Total);
-
-            foreach (var group in groups) ExpenseGroups.Add(group);
-        }
+        public void RefreshExpenseCategory() => ExpenseReport.RefreshExpenseGroups(_data, DateFrom, DateTo, ExpenseGroups);
         //
-
-        // Подсчет Доходов
-        public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
-        [ObservableProperty] private decimal _totalIncome;
-
-        private decimal RefreshIncomeRows()
-        {
-            IncomeRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList(); 
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
-
-            var incomeGroups = txInRange
-                .SelectMany(t => t.Entries)
-                .Where(e =>
-                {
-                    var acc = accountById[e.AccountId];
-                    return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
-                })
-                .GroupBy(e => e.CategoryId)
-                .Select(g =>
-                {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key).Name;
-                    return new CategoryTotalRow
-                    {
-                        CategoryName = catName,
-                        Total = g.Sum(x => x.Amount.Amount)
-                    };
-                })
-                .OrderByDescending(r => r.Total);
-
-            foreach (var row in incomeGroups) IncomeRows.Add(row);
-
-            return IncomeRows.Sum(r => r.Total);
-        }
 
         // Группировка доходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> IncomeGroups { get; } = new();
 
         [RelayCommand]
-        public void RefreshIncomeCategory() => RefreshIncomeGroups();
-
-        private void RefreshIncomeGroups()
-        {
-            IncomeGroups.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
-
-            var groups = txInRange
-                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
-                .Where(x =>
-                {
-                    var acc = accountById[x.Entry.AccountId];
-                    return acc.Type == AccountType.Income && x.Entry.Direction == EntryDirection.Credit;
-                })
-                .GroupBy(x => x.Entry.CategoryId)
-                .Select(g =>
-                {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
-                    var days = g
-                        .GroupBy(x => x.Tx.Date.Date)
-                        .OrderBy(d => d.Key)
-                        .Select(d => new DailyDetailRow
-                        {
-                            Date = d.Key.ToString("dd.MM.yyyy"),
-                            Amount = d.Sum(x => x.Entry.Amount.Amount),
-                            Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
-                        })
-                        .ToList();
-
-                    return new CategoryDetailGroup
-                    {
-                        CategoryName = catName,
-                        Total = g.Sum(x => x.Entry.Amount.Amount),
-                        Days = days
-                    };
-                })
-                .OrderByDescending(r => r.Total);
-
-            foreach (var group in groups) IncomeGroups.Add(group);
-        }
+        public void RefreshIncomeCategory() => IncomeReport.RefreshIncomeGroups(_data, DateFrom, DateTo, IncomeGroups);
         //
 
         // Подсчет помесячных итогов
+        public ObservableCollection<ISeries> MonthlySeries { get; } = new();
+        public ObservableCollection<string> MonthlyLabels { get; } = new();
+        public Axis[] XAxes { get; private set; } = Array.Empty<Axis>();
+        public Axis[] YAxes { get; private set; } = Array.Empty<Axis>();
         public ObservableCollection<MonthlyTotalRow> MonthlyRows { get; } = new();
 
         [RelayCommand]
         public void RefreshMonthly()
         {
-             RefreshMonthlyRows();
-             RefreshMonthlyChart();
-        }
-
-        private void RefreshMonthlyRows()
-        {
-            MonthlyRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
-
-            var mothlyGroups = txInRange
-                .GroupBy(t => new { t.Date.Year, t.Date.Month })
-                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month);
-
-            foreach (var mg in mothlyGroups)
-            {
-                var enteries = mg.SelectMany(t => t.Entries);
-
-                var expense = enteries
-                    .Where(e =>
-                    {
-                        var acc = accountById[e.AccountId];
-                        return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
-                    })
-                    .Sum(e => e.Amount.Amount);
-
-                var income = enteries
-                    .Where(e =>
-                    {
-                        var acc = accountById[e.AccountId];
-                        return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
-                    })
-                    .Sum(e => e.Amount.Amount);
-
-                MonthlyRows.Add(new MonthlyTotalRow
-                {
-                    Month = $"{mg.Key.Year:D4}-{mg.Key.Month:D2}",
-                    Income = income,
-                    Expense = expense
-                });
-            }
-        }
-        //
-
-        // Подсчет помесячного графика
-        public ObservableCollection<ISeries> MonthlySeries { get; } = new();
-        public ObservableCollection<string> MonthlyLabels { get; } = new();
-        public Axis[] XAxes { get; private set; } = Array.Empty<Axis>();
-        public Axis[] YAxes { get; private set; } = Array.Empty<Axis>();
-
-        private void RefreshMonthlyChart()
-        {
-            MonthlySeries.Clear();
-            MonthlyLabels.Clear();
-
-            foreach (var r in MonthlyRows) MonthlyLabels.Add(r.Month);
-
-            var incomeValues = MonthlyRows.Select(r => r.Income).ToArray();
-            var expenseValues = MonthlyRows.Select(r => r.Expense).ToArray();
-
-            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Доходы", Values = incomeValues });
-            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Расходы", Values = expenseValues });
-
-            XAxes = new[] { new Axis { Labels = MonthlyLabels.ToArray() } };
-            YAxes = new[] { new Axis() };
+            MonthlyReport.RefreshMonthlyRows(_data, DateFrom, DateTo, MonthlyRows);
+            MonthlyReport.RefreshMonthlyChart(MonthlyRows, MonthlySeries, MonthlyLabels, out var xAxes, out var yAxes);
+            XAxes = xAxes;
+            YAxes = yAxes;
             OnPropertyChanged(nameof(XAxes));
             OnPropertyChanged(nameof(YAxes));
         }
@@ -349,134 +147,24 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topExpensesShare;
 
         [RelayCommand]
-        public void RefreshExpenseTop() => RefreshExpenseChart();
-
-        private void RefreshExpenseChart()
-        {
-            ExpenseShareRows.Clear();
-
-            if (TotalExpense <= 0)
-            {
-                TopExpensesSum = 0;
-                TopExpensesShare = 0;
-                return;
-            }
-
-            var top = ExpenseRows
-                .OrderByDescending(r => r.Total)
-                .Take(TopN)
-                .Select(r => new CategoryShareRow
-                {
-                    CategoryName = r.CategoryName,
-                    Total = r.Total,
-                    SharePercent = r.Total / TotalExpense
-                }).ToList();
-
-            foreach (var row in top) ExpenseShareRows.Add(row);
-
-            TopExpensesSum = top.Sum(r => r.Total);
-            TopExpensesShare = Math.Round((TopExpensesSum / TotalExpense) * 100m, 2);
-
-            ExpensePieSeries.Clear();
-            foreach (var r in ExpenseShareRows)
-                ExpensePieSeries.Add(new PieSeries<decimal> { Values = new[] { r.Total }, Name = r.CategoryName });
-        }
+        public void RefreshExpenseTop() => ExpenseReport.RefreshExpenseChart(_data, DateFrom, DateTo, ExpenseShareRows, ExpensePieSeries, TotalExpense, TopN, TopExpensesSum, TopExpensesShare, ExpenseRows);
         //
 
-        // Подсчет графика по доходам (Топ доходов)
+        // Подсчет графика по доходам
         public ObservableCollection<CategoryShareRow> IncomeShareRows { get; } = new();
         public ObservableCollection<ISeries> IncomePieSeries { get; } = new();
         [ObservableProperty] private decimal _topIncomesSum;
         [ObservableProperty] private decimal _topIncomesShare;
 
         [RelayCommand]
-        public void RefreshIncomeTop() => RefreshIncomeChart();
-
-        private void RefreshIncomeChart()
-        {
-            IncomeShareRows.Clear();
-
-            if (TotalIncome <= 0)
-            {
-                TopIncomesSum = 0;
-                TopIncomesShare = 0;
-                return;
-            }
-
-            var top = IncomeRows
-                .OrderByDescending(r => r.Total)
-                .Take(TopN)
-                .Select(r => new CategoryShareRow
-                {
-                    CategoryName = r.CategoryName,
-                    Total = r.Total,
-                    SharePercent = r.Total / TotalIncome
-                }).ToList();
-
-            foreach (var row in top) IncomeShareRows.Add(row);
-
-            TopIncomesSum = top.Sum(r => r.Total);
-            TopIncomesShare = Math.Round((TopIncomesSum / TotalIncome) * 100m, 2);
-
-            IncomePieSeries.Clear();
-            foreach (var r in IncomeShareRows)
-                IncomePieSeries.Add(new PieSeries<decimal> { Values = new[] { r.Total }, Name = r.CategoryName });
-        }
+        public void RefreshIncomeTop() => IncomeReport.RefreshIncomeChart(_data, DateFrom, DateTo, IncomeShareRows, IncomePieSeries, TotalIncome, TopN, TopIncomesSum, TopIncomesShare, IncomeRows);
         //
 
         // Подсчет остатков и оборотов
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         
         [RelayCommand]
-        public void RefreshAccounts() => RefreshAccountsRows();
-
-        private void RefreshAccountsRows()
-        {
-            AccountRows.Clear();
-
-            var assetAccounts = _data.Accounts
-                .Where(a => a.Type == AccountType.Assets)
-                .ToList();
-
-            var allTx = _data.Transactions.ToList();
-
-            foreach (var acc in assetAccounts)
-            {
-                var deltaBeforeFrom = allTx
-                    .Where(t => t.Date < DateFrom)
-                    .SelectMany(t => t.Entries)
-                    .Where(e => e.AccountId == acc.Id)
-                    .Sum(e => e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount);
-
-                var opening = acc.InitialBalance + deltaBeforeFrom;
-
-                var entriesInPeriod = allTx
-                    .Where(t => t.Date >= DateFrom && t.Date <= DateTo)
-                    .SelectMany(t => t.Entries)
-                    .Where(e => e.AccountId == acc.Id)
-                    .ToList();
-
-                var debitTurnover = entriesInPeriod
-                    .Where(e => e.Direction == EntryDirection.Debit)
-                    .Sum(e => e.Amount.Amount);
-
-                var creditTurnover = entriesInPeriod
-                    .Where(e => e.Direction == EntryDirection.Credit)
-                    .Sum(e => e.Amount.Amount);
-
-                var closing = opening + (debitTurnover - creditTurnover);
-
-                AccountRows.Add(new AccountTurnoverRow
-                {
-                    AccountName = acc.Name,
-                    CurrencyCode = acc.CurrencyCode,
-                    Opening = opening,
-                    DebitTurnOver = debitTurnover,
-                    CreditTurnOver = creditTurnover,
-                    Closing = closing
-                });
-            }
-        }
+        public void RefreshAccounts() => AccountReport.RefreshAccountsRows(_data, DateFrom, DateTo, AccountRows);
         //
 
         // Обновление баланса на дату
@@ -488,34 +176,7 @@ namespace Client.ViewModels
         [RelayCommand]
         public void RefreshBalance()
         {
-            BalanceRows.Clear();
-
-            var assetAccounts = _data.Accounts
-                .Where(a => a.Type == AccountType.Assets)
-                .ToList();
-
-            var txUpToDate = _data.Transactions
-                .Where(t => t.Date <= BalanceDate)
-                .ToList();
-
-            foreach (var acc in assetAccounts)
-            {
-                var d = txUpToDate
-                    .SelectMany(t => t.Entries)
-                    .Where(e => e.AccountId == acc.Id)
-                    .Sum(e => e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount);
-
-                var bal = acc.InitialBalance + d;
-
-                BalanceRows.Add(new AccountBalanceRow
-                {
-                    AccountName = acc.Name,
-                    CurrencyCode = acc.CurrencyCode,
-                    Balance = bal
-                });
-
-                TotalAssetsAtDate = BalanceRows.Sum(r => r.Balance);
-            }
+            TotalAssetsAtDate = BalanceReport.RefreshBalanceRows(_data, BalanceDate, BalanceRows);
         }
         //
 
