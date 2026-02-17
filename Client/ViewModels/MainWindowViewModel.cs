@@ -38,6 +38,7 @@ namespace Client.ViewModels
                 _notify, 
                 catDialog,
                 input, 
+                _settings,
                 onQuickTx: openQuickTx,
                 getWindow: () => App.MainWindow!);
 

@@ -14,9 +14,9 @@ public partial class AddAccountDialog : Window
         InitializeComponent();
     }
 
-    public Task<Account?> ShowDialogAsync(Window owner)
+    public Task<Account?> ShowDialogAsync(Window owner, string baseCurrency)
     {
-        DataContext = new AddAccountDialogViewModel();
+        DataContext = new AddAccountDialogViewModel(baseCurrency);
         return ShowDialog<Account?>(owner);
     }
 

@@ -19,6 +19,7 @@ namespace Client.ViewModels
         private readonly IInputDialogService _input;
         private readonly Action<Account, TxKindChoice> _onQuickTx;
         private readonly Func<Avalonia.Controls.Window> _getWindow;
+        private readonly SettingsService _settings;
 
         public ObservableCollection<Account> Accounts { get; }
 
@@ -36,6 +37,7 @@ namespace Client.ViewModels
             INotificationService notify, 
             ICategoryDialogService catDialog,
             IInputDialogService input,
+            SettingsService settings,
             Action<Account, TxKindChoice> onQuickTx,
             Func<Avalonia.Controls.Window> getWindow
             )
@@ -44,6 +46,7 @@ namespace Client.ViewModels
             _notify = notify;
             _input = input;
             _catDialog = catDialog;
+            _settings = settings;
             _onQuickTx = onQuickTx;
             _getWindow = getWindow;
 
@@ -54,7 +57,7 @@ namespace Client.ViewModels
         private async Task AddAccount()
         {
             var dlg = new AddAccountDialog();
-            var acc = await dlg.ShowDialogAsync(_getWindow());
+            var acc = await dlg.ShowDialogAsync(_getWindow(), _settings.BaseCurrency);
 
             if (acc is null) return;
 

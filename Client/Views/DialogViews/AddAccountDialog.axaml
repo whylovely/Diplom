@@ -14,9 +14,7 @@
     <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
 
     <TextBlock Text="Основная валюта:" />
-    <ComboBox ItemsSource="{Binding Currencies}"
-              SelectedItem="{Binding SelectedCurrency}"
-              Width="220" />
+    <TextBox Text="{Binding BaseCurrency, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" Width="220" HorizontalAlignment="Left"/>
 
     <TextBlock Text="Начальный баланс:" />
     <TextBox Text="{Binding InitialBalance}" Watermark="0" />
@@ -26,7 +24,7 @@
 
     <StackPanel Spacing="6" IsVisible="{Binding IsMultiCurrency}">
       <TextBlock Text="Дополнительная валюта:" />
-      <ComboBox ItemsSource="{Binding Currencies}"
+      <ComboBox ItemsSource="{Binding SecondaryCurrencies}"
                 SelectedItem="{Binding SelectedSecondaryCurrency}"
                 Width="220" />
     </StackPanel>
