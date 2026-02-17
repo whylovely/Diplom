@@ -4,7 +4,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using Client.ViewModels;
 using System.IO;
-using System.Text;
 
 namespace Client.Views;
 
@@ -18,28 +17,33 @@ public partial class ReportView : UserControl
         {
             if (DataContext is ReportViewModel vm)
             {
-                vm.ExportCSVRequested -= OnExportCsvRequested;
-                vm.ExportCSVRequested += OnExportCsvRequested;
+                vm.ExportRequested -= OnExportRequested;
+                vm.ExportRequested += OnExportRequested;
             }
         };
     }
 
-    private async void OnExportCsvRequested(string suggestedFileName, string csvContent)
+    private async void OnExportRequested(string suggestedFileName, byte[] content)
     {
         var window = this.VisualRoot as Window;
         if (window == null) return;
+
+        var ext = Path.GetExtension(suggestedFileName).TrimStart('.');
+        var filterName = ext.ToUpperInvariant();
+        var pattern = $"*.{ext}";
 
         var file = await window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             SuggestedFileName = suggestedFileName,
             FileTypeChoices = new[]
-            { new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } } }
+            {
+                new FilePickerFileType(filterName) { Patterns = new[] { pattern } }
+            }
         });
 
         if (file == null) return;
 
         await using var stream = await file.OpenWriteAsync();
-        await using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
-        await writer.WriteAsync(csvContent);
+        await stream.WriteAsync(content);
     }
 }

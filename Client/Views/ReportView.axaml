@@ -26,16 +26,19 @@
                 </ComboBox>
             </StackPanel>
             
-            <Button Grid.Column="2" Content="Экспорт CSV" Command="{Binding ExportCSVCommand}" Margin="0,10,10,0"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" Margin="0,10,10,0">
+                <ComboBox ItemsSource="{Binding ExportFormats}" SelectedItem="{Binding SelectedExportFormat}" Width="100"/>
+                <Button Content="Экспорт" Command="{Binding ExportCommand}" />
+            </StackPanel>
         </Grid>
 
         <Panel Grid.Row="1">
             <Grid IsVisible="{Binding IsSummary}" RowDefinitions="Auto, Auto, *">
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
                     <TextBlock Text="С:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateFrom}" Width="140"/>
+                    <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                     <TextBlock Text="По:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateTo}" Width="140"/>
+                    <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                     <Button Content="Обновить" Command="{Binding RefreshSummaryCommand}" />
                 </StackPanel>
 
@@ -136,6 +139,30 @@
                 <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" />
             </Grid>
 
+            <Grid IsVisible="{Binding IsIncomeTop}" RowDefinitions="Auto, *, *">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+                    <TextBlock Text="С:" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
+                    <TextBlock Text="По:" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
+                    <TextBlock Text="Топ:" VerticalAlignment="Center"/>
+                    <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="120"/>
+                    <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" />
+                    <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+                        <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
+                        <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" />
+            </Grid>
+
            <Grid IsVisible="{Binding IsExpenseByCategory}" RowDefinitions="Auto, Auto, *">
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
                     <TextBlock Text="С:" VerticalAlignment="Center"/>
@@ -177,9 +204,9 @@
             <Grid IsVisible="{Binding IsIncomeByCategory}" RowDefinitions="Auto, Auto, *">
                  <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
                     <TextBlock Text="С:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateFrom}" Width="140"/>
+                   <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                    <TextBlock Text="По:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateTo}" Width="140"/>
+                   <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                    <Button Content="Обновить" Command="{Binding RefreshIncomeCategoryCommand}" />
                 </StackPanel>
 

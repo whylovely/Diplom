@@ -27,7 +27,7 @@ namespace Client.Services
 
         public MockDS()
         {
-            DemoData(); // изменить позже на дефолтные при регистрации аккаунта
+            DemoData();
         }
 
         private void DemoData()
@@ -104,7 +104,7 @@ namespace Client.Services
             _obligations.AddRange([
                 new Obligation { Counterparty = "Максим", Amount = 5000, Type = ObligationType.Debt, DueDate = today.AddDays(7), Note = "Одолжил до зарплаты" },
                 new Obligation { Counterparty = "Альфа-Банк (Кредитка)", Amount = 12400, Type = ObligationType.Credit, DueDate = today.AddDays(15), Note = "Льготный период" },
-                new Obligation { Counterparty = "Ипотека", Amount = 25000, Type = ObligationType.Credit, IsPaid = true, PaidAt = today.AddDays(-10), Note = "Платеж за текущий месяц" }
+                new Obligation { Counterparty = "Ипотека", Amount = 25000, Type = ObligationType.Credit, IsPaid = true, PaidAt = today.AddDays(-1), Note = "Платеж за текущий месяц" }
             ]);
         }
 

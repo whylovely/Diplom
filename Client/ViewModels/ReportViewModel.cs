@@ -42,6 +42,7 @@ namespace Client.ViewModels
             RefreshSummary();
             RefreshMonthly();
             RefreshExpenseTop();
+            RefreshIncomeTop();
             RefreshExpenseCategory();
             RefreshIncomeCategory();
             RefreshAccounts();
@@ -58,6 +59,7 @@ namespace Client.ViewModels
             new(ReportSelection.MothlyDinamics, "Помесячная динамика"),
             new(ReportSelection.AccountsTurnover, "Обороты по счетам"),
             new(ReportSelection.ExpenseTop, "Топ расходов по категориям"),
+            new(ReportSelection.IncomeTop, "Топ доходов по категориям"),
             new(ReportSelection.ExpenseByCategory, "Расходы по категориям"),
             new(ReportSelection.IncomeByCategory, "Доходы по категориям"),
         };
@@ -72,6 +74,7 @@ namespace Client.ViewModels
         public bool IsMonthlyDynamics => SelectedSection == ReportSelection.MothlyDinamics;
         public bool IsAccountsTurnover => SelectedSection == ReportSelection.AccountsTurnover;
         public bool IsExpenseTop => SelectedSection == ReportSelection.ExpenseTop;
+        public bool IsIncomeTop => SelectedSection == ReportSelection.IncomeTop;
         public bool IsExpenseByCategory => SelectedSection == ReportSelection.ExpenseByCategory;
         public bool IsIncomeByCategory => SelectedSection == ReportSelection.IncomeByCategory;
 
@@ -84,6 +87,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(IsMonthlyDynamics));
             OnPropertyChanged(nameof(IsAccountsTurnover));
             OnPropertyChanged(nameof(IsExpenseTop));
+            OnPropertyChanged(nameof(IsIncomeTop));
             OnPropertyChanged(nameof(IsExpenseByCategory));
             OnPropertyChanged(nameof(IsIncomeByCategory));
         }
@@ -379,6 +383,47 @@ namespace Client.ViewModels
         }
         //
 
+        // Подсчет графика по доходам (Топ доходов)
+        public ObservableCollection<CategoryShareRow> IncomeShareRows { get; } = new();
+        public ObservableCollection<ISeries> IncomePieSeries { get; } = new();
+        [ObservableProperty] private decimal _topIncomesSum;
+        [ObservableProperty] private decimal _topIncomesShare;
+
+        [RelayCommand]
+        public void RefreshIncomeTop() => RefreshIncomeChart();
+
+        private void RefreshIncomeChart()
+        {
+            IncomeShareRows.Clear();
+
+            if (TotalIncome <= 0)
+            {
+                TopIncomesSum = 0;
+                TopIncomesShare = 0;
+                return;
+            }
+
+            var top = IncomeRows
+                .OrderByDescending(r => r.Total)
+                .Take(TopN)
+                .Select(r => new CategoryShareRow
+                {
+                    CategoryName = r.CategoryName,
+                    Total = r.Total,
+                    SharePercent = r.Total / TotalIncome
+                }).ToList();
+
+            foreach (var row in top) IncomeShareRows.Add(row);
+
+            TopIncomesSum = top.Sum(r => r.Total);
+            TopIncomesShare = Math.Round((TopIncomesSum / TotalIncome) * 100m, 2);
+
+            IncomePieSeries.Clear();
+            foreach (var r in IncomeShareRows)
+                IncomePieSeries.Add(new PieSeries<decimal> { Values = new[] { r.Total }, Name = r.CategoryName });
+        }
+        //
+
         // Подсчет остатков и оборотов
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         
@@ -436,7 +481,7 @@ namespace Client.ViewModels
 
         // Обновление баланса на дату
         public ObservableCollection<AccountBalanceRow> BalanceRows { get; } = new();
-        partial void OnBalanceDateChanged(DateTimeOffset Value) => RefreshBalance();
+        partial void OnBalanceDateChanged(DateTimeOffset value) => RefreshBalance();
         [ObservableProperty] private DateTimeOffset _balanceDate = DateTimeOffset.Now;
         [ObservableProperty] private decimal _totalAssetsAtDate;
 
@@ -475,18 +520,43 @@ namespace Client.ViewModels
         //
 
         // Формирование отчета на экспорт
-        public event Action<string, string>? ExportCSVRequested;
-        private string CSVReport() => DropReport.BuildCSVReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+        public event Action<string, byte[]>? ExportRequested;
+
+        [ObservableProperty] private ExportFormat _selectedExportFormat = ExportFormat.CSV;
+
+        public ExportFormat[] ExportFormats { get; } = Enum.GetValues<ExportFormat>();
 
         [RelayCommand]
-        private void ExportCSV()
+        private void Export()
         {
-            var csv = CSVReport();
-            var fName = $"report_{DateFrom:yyMMdd}_{DateTo:yyMMdd}.csv";
+            var baseName = $"report_{DateFrom:yyMMdd}_{DateTo:yyMMdd}";
 
-            ExportCSVRequested?.Invoke(fName, csv);
+            switch (SelectedExportFormat)
+            {
+                case ExportFormat.CSV:
+                    var csv = DropReport.BuildCSVReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    ExportRequested?.Invoke(baseName + ".csv", System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray());
+                    break;
+
+                case ExportFormat.TXT:
+                    var txt = DropReport.BuildTXTReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    ExportRequested?.Invoke(baseName + ".txt", System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(txt)).ToArray());
+                    break;
+
+                case ExportFormat.Excel:
+                    var xlsx = DropReport.BuildExcelReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    ExportRequested?.Invoke(baseName + ".xlsx", xlsx);
+                    break;
+            }
         }
         //
+    }
+
+    public enum ExportFormat
+    {
+        CSV,
+        TXT,
+        Excel
     }
 
     public enum ReportSelection
@@ -495,7 +565,8 @@ namespace Client.ViewModels
         BalanceAtDate,
         MothlyDinamics,
         AccountsTurnover,
-        ExpenseTop, // сделать тоже самое для доходов
+        ExpenseTop,
+        IncomeTop,
         ExpenseByCategory,
         IncomeByCategory
     }
