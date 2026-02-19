@@ -3,57 +3,66 @@
              xmlns:vm="using:Client.ViewModels"
              x:Class="Client.Views.AccountsView"
              x:DataType="vm:AccountsViewModel">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-      <StackPanel Spacing="10">
-        <TextBlock Text="Счета" FontSize="22"/>
-        <Button Content="Добавить счет"
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="Счета" Classes="heading"/>
+        <Button Grid.Column="1" Content="＋ Добавить счёт"
+                Classes="accent"
                 Command="{Binding AddAccountCommand}"
-                Width="160"/>
+                Width="180"/>
+      </Grid>
 
-            <DataGrid x:Name="AccountsGrid"
-                      ItemsSource="{Binding Accounts}"
-                      SelectedItem="{Binding SelectedAccount}"
-                      AutoGenerateColumns="False"
-                      Height="420"
-                      IsReadOnly="True">
+      <!-- Accounts Table -->
+      <Border Classes="card">
+        <DataGrid x:Name="AccountsGrid"
+                  ItemsSource="{Binding Accounts}"
+                  SelectedItem="{Binding SelectedAccount}"
+                  AutoGenerateColumns="False"
+                  Height="480"
+                  IsReadOnly="True">
 
-              <DataGrid.ContextMenu>
-                <ContextMenu x:CompileBindings="False">
-                  <MenuItem Header="Переименовать" Command="{Binding RenameAccountCommand}" />
-                  <MenuItem Header="Удалить" Command="{Binding DeleteAccountCommand}" />
-                  <Separator/>
-                  <MenuItem Header="Быстрый расход" Command="{Binding QuickExpenseCommand}" />
-                  <MenuItem Header="Быстрый доход" Command="{Binding QuickIncomeCommand}" />
-                </ContextMenu>
-              </DataGrid.ContextMenu>
+          <DataGrid.ContextMenu>
+            <ContextMenu x:CompileBindings="False">
+              <MenuItem Header="Переименовать" Command="{Binding RenameAccountCommand}" />
+              <MenuItem Header="Удалить" Command="{Binding DeleteAccountCommand}" />
+              <Separator/>
+              <MenuItem Header="Быстрый расход" Command="{Binding QuickExpenseCommand}" />
+              <MenuItem Header="Быстрый доход" Command="{Binding QuickIncomeCommand}" />
+            </ContextMenu>
+          </DataGrid.ContextMenu>
 
-              <DataGrid.Columns>
-                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="300"/>
-                <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
-                <DataGridTextColumn Header="Баланс" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="140"/>
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="300"/>
+            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
+            <DataGridTextColumn Header="Баланс" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="140"/>
 
-                <DataGridTemplateColumn Header="Доп. валюта" Width="100">
-                  <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                      <TextBlock Text="{Binding SecondaryCurrencyCode}"
-                                 IsVisible="{Binding IsMultiCurrency}"
-                                 VerticalAlignment="Center" Margin="4,0"/>
-                    </DataTemplate>
-                  </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Доп. валюта" Width="100">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding SecondaryCurrencyCode}"
+                             IsVisible="{Binding IsMultiCurrency}"
+                             VerticalAlignment="Center" Margin="4,0"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Доп. баланс" Width="120">
-                  <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                      <TextBlock Text="{Binding SecondaryBalance, StringFormat={}{0:N2}}"
-                                 IsVisible="{Binding IsMultiCurrency}"
-                                 VerticalAlignment="Center" Margin="4,0"/>
-                    </DataTemplate>
-                  </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-              </DataGrid.Columns>
-            </DataGrid>
+            <DataGridTemplateColumn Header="Доп. баланс" Width="120">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding SecondaryBalance, StringFormat={}{0:N2}}"
+                             IsVisible="{Binding IsMultiCurrency}"
+                             VerticalAlignment="Center" Margin="4,0"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </Border>
 
-      </StackPanel>
-    </ScrollViewer>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

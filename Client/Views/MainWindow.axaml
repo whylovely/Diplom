@@ -5,7 +5,7 @@
         x:Class="Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         MinWidth="1000" MinHeight="650"
-        Width="1000" Height="650"
+        Width="1100" Height="700"
         Title="FinanceApp">
 
   <Window.DataContext>
@@ -16,45 +16,193 @@
     <DataTemplate DataType="vm:AccountsViewModel">
       <views:AccountsView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:CategoriesViewModel">
       <views:CategoriesView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:JournalViewModel">
       <views:JournalView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:NewTransactionViewModel">
       <views:NewTransactionView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:ReportViewModel">
       <views:ReportView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:ObligationsViewModel">
       <views:ObligationsView/>
     </DataTemplate>
-
     <DataTemplate DataType="vm:SettingsViewModel">
       <views:SettingsView/>
     </DataTemplate>
   </Window.DataTemplates>
 
   <DockPanel>
-    <StackPanel DockPanel.Dock="Left" Width="200" Spacing="8" Margin="12">
-      <TextBlock Text="Навигация" FontSize="18"/>
-      <Button Content="Счета" Command="{Binding NavigateAccountsCommand}"/>
-      <Button Content="Категории" Command="{Binding NavigateCategoriesCommand}"/>
-      <Button Content="Журнал" Command="{Binding NavigateJournalCommand}"/>
-      <Button Content="Отчеты" Command="{Binding NavigateReportCommand}"/>
-      <Button Content="Долги" Command="{Binding NavigateObligationsCommand}"/>
-      <Button Content="Новая операция" Command="{Binding NavigateNewTransactionCommand}"/>
-      <Separator />
-      <Button Content="Настройки" Command="{Binding NavigateSettingsCommand}"/>
-    </StackPanel>
+    <!-- ═══ LIQUID GLASS SIDEBAR ═══════════════════════════════ -->
+    <Border DockPanel.Dock="Left"
+            Width="220"
+            Background="#991C2235"
+            BorderBrush="#2A3150"
+            BorderThickness="0,0,1,0"
+            Padding="0">
 
-    <ContentControl Content="{Binding Current}" />
+      <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ── App Title ─────────────────────────────────────── -->
+        <Border Grid.Row="0" Padding="20,24,20,20">
+          <StackPanel Spacing="2">
+            <TextBlock Text="💰 FinanceApp"
+                       FontSize="20" FontWeight="Bold"
+                       Foreground="#29B6F6"/>
+            <TextBlock Text="Управление финансами"
+                       FontSize="11" Foreground="#9E9E9E"/>
+          </StackPanel>
+        </Border>
+
+        <!-- ── Navigation Items ──────────────────────────────── -->
+        <StackPanel Grid.Row="1" Spacing="2" Margin="10,0">
+
+          <!-- Счета -->
+          <Button Command="{Binding NavigateAccountsCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Classes.active="{Binding Current, Converter={x:Static ObjectConverters.IsNotNull}}"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="🏦" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Счета" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <!-- Категории -->
+          <Button Command="{Binding NavigateCategoriesCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="📂" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Категории" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <!-- Журнал -->
+          <Button Command="{Binding NavigateJournalCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="📋" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Журнал" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <!-- Отчёты -->
+          <Button Command="{Binding NavigateReportCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="📊" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Отчёты" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <!-- Долги -->
+          <Button Command="{Binding NavigateObligationsCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="🤝" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Долги" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+
+          <!-- Separator -->
+          <Border Height="1" Background="#2A3150" Margin="4,8"/>
+
+          <!-- Новая операция — Accent -->
+          <Button Command="{Binding NavigateNewTransactionCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  CornerRadius="10" Padding="14,10"
+                  BorderThickness="0"
+                  FontWeight="SemiBold">
+            <Button.Background>
+              <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#3329B6F6" Offset="0"/>
+                <GradientStop Color="#33AA00FF" Offset="1"/>
+              </LinearGradientBrush>
+            </Button.Background>
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background">
+                  <Setter.Value>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                      <GradientStop Color="#5529B6F6" Offset="0"/>
+                      <GradientStop Color="#55AA00FF" Offset="1"/>
+                    </LinearGradientBrush>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="➕" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Новая операция" FontSize="14" VerticalAlignment="Center" Foreground="#29B6F6" FontWeight="SemiBold"/>
+            </StackPanel>
+          </Button>
+
+        </StackPanel>
+
+        <!-- ── Settings at bottom ────────────────────────────── -->
+        <StackPanel Grid.Row="2" Margin="10,0,10,16" Spacing="2">
+          <Border Height="1" Background="#2A3150" Margin="4,0,4,8"/>
+          <Button Command="{Binding NavigateSettingsCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Left"
+                  Background="Transparent" BorderThickness="0" CornerRadius="10" Padding="14,10">
+            <Button.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="#29B6F615"/>
+              </Style>
+            </Button.Styles>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <TextBlock Text="⚙️" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Настройки" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+
+      </Grid>
+    </Border>
+
+    <!-- ═══ MAIN CONTENT AREA ══════════════════════════════════ -->
+    <Border Background="#0B1021" Padding="24,20">
+      <ContentControl Content="{Binding Current}" />
+    </Border>
   </DockPanel>
 </Window>

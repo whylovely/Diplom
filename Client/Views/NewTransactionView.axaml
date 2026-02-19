@@ -4,109 +4,122 @@
              x:Class="Client.Views.NewTransactionView"
              x:DataType="vm:NewTransactionViewModel">
 
-  <StackPanel Spacing="12">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="16" MaxWidth="600">
 
-    <TextBlock Text="Новая операция"
-               FontSize="22"
-               FontWeight="Bold"/>
+      <TextBlock Text="Новая операция" Classes="heading"/>
 
-    <StackPanel Orientation="Horizontal" Spacing="16">
-        <RadioButton Content="Расход"
-                     IsChecked="{Binding IsExpense}"
-                     Command="{Binding SetExpenseCommand}" />
+      <!-- Transaction Type Selector -->
+      <Border Classes="cardSmall">
+        <StackPanel Orientation="Horizontal" Spacing="20">
+          <RadioButton Content="Расход"
+                       IsChecked="{Binding IsExpense}"
+                       Command="{Binding SetExpenseCommand}"
+                       Foreground="#FF5252"/>
+          <RadioButton Content="Доход"
+                       IsChecked="{Binding IsIncome}"
+                       Command="{Binding SetIncomeCommand}"
+                       Foreground="#00E676"/>
+          <RadioButton Content="Перевод"
+                       IsChecked="{Binding IsTransfer}"
+                       Command="{Binding SetTransferCommand}"
+                       Foreground="#29B6F6"/>
+        </StackPanel>
+      </Border>
 
-        <RadioButton Content="Доход"
-                     IsChecked="{Binding IsIncome}"
-                     Command="{Binding SetIncomeCommand}" />
+      <!-- Form Fields -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
 
-        <RadioButton Content="Перевод"
-                     IsChecked="{Binding IsTransfer}"
-                     Command="{Binding SetTransferCommand}" />
+          <!-- Дата -->
+          <StackPanel Spacing="4">
+            <TextBlock Text="Дата" Classes="dim"/>
+            <DatePicker SelectedDate="{Binding Date}" Width="300"/>
+          </StackPanel>
+
+          <!-- Описание -->
+          <StackPanel Spacing="4">
+            <TextBlock Text="Описание" Classes="dim"/>
+            <TextBox Text="{Binding Description}" Width="400"/>
+          </StackPanel>
+
+          <!-- Счёт (для расхода/дохода) -->
+          <StackPanel Spacing="4"
+                      IsVisible="{Binding IsSingleAccount}">
+            <TextBlock Text="Счёт" Classes="dim"/>
+            <ComboBox ItemsSource="{Binding Accounts}"
+                      SelectedItem="{Binding FromAccount}"
+                      Width="300">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Откуда (для перевода) -->
+          <StackPanel Spacing="4"
+                      IsVisible="{Binding IsTransfer}">
+            <TextBlock Text="Откуда" Classes="dim"/>
+            <ComboBox ItemsSource="{Binding Accounts}"
+                      SelectedItem="{Binding FromAccount}"
+                      Width="300">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Куда (для перевода) -->
+          <StackPanel Spacing="4"
+                      IsVisible="{Binding IsTransfer}">
+            <TextBlock Text="Куда" Classes="dim"/>
+            <ComboBox ItemsSource="{Binding Accounts}"
+                      SelectedItem="{Binding ToAccount}"
+                      Width="300">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Категория -->
+          <StackPanel Spacing="4"
+                      IsVisible="{Binding IsCategoryRequire}">
+            <TextBlock Text="Категория" Classes="dim"/>
+            <ComboBox ItemsSource="{Binding FilteredCategories}"
+                      SelectedItem="{Binding Category}"
+                      Width="300">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Сумма -->
+          <StackPanel Spacing="4">
+            <TextBlock Text="Сумма" Classes="dim"/>
+            <TextBox Text="{Binding Amount}" Width="200"/>
+          </StackPanel>
+
+          <Separator/>
+
+          <Button Content="✓ Провести"
+                  Classes="accent"
+                  Command="{Binding PostCommand}"
+                  Width="180"
+                  HorizontalAlignment="Left"/>
+
+        </StackPanel>
+      </Border>
+
     </StackPanel>
-
-    <Separator/>
-
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Дата:" Width="90"/>
-      <DatePicker SelectedDate="{Binding Date}" Width="300"/>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Описание:" Width="90"/>
-      <TextBox Text="{Binding Description}" Width="400"/>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal"
-                Spacing="10"
-                IsVisible="{Binding IsSingleAccount}">
-      <TextBlock Text="Счет:" Width="90"/>
-      <ComboBox ItemsSource="{Binding Accounts}"
-                SelectedItem="{Binding FromAccount}"
-                Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal"
-                Spacing="10"
-                IsVisible="{Binding IsTransfer}">
-      <TextBlock Text="Откуда:" Width="90"/>
-      <ComboBox ItemsSource="{Binding Accounts}"
-                SelectedItem="{Binding FromAccount}"
-                Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal"
-                Spacing="10"
-                IsVisible="{Binding IsTransfer}">
-      <TextBlock Text="Куда:" Width="90"/>
-      <ComboBox ItemsSource="{Binding Accounts}"
-                SelectedItem="{Binding ToAccount}"
-                Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal"
-                Spacing="10"
-                IsVisible="{Binding IsCategoryRequire}">
-      <TextBlock Text="Категория:" Width="90"/>
-      <ComboBox ItemsSource="{Binding FilteredCategories}"
-                SelectedItem="{Binding Category}"
-                Width="260">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="10">
-      <TextBlock Text="Сумма:" Width="90"/>
-      <TextBox Text="{Binding Amount}" Width="200"/>
-    </StackPanel>
-
-    <Separator/>
-
-    <Button Content="Провести"
-            Command="{Binding PostCommand}"
-            Width="160"
-            HorizontalAlignment="Left"/>
-
-  </StackPanel>
+  </ScrollViewer>
 </UserControl>

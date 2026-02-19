@@ -3,30 +3,40 @@
         xmlns:vm="using:Client.ViewModels"
         x:Class="Client.Views.AddCategoryDialog"
         x:DataType="vm:AddCategoryDialogViewModel"
-        Width="420" Height="200"
+        Width="420" Height="260"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
+        Background="#0B1021"
         Title="Добавить категорию">
 
-  <StackPanel Margin="16" Spacing="12">
-    <TextBlock Text="Название категории:"/>
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="14">
 
-    <TextBox Text="{Binding Name}" Watermark="Например: Коммуналка" />
+      <TextBlock Text="Новая категория" Classes="subheading"/>
 
-    <TextBlock Text="Тип категории" />
-    <ComboBox ItemsSource="{Binding KindItems}"
-              SelectedItem="{Binding SelectedKind}"
-              Width="220">
-      <ComboBox.ItemTemplate>
-        <DataTemplate x:DataType="vm:AddCategoryDialogViewModel+KindItem">
-          <TextBlock Text="{Binding Title}" />
-        </DataTemplate>
-      </ComboBox.ItemTemplate>
-    </ComboBox>
-
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,-56,0,0">
-    <Button Content="OK" IsEnabled="{Binding CanOk}" Click="OnOkClick" />
-    <Button Content="Отмена" Click="OnCancelClick" />
-  </StackPanel>
+      <StackPanel Spacing="4">
+        <TextBlock Text="Название" Classes="dim"/>
+        <TextBox Text="{Binding Name}" Watermark="Например: Коммуналка" />
       </StackPanel>
+
+      <StackPanel Spacing="4">
+        <TextBlock Text="Тип категории" Classes="dim"/>
+        <ComboBox ItemsSource="{Binding KindItems}"
+                  SelectedItem="{Binding SelectedKind}"
+                  Width="220">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:AddCategoryDialogViewModel+KindItem">
+              <TextBlock Text="{Binding Title}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,4,0,0">
+        <Button Content="✓ Создать" Classes="accent" IsEnabled="{Binding CanOk}" Click="OnOkClick" Width="110"/>
+        <Button Content="Отмена" Click="OnCancelClick" Width="100"/>
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
 </Window>

@@ -5,72 +5,77 @@
              x:Class="Client.Views.JournalView"
              x:DataType="vm:JournalViewModel">
 
-  <StackPanel Spacing="10">
-    <TextBlock Text="Журнал операций" FontSize="22"/>
+  <StackPanel Spacing="16">
 
-    <TextBox Watermark="Поиск по описанию, счёту, категории..."
+    <!-- Header -->
+    <TextBlock Text="Журнал операций" Classes="heading"/>
+
+    <!-- Search -->
+    <TextBox Watermark="🔍 Поиск по описанию, счёту, категории..."
              Text="{Binding SearchText}"
-             Width="400"
+             Width="450"
              HorizontalAlignment="Left"/>
 
-    <DataGrid ItemsSource="{Binding FilteredRows}"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              Height="500"
-              GridLinesVisibility="Horizontal">
-      <DataGrid.Columns>
+    <!-- Journal Table -->
+    <Border Classes="card">
+      <DataGrid ItemsSource="{Binding FilteredRows}"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                Height="500"
+                GridLinesVisibility="Horizontal">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Дата"
+                              Binding="{Binding DateFormatted}"
+                              Width="100"/>
 
-        <DataGridTextColumn Header="Дата"
-                            Binding="{Binding DateFormatted}"
-                            Width="100"/>
+          <DataGridTemplateColumn Header="Тип" Width="90">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="models:JournalRow">
+                <TextBlock Text="{Binding TypeLabel}"
+                           VerticalAlignment="Center"
+                           Margin="4,0"
+                           FontWeight="SemiBold"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
 
-        <DataGridTemplateColumn Header="Тип" Width="90">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate x:DataType="models:JournalRow">
-              <TextBlock Text="{Binding TypeLabel}"
-                         VerticalAlignment="Center"
-                         Margin="4,0"
-                         FontWeight="SemiBold"/>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Описание"
+                              Binding="{Binding Description}"
+                              Width="*"/>
 
-        <DataGridTextColumn Header="Описание"
-                            Binding="{Binding Description}"
-                            Width="*"/>
+          <DataGridTextColumn Header="Счёт"
+                              Binding="{Binding AccountName}"
+                              Width="150"/>
 
-        <DataGridTextColumn Header="Счёт"
-                            Binding="{Binding AccountName}"
-                            Width="150"/>
+          <DataGridTemplateColumn Header="Куда" Width="120">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="models:JournalRow">
+                <TextBlock Text="{Binding ToAccountName}"
+                           IsVisible="{Binding IsTransfer}"
+                           VerticalAlignment="Center"
+                           Margin="4,0"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
 
-        <DataGridTemplateColumn Header="Куда" Width="120">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate x:DataType="models:JournalRow">
-              <TextBlock Text="{Binding ToAccountName}"
-                         IsVisible="{Binding IsTransfer}"
-                         VerticalAlignment="Center"
-                         Margin="4,0"/>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Категория"
+                              Binding="{Binding CategoryName}"
+                              Width="130"/>
 
-        <DataGridTextColumn Header="Категория"
-                            Binding="{Binding CategoryName}"
-                            Width="130"/>
+          <DataGridTemplateColumn Header="Сумма" Width="160">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="models:JournalRow">
+                <TextBlock Text="{Binding FormattedAmount}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           Margin="4,0"
+                           FontWeight="SemiBold"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
 
-        <DataGridTemplateColumn Header="Сумма" Width="160">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate x:DataType="models:JournalRow">
-              <TextBlock Text="{Binding FormattedAmount}"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Right"
-                         Margin="4,0"
-                         FontWeight="SemiBold"/>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-
-      </DataGrid.Columns>
-    </DataGrid>
   </StackPanel>
 </UserControl>

@@ -7,22 +7,23 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
+        Background="#0B1021"
         Title="{Binding Title}">
 
-  <ScrollViewer VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="16" Spacing="12">
-      <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="14">
+
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="#E0E0E0"/>
 
       <TextBox Text="{Binding Text}" />
 
       <StackPanel Orientation="Horizontal"
                   HorizontalAlignment="Right"
-                  Spacing="8"
-                  Margin="0,12,0,0">
-        <Button Content="OK" IsEnabled="{Binding CanOk}" Click="OnOkClick"/>
-        <Button Content="Отмена" Click="OnCancelClick"/>
+                  Spacing="8">
+        <Button Content="✓ OK" Classes="accent" IsEnabled="{Binding CanOk}" Click="OnOkClick" Width="100"/>
+        <Button Content="Отмена" Click="OnCancelClick" Width="100"/>
       </StackPanel>
+
     </StackPanel>
-  </ScrollViewer>
+  </Border>
 </Window>

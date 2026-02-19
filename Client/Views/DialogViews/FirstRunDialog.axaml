@@ -4,31 +4,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Client.ViewModels.DialogWindow"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
-        Width="400" Height="300"
+        Width="420" Height="300"
         x:Class="Client.Views.DialogViews.FirstRunDialog"
         x:DataType="vm:FirstRunDialogViewModel"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
+        Background="#0B1021"
         Title="Добро пожаловать">
 
-  <Border BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="5">
-    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
-      <TextBlock Grid.Row="0" Text="Добро пожаловать в FinanceApp!" 
-                 FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"/>
+  <Border Background="#CC1C2235" CornerRadius="16" BorderBrush="#2A3150" BorderThickness="1" Margin="8">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+
+      <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Center">
+        <TextBlock Text="💰" FontSize="32" HorizontalAlignment="Center"/>
+        <TextBlock Text="Добро пожаловать в FinanceApp!" 
+                   FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"
+                   Foreground="#29B6F6"/>
+      </StackPanel>
       
-      <StackPanel Grid.Row="1" Spacing="15" VerticalAlignment="Center">
-        <TextBlock Text="Выберите базовую валюту для учета:" 
-                   HorizontalAlignment="Center"/>
+      <StackPanel Grid.Row="1" Spacing="14" VerticalAlignment="Center">
+        <TextBlock Text="Выберите базовую валюту для учёта:" 
+                   HorizontalAlignment="Center" Foreground="#E0E0E0"/>
         <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                   SelectedItem="{Binding SelectedCurrency}"
                   HorizontalAlignment="Center" Width="200"/>
         <TextBlock Text="Вы сможете изменить это позже в настройках."
-                   FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
+                   Classes="dim" HorizontalAlignment="Center"/>
       </StackPanel>
 
-      <Button Grid.Row="2" Content="Начать работу" 
+      <Button Grid.Row="2" Content="🚀 Начать работу" 
+              Classes="accent"
               Command="{Binding ConfirmCommand}"
-              HorizontalAlignment="Center" Width="150" Height="35"/>
+              HorizontalAlignment="Center" Width="180" Height="38"/>
     </Grid>
   </Border>
 </Window>

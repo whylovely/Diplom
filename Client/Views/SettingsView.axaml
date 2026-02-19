@@ -7,17 +7,19 @@
              x:Class="Client.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
-  <StackPanel Spacing="20" Margin="20">
-    <TextBlock Text="Настройки" FontSize="24" FontWeight="Bold"/>
+  <StackPanel Spacing="20" MaxWidth="500">
+    <TextBlock Text="Настройки" Classes="heading"/>
 
-    <StackPanel Spacing="10">
-      <TextBlock Text="Базовая валюта" FontWeight="SemiBold"/>
-      <TextBlock Text="Валюта, которая будет использоваться по умолчанию для новых счетов и в отчетах (в будущем)." 
-                 FontSize="12" Foreground="Gray" TextWrapping="Wrap"/>
-      <ComboBox ItemsSource="{Binding AvailableCurrencies}"
-                SelectedItem="{Binding SelectedCurrency}"
-                Width="200"/>
-    </StackPanel>
-    
+    <!-- Currency Setting Card -->
+    <Border Classes="card">
+      <StackPanel Spacing="12">
+        <TextBlock Text="Базовая валюта" Classes="subheading"/>
+        <TextBlock Text="Валюта по умолчанию для новых счетов и отчётов." 
+                   Classes="dim" TextWrapping="Wrap"/>
+        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
+                  SelectedItem="{Binding SelectedCurrency}"
+                  Width="200"/>
+      </StackPanel>
+    </Border>
   </StackPanel>
 </UserControl>

@@ -6,33 +6,44 @@
         Width="460" Height="420"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
+        Background="#0B1021"
         Title="Добавить счёт">
 
-  <StackPanel Margin="20" Spacing="12">
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="14">
 
-    <TextBlock Text="Название счёта:" />
-    <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
+      <TextBlock Text="Добавить счёт" Classes="subheading"/>
 
-    <TextBlock Text="Основная валюта:" />
-    <TextBox Text="{Binding BaseCurrency, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" Width="220" HorizontalAlignment="Left"/>
+      <StackPanel Spacing="4">
+        <TextBlock Text="Название счёта" Classes="dim"/>
+        <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
+      </StackPanel>
 
-    <TextBlock Text="Начальный баланс:" />
-    <TextBox Text="{Binding InitialBalance}" Watermark="0" />
+      <StackPanel Spacing="4">
+        <TextBlock Text="Основная валюта" Classes="dim"/>
+        <TextBox Text="{Binding BaseCurrency, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" Width="220" HorizontalAlignment="Left"/>
+      </StackPanel>
 
-    <CheckBox Content="Многовалютный счёт"
-              IsChecked="{Binding IsMultiCurrency}" />
+      <StackPanel Spacing="4">
+        <TextBlock Text="Начальный баланс" Classes="dim"/>
+        <TextBox Text="{Binding InitialBalance}" Watermark="0" />
+      </StackPanel>
 
-    <StackPanel Spacing="6" IsVisible="{Binding IsMultiCurrency}">
-      <TextBlock Text="Дополнительная валюта:" />
-      <ComboBox ItemsSource="{Binding SecondaryCurrencies}"
-                SelectedItem="{Binding SelectedSecondaryCurrency}"
-                Width="220" />
+      <CheckBox Content="Многовалютный счёт"
+                IsChecked="{Binding IsMultiCurrency}" />
+
+      <StackPanel Spacing="4" IsVisible="{Binding IsMultiCurrency}">
+        <TextBlock Text="Дополнительная валюта" Classes="dim"/>
+        <ComboBox ItemsSource="{Binding SecondaryCurrencies}"
+                  SelectedItem="{Binding SelectedSecondaryCurrency}"
+                  Width="220" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+        <Button Content="✓ Создать" Classes="accent" IsEnabled="{Binding CanOk}" Click="OnOkClick" Width="110"/>
+        <Button Content="Отмена" Click="OnCancelClick" Width="100"/>
+      </StackPanel>
+
     </StackPanel>
-
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
-      <Button Content="OK" IsEnabled="{Binding CanOk}" Click="OnOkClick" />
-      <Button Content="Отмена" Click="OnCancelClick" />
-    </StackPanel>
-
-  </StackPanel>
+  </Border>
 </Window>

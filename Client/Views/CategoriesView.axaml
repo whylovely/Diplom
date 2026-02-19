@@ -4,30 +4,41 @@
              xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
              x:Class="Client.Views.CategoriesView"
              x:DataType="vm:CategoriesViewModel">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-  
-    <StackPanel Spacing="10" >
-      <TextBlock Text="Категории" FontSize="22"/>
-      <Button Content="Добавить" Command="{Binding AddCommand}"/>
-   
-      <dg:DataGrid x:Name="CategoriesGrid"
-                   ItemsSource="{Binding Categories}"
-                   SelectedItem="{Binding Selected}"
-                   AutoGenerateColumns="False"
-                   Height="420"
-                   IsReadOnly="True">
+             
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="16">
 
-        <dg:DataGrid.ContextMenu>
-          <ContextMenu x:CompileBindings="False">
-            <MenuItem Header="Переименовать" Command="{Binding RenameCommand}" />
-            <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" />
-          </ContextMenu>
-        </dg:DataGrid.ContextMenu>
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="Категории" Classes="heading"/>
+        <Button Grid.Column="1" Content="＋ Добавить"
+                Classes="accent"
+                Command="{Binding AddCommand}"
+                Width="160"/>
+      </Grid>
 
-        <dg:DataGrid.Columns>
-          <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
-        </dg:DataGrid.Columns>
-      </dg:DataGrid>
-        </StackPanel>
+      <!-- Categories Table -->
+      <Border Classes="card">
+        <dg:DataGrid x:Name="CategoriesGrid"
+                     ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding Selected}"
+                     AutoGenerateColumns="False"
+                     Height="480"
+                     IsReadOnly="True">
+
+          <dg:DataGrid.ContextMenu>
+            <ContextMenu x:CompileBindings="False">
+              <MenuItem Header="Переименовать" Command="{Binding RenameCommand}" />
+              <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" />
+            </ContextMenu>
+          </dg:DataGrid.ContextMenu>
+
+          <dg:DataGrid.Columns>
+            <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
+          </dg:DataGrid.Columns>
+        </dg:DataGrid>
+      </Border>
+
+    </StackPanel>
   </ScrollViewer>
 </UserControl>

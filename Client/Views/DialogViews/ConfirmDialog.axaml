@@ -7,41 +7,44 @@
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
+        Background="#0B1021"
         Title="{Binding Title}">
 
-  <StackPanel Margin="24" Spacing="16">
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="20">
 
-    <StackPanel Orientation="Horizontal" Spacing="14">
+      <StackPanel Orientation="Horizontal" Spacing="14">
+        <Viewbox Width="28" Height="28" VerticalAlignment="Top">
+          <Path Data="{Binding IconPath}"
+                Fill="{Binding IconColor}"
+                Stretch="Uniform"/>
+        </Viewbox>
 
-      <Viewbox Width="28" Height="28" VerticalAlignment="Top">
-        <Path Data="{Binding IconPath}"
-              Fill="{Binding IconColor}"
-              Stretch="Uniform"/>
-      </Viewbox>
+        <TextBlock Text="{Binding Message}"
+                   TextWrapping="Wrap"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   MaxWidth="320"/>
+      </StackPanel>
 
-      <TextBlock Text="{Binding Message}"
-                 TextWrapping="Wrap"
-                 FontSize="14"
-                 VerticalAlignment="Center"
-                 MaxWidth="340"/>
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="8">
+
+        <Button Content="Удалить"
+                Width="110"
+                Classes="danger"
+                IsDefault="True"
+                HorizontalContentAlignment="Center"
+                Command="{Binding ConfirmCommand}" />
+
+        <Button Content="Отмена"
+                Width="100"
+                IsCancel="True"
+                HorizontalContentAlignment="Center"
+                Command="{Binding CancelCommand}" />
+      </StackPanel>
+
     </StackPanel>
-
-    <StackPanel Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                Spacing="8">
-
-      <Button Content="Удалить"
-              Width="100"
-              IsDefault="True"
-              HorizontalContentAlignment="Center"
-              Command="{Binding ConfirmCommand}" />
-
-      <Button Content="Отмена"
-              Width="100"
-              IsCancel="True"
-              HorizontalContentAlignment="Center"
-              Command="{Binding CancelCommand}" />
-    </StackPanel>
-
-  </StackPanel>
+  </Border>
 </Window>

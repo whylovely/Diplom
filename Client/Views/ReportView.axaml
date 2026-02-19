@@ -9,15 +9,16 @@
              x:DataType="vm:ReportViewModel">
 
     <Grid RowDefinitions="Auto, *">
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="Отчёты" FontSize="22" VerticalAlignment="Center" Margin="0,0,20,0"/>
 
-                <TextBlock Text="Раздел:" VerticalAlignment="Center" Margin="0,5,0,0"/>
+        <!-- ── Header Bar ─────────────────────────────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="Отчёты" Classes="heading" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                <TextBlock Text="Раздел:" VerticalAlignment="Center" Classes="dim" Margin="0,6,0,0"/>
                 <ComboBox ItemsSource="{Binding SectionItems}"
                           SelectedItem="{Binding SelectedSectionItem}"
-                          Width="260"
-                          Margin="0,5,0,0">
+                          Width="280"
+                          Margin="0,4,0,0">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:ReportViewModel+SectionItem">
                             <TextBlock Text="{Binding Title}"/>
@@ -26,217 +27,278 @@
                 </ComboBox>
             </StackPanel>
             
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" Margin="0,10,10,0">
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
                 <ComboBox ItemsSource="{Binding ExportFormats}" SelectedItem="{Binding SelectedExportFormat}" Width="100"/>
-                <Button Content="Экспорт" Command="{Binding ExportCommand}" />
+                <Button Content="📥 Экспорт" Command="{Binding ExportCommand}" />
             </StackPanel>
         </Grid>
 
         <Panel Grid.Row="1">
-            <Grid IsVisible="{Binding IsSummary}" RowDefinitions="Auto, Auto, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="С:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                    <TextBlock Text="По:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                    <Button Content="Обновить" Command="{Binding RefreshSummaryCommand}" />
-                </StackPanel>
 
-                <Border Grid.Row="1" Padding="15" CornerRadius="8" Background="{DynamicResource SystemRegionBrush}" Margin="0,0,0,10">
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Итог за период" FontSize="18" FontWeight="SemiBold"/>
-                        <StackPanel Orientation="Horizontal" Spacing="20">
-                            <TextBlock Text="{Binding TotalIncome, StringFormat=Доходы: {0:N2}}" Foreground="Green" FontSize="16"/>
-                            <TextBlock Text="{Binding TotalExpense, StringFormat=Расходы: {0:N2}}" Foreground="Red" FontSize="16"/>
-                            <TextBlock Text="{Binding Net, StringFormat=Итог: {0:N2}}" FontSize="16" FontWeight="Bold"/>
-                        </StackPanel>
+            <!-- ══ SUMMARY ════════════════════════════════════ -->
+            <Grid IsVisible="{Binding IsSummary}" RowDefinitions="Auto, Auto, *">
+                <!-- Date Filter -->
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                        <Button Content="Обновить" Command="{Binding RefreshSummaryCommand}" Classes="accent"/>
                     </StackPanel>
+                </Border>
+
+                <!-- Summary Cards -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
+                    <Border Classes="cardSmall" Margin="0,0,6,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Доходы" Classes="dim"/>
+                            <TextBlock Text="{Binding TotalIncome, StringFormat={}{0:N2}}" Classes="moneyGreen" FontSize="20"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Classes="cardSmall" Margin="6,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Расходы" Classes="dim"/>
+                            <TextBlock Text="{Binding TotalExpense, StringFormat={}{0:N2}}" Classes="moneyRed" FontSize="20"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Classes="cardSmall" Margin="6,0,0,0">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Итог" Classes="dim"/>
+                            <TextBlock Text="{Binding Net, StringFormat={}{0:N2}}" Classes="cyan" FontSize="20"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid> 
+
+            <!-- ══ BALANCE AT DATE ════════════════════════════ -->
+            <Grid IsVisible="{Binding IsBalanceAtDate}" RowDefinitions="Auto, *">
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="Дата:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding BalanceDate}" Width="260"/>
+                        <Button Content="Обновить" Command="{Binding RefreshBalanceCommand}" Classes="accent"/>
+                        <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого: {0:N2}}" 
+                                   VerticalAlignment="Center" FontWeight="Bold" Foreground="#29B6F6" Margin="16,0,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Classes="card">
+                    <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" IsReadOnly="True"
+                              GridLinesVisibility="Horizontal">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
+                            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
+                            <DataGridTextColumn Header="Остаток" Binding="{Binding Balance, StringFormat=N2}" Width="150"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </Grid>
+
+            <!-- ══ MONTHLY DYNAMICS ═══════════════════════════ -->
+           <Grid IsVisible="{Binding IsMonthlyDynamics}" RowDefinitions="Auto, *, *">
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                       <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <Button Content="Обновить" Command="{Binding RefreshMonthlyCommand}" Classes="accent"/>
+                    </StackPanel>
+                </Border>
+                
+                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="150"/>
+                            <DataGridTextColumn Header="Доходы" Binding="{Binding Income, StringFormat=N2}" Width="*"/>
+                            <DataGridTextColumn Header="Расходы" Binding="{Binding Expense, StringFormat=N2}" Width="*"/>
+                            <DataGridTextColumn Header="Итог" Binding="{Binding Net, StringFormat=N2}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <Border Grid.Row="2" Classes="card">
+                    <lvc:CartesianChart Series="{Binding MonthlySeries}"
+                                        XAxes="{Binding XAxes}"
+                                        YAxes="{Binding YAxes}" />
                 </Border>
             </Grid> 
 
-            <Grid IsVisible="{Binding IsBalanceAtDate}" RowDefinitions="Auto, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="Дата:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
-                    <Button Content="Обновить" Command="{Binding RefreshBalanceCommand}" />
-                    <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого активы: {0:N2}}" VerticalAlignment="Center" FontWeight="Bold" Margin="10,0,0,0"/>
-                </StackPanel>
-
-                <DataGrid Grid.Row="1" ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" BorderThickness="1" BorderBrush="Gray">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
-                        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-                        <DataGridTextColumn Header="Остаток" Binding="{Binding Balance, StringFormat=N2}" Width="150" CellStyleClasses="RightAlign"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
-
-           <Grid IsVisible="{Binding IsMonthlyDynamics}" RowDefinitions="Auto, *, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                   <TextBlock Text="С:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                   <TextBlock Text="По:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                   <Button Content="Обновить" Command="{Binding RefreshMonthlyCommand}" />
-                </StackPanel>
-                
-                <DataGrid Grid.Row="1" ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="150"/>
-                        <DataGridTextColumn Header="Доходы" Binding="{Binding Income, StringFormat=N2}" Width="*"/>
-                        <DataGridTextColumn Header="Расходы" Binding="{Binding Expense, StringFormat=N2}" Width="*"/>
-                        <DataGridTextColumn Header="Итог" Binding="{Binding Net, StringFormat=N2}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <lvc:CartesianChart Grid.Row="2" Series="{Binding MonthlySeries}"
-                                    XAxes="{Binding XAxes}"
-                                    YAxes="{Binding YAxes}" />
-            </Grid> 
-
+            <!-- ══ ACCOUNTS TURNOVER ══════════════════════════ -->
             <Grid IsVisible="{Binding IsAccountsTurnover}" RowDefinitions="Auto, *">
-                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                   <TextBlock Text="С:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                   <TextBlock Text="По:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                   <Button Content="Обновить" Command="{Binding RefreshAccountsCommand}" />
-                </StackPanel>
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                       <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <Button Content="Обновить" Command="{Binding RefreshAccountsCommand}" Classes="accent"/>
+                    </StackPanel>
+                </Border>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Счет" Binding="{Binding AccountName}" Width="*"/>
-                        <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
-                        <DataGridTextColumn Header="Начало" Binding="{Binding Opening, StringFormat=N2}" Width="100"/>
-                        <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver, StringFormat=N2}" Width="120"/>
-                        <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver, StringFormat=N2}" Width="120"/>
-                        <DataGridTextColumn Header="Конец" Binding="{Binding Closing, StringFormat=N2}" Width="100"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Border Grid.Row="1" Classes="card">
+                    <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
+                            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
+                            <DataGridTextColumn Header="Начало" Binding="{Binding Opening, StringFormat=N2}" Width="100"/>
+                            <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver, StringFormat=N2}" Width="120"/>
+                            <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver, StringFormat=N2}" Width="120"/>
+                            <DataGridTextColumn Header="Конец" Binding="{Binding Closing, StringFormat=N2}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
             </Grid>
 
+            <!-- ══ EXPENSE TOP ════════════════════════════════ -->
             <Grid IsVisible="{Binding IsExpenseTop}" RowDefinitions="Auto, *, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="С:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                    <TextBlock Text="По:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                    <TextBlock Text="Топ:" VerticalAlignment="Center"/>
-                    <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="120"/>
-                    <Button Content="Обновить" Command="{Binding RefreshExpenseTopCommand}" />
-                    <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                    <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
-                </StackPanel>
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="220"/>
+                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="220"/>
+                        <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
+                        <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
+                        <Button Content="Обновить" Command="{Binding RefreshExpenseTopCommand}" Classes="accent"/>
+                        <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Foreground="#FF5252" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center" Foreground="#9E9E9E"/>
+                    </StackPanel>
+                </Border>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-                        <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
-                        <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
+                            <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
 
-                <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" />
+                <Border Grid.Row="2" Classes="card">
+                    <lvc:PieChart Series="{Binding ExpensePieSeries}" />
+                </Border>
             </Grid>
 
+            <!-- ══ INCOME TOP ═════════════════════════════════ -->
             <Grid IsVisible="{Binding IsIncomeTop}" RowDefinitions="Auto, *, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="С:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                    <TextBlock Text="По:" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                    <TextBlock Text="Топ:" VerticalAlignment="Center"/>
-                    <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="120"/>
-                    <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" />
-                    <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                    <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center"/>
-                </StackPanel>
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="220"/>
+                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="220"/>
+                        <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
+                        <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
+                        <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" Classes="accent"/>
+                        <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Foreground="#00E676" Margin="10,0,0,0"/>
+                        <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center" Foreground="#9E9E9E"/>
+                    </StackPanel>
+                </Border>
 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-                        <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
-                        <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
+                    <DataGrid ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
+                            <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
 
-                <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" />
+                <Border Grid.Row="2" Classes="card">
+                    <lvc:PieChart Series="{Binding IncomePieSeries}" />
+                </Border>
             </Grid>
 
+            <!-- ══ EXPENSE BY CATEGORY ════════════════════════ -->
            <Grid IsVisible="{Binding IsExpenseByCategory}" RowDefinitions="Auto, Auto, *">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="С:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                   <TextBlock Text="По:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                   <Button Content="Обновить" Command="{Binding RefreshExpenseCategoryCommand}" />
-                </StackPanel>
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <Button Content="Обновить" Command="{Binding RefreshExpenseCategoryCommand}" Classes="accent"/>
+                    </StackPanel>
+                </Border>
                 
-                <TextBlock Grid.Row="1" Text="{Binding TotalExpense, StringFormat=Итого расходов: {0:N2}}" FontSize="14" Margin="0,0,0,5" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Text="{Binding TotalExpense, StringFormat=Итого расходов: {0:N2}}" 
+                           FontSize="16" Margin="0,0,0,8" Classes="moneyRed"/>
 
-                <ScrollViewer Grid.Row="2">
-                    <ItemsControl ItemsSource="{Binding ExpenseGroups}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="m:CategoryDetailGroup">
-                                <Expander Margin="0,2" HorizontalAlignment="Stretch">
-                                    <Expander.Header>
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Expander.Header>
-                                    <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
-                                              IsReadOnly="True" HeadersVisibility="Column"
-                                              MaxHeight="400">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
-                                            <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
-                                            <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Expander>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                <Border Grid.Row="2" Classes="card">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding ExpenseGroups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="m:CategoryDetailGroup">
+                                    <Expander Margin="0,2" HorizontalAlignment="Stretch">
+                                        <Expander.Header>
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Expander.Header>
+                                        <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
+                                                  IsReadOnly="True" HeadersVisibility="Column"
+                                                  MaxHeight="400">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
+                                                <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                                                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
             </Grid>
 
+            <!-- ══ INCOME BY CATEGORY ═════════════════════════ -->
             <Grid IsVisible="{Binding IsIncomeByCategory}" RowDefinitions="Auto, Auto, *">
-                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-                    <TextBlock Text="С:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
-                   <TextBlock Text="По:" VerticalAlignment="Center"/>
-                   <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
-                   <Button Content="Обновить" Command="{Binding RefreshIncomeCategoryCommand}" />
-                </StackPanel>
+                <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <Button Content="Обновить" Command="{Binding RefreshIncomeCategoryCommand}" Classes="accent"/>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Grid.Row="1" Text="{Binding TotalIncome, StringFormat=Итого доходов: {0:N2}}" FontSize="14" Margin="0,0,0,5" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Text="{Binding TotalIncome, StringFormat=Итого доходов: {0:N2}}" 
+                           FontSize="16" Margin="0,0,0,8" Classes="moneyGreen"/>
 
-                <ScrollViewer Grid.Row="2">
-                    <ItemsControl ItemsSource="{Binding IncomeGroups}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="m:CategoryDetailGroup">
-                                <Expander Margin="0,2" HorizontalAlignment="Stretch">
-                                    <Expander.Header>
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Expander.Header>
-                                    <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
-                                              IsReadOnly="True" HeadersVisibility="Column"
-                                              MaxHeight="400">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
-                                            <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
-                                            <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Expander>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                <Border Grid.Row="2" Classes="card">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding IncomeGroups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="m:CategoryDetailGroup">
+                                    <Expander Margin="0,2" HorizontalAlignment="Stretch">
+                                        <Expander.Header>
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding CategoryName}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat={}{0:N2}}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Expander.Header>
+                                        <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
+                                                  IsReadOnly="True" HeadersVisibility="Column"
+                                                  MaxHeight="400">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
+                                                <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                                                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
             </Grid>
 
         </Panel>

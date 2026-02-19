@@ -5,69 +5,84 @@
              x:DataType="vm:ObligationsViewModel">
   
   <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <StackPanel Spacing="10">
-      <TextBlock Text="Обязательства" FontSize="22"/>
+    <StackPanel Spacing="16">
 
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <Button Content="Добавить" Command="{Binding AddCommand}" Width="120" />
-        <Button Content="Изменить" Command="{Binding EditCommand}" Width="120" />
-        <Button Content="Удалить" Command="{Binding DeleteCommand}" Width="120" />
-        <Button Content="Статус" Command="{Binding MarkPaidCommand}" Width="120" ToolTip.Tip="Переключить статус оплачено/активно" />
-        
-        <CheckBox IsChecked="{Binding ShowPaid}" Content="Показывать оплаченные" VerticalAlignment="Center" Margin="10,0"/>
-      </StackPanel>
+      <!-- Header -->
+      <TextBlock Text="Обязательства" Classes="heading"/>
 
-      <Border Background="#F0F0F0" CornerRadius="5" Padding="10" Margin="0,5">
-        <StackPanel Orientation="Horizontal" Spacing="20">
-          <TextBlock Text="{Binding TotalDebt, StringFormat='Я должен: {0:N2}'}" Foreground="#D13438" FontWeight="Bold" FontSize="16" />
-          <TextBlock Text="{Binding TotalCredit, StringFormat='Мне должны: {0:N2}'}" Foreground="#107C10" FontWeight="Bold" FontSize="16" />
+      <!-- Action Bar -->
+      <Border Classes="cardSmall">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button Content="＋ Добавить" Classes="accent" Command="{Binding AddCommand}" Width="130" />
+          <Button Content="Изменить" Command="{Binding EditCommand}" Width="110" />
+          <Button Content="Удалить" Classes="danger" Command="{Binding DeleteCommand}" Width="110" />
+          <Button Content="Статус" Command="{Binding MarkPaidCommand}" Width="110" ToolTip.Tip="Переключить статус оплачено/активно" />
+          <CheckBox IsChecked="{Binding ShowPaid}" Content="Показывать оплаченные" VerticalAlignment="Center" Margin="14,0"/>
         </StackPanel>
       </Border>
 
-      <DataGrid ItemsSource="{Binding Items}" 
-                SelectedItem="{Binding SelectedItem}"
-                AutoGenerateColumns="False" 
-                IsReadOnly="True" 
-                Height="450"
-                GridLinesVisibility="Horizontal">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="200" />
-          
-          <DataGridTemplateColumn Header="Сумма" Width="120">
-            <DataTemplate>
-              <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
-                <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding Currency}" Foreground="Gray" />
-              </StackPanel>
-            </DataTemplate>
-          </DataGridTemplateColumn>
+      <!-- Summary -->
+      <Grid ColumnDefinitions="*,*" Margin="0,0,0,4">
+        <Border Classes="cardSmall" Margin="0,0,8,0">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Я должен" Classes="dim"/>
+            <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed" FontSize="20"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Classes="cardSmall" Margin="8,0,0,0">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Мне должны" Classes="dim"/>
+            <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen" FontSize="20"/>
+          </StackPanel>
+        </Border>
+      </Grid>
 
-          <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="100" />
-          
-          <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100" />
-          
-          <DataGridTemplateColumn Header="Статус" Width="100">
-            <DataTemplate>
-              <TextBlock Text="{Binding StatusLabel}">
-                <TextBlock.Styles>
-                  <Style Selector="TextBlock[Text=Погашено]">
-                    <Setter Property="Foreground" Value="Gray"/>
-                  </Style>
-                  <Style Selector="TextBlock[Text=Просрочено]">
-                    <Setter Property="Foreground" Value="Red"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                  </Style>
-                  <Style Selector="TextBlock[Text=Активно]">
-                    <Setter Property="Foreground" Value="Green"/>
-                  </Style>
-                </TextBlock.Styles>
-              </TextBlock>
-            </DataTemplate>
-          </DataGridTemplateColumn>
-          
-          <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*" />
-        </DataGrid.Columns>
-      </DataGrid>
+      <!-- Table -->
+      <Border Classes="card">
+        <DataGrid ItemsSource="{Binding Items}" 
+                  SelectedItem="{Binding SelectedItem}"
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  Height="400"
+                  GridLinesVisibility="Horizontal">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="200" />
+            
+            <DataGridTemplateColumn Header="Сумма" Width="120">
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                  <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Currency}" Foreground="#9E9E9E" />
+                </StackPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="100" />
+            <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100" />
+            
+            <DataGridTemplateColumn Header="Статус" Width="100">
+              <DataTemplate>
+                <TextBlock Text="{Binding StatusLabel}">
+                  <TextBlock.Styles>
+                    <Style Selector="TextBlock[Text=Погашено]">
+                      <Setter Property="Foreground" Value="#9E9E9E"/>
+                    </Style>
+                    <Style Selector="TextBlock[Text=Просрочено]">
+                      <Setter Property="Foreground" Value="#FF5252"/>
+                      <Setter Property="FontWeight" Value="Bold"/>
+                    </Style>
+                    <Style Selector="TextBlock[Text=Активно]">
+                      <Setter Property="Foreground" Value="#00E676"/>
+                    </Style>
+                  </TextBlock.Styles>
+                </TextBlock>
+              </DataTemplate>
+            </DataGridTemplateColumn>
+            
+            <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*" />
+          </DataGrid.Columns>
+        </DataGrid>
+      </Border>
 
     </StackPanel>
   </ScrollViewer>
