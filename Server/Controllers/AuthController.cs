@@ -50,6 +50,21 @@ public sealed class AuthController : ControllerBase
         var email = req.Email.Trim().ToLowerInvariant();
         var user = await _db.Users.SingleOrDefaultAsync(x => x.Email == email, ct);
         if (user is null) return Unauthorized("Invalid credentials.");
+        if (user.IsBlocked) return Unauthorized("Account is blocked.");
+
+        var vr = _hasher.VerifyHashedPassword(user, user.PasswordHash, req.Password);
+        if (vr == PasswordVerificationResult.Failed) return Unauthorized("Invalid credentials.");
+
+        return Ok(new AuthResponse(CreateToken(user)));
+    }
+
+    [HttpPost("admin/login")]
+    public async Task<ActionResult<AuthResponse>> AdminLogin(LoginRequest req, CancellationToken ct)
+    {
+        var email = req.Email.Trim().ToLowerInvariant();
+        var user = await _db.Users.SingleOrDefaultAsync(x => x.Email == email, ct);
+        if (user is null) return Unauthorized("Invalid credentials.");
+        if (user.Role != "Admin") return Forbid();
 
         var vr = _hasher.VerifyHashedPassword(user, user.PasswordHash, req.Password);
         if (vr == PasswordVerificationResult.Failed) return Unauthorized("Invalid credentials.");
@@ -68,7 +83,8 @@ public sealed class AuthController : ControllerBase
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString())
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Role, user.Role)
         };
 
         var creds = new SigningCredentials(
