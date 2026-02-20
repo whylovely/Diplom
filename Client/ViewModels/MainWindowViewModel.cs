@@ -16,6 +16,24 @@ namespace Client.ViewModels
         [ObservableProperty]
         private ViewModelBase _current;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsAccountsActive))]
+        [NotifyPropertyChangedFor(nameof(IsCategoriesActive))]
+        [NotifyPropertyChangedFor(nameof(IsJournalActive))]
+        [NotifyPropertyChangedFor(nameof(IsReportActive))]
+        [NotifyPropertyChangedFor(nameof(IsObligationsActive))]
+        [NotifyPropertyChangedFor(nameof(IsNewTransactionActive))]
+        [NotifyPropertyChangedFor(nameof(IsSettingsActive))]
+        private string _activePage = "Accounts";
+
+        public bool IsAccountsActive      => ActivePage == "Accounts";
+        public bool IsCategoriesActive     => ActivePage == "Categories";
+        public bool IsJournalActive        => ActivePage == "Journal";
+        public bool IsReportActive         => ActivePage == "Report";
+        public bool IsObligationsActive    => ActivePage == "Obligations";
+        public bool IsNewTransactionActive => ActivePage == "NewTransaction";
+        public bool IsSettingsActive       => ActivePage == "Settings";
+
         public AccountsViewModel AccountsVm { get; }
         public JournalViewModel JournalVm { get; }
         public NewTransactionViewModel NewTxVm { get; }
@@ -50,7 +68,7 @@ namespace Client.ViewModels
                 onPosted: () =>
             {
                 JournalVm.Refresh();
-                Current = JournalVm;
+                NavigateJournal();
             });
 
             ReportVm = new ReportViewModel(_data);
@@ -84,16 +102,16 @@ namespace Client.ViewModels
 
         private void openQuickTx(Account account, TxKindChoice choice)
         {
-            Current = NewTxVm;
+            NavigateNewTransaction();
             NewTxVm.PresetForQuickTx(account, choice);
         }
 
-        [RelayCommand] private void NavigateAccounts() => Current = AccountsVm;
-        [RelayCommand] private void NavigateJournal() => Current = JournalVm;
-        [RelayCommand] private void NavigateNewTransaction() => Current = NewTxVm;
-        [RelayCommand] private void NavigateReport() => Current = ReportVm;
-        [RelayCommand] private void NavigateCategories() => Current = CategoriesVm;
-        [RelayCommand] private void NavigateObligations() => Current = ObligationsVm;
-        [RelayCommand] private void NavigateSettings() => Current = SettingsVm;
+        [RelayCommand] private void NavigateAccounts()        { Current = AccountsVm;     ActivePage = "Accounts"; }
+        [RelayCommand] private void NavigateJournal()         { Current = JournalVm;      ActivePage = "Journal"; }
+        [RelayCommand] private void NavigateNewTransaction()  { Current = NewTxVm;        ActivePage = "NewTransaction"; }
+        [RelayCommand] private void NavigateReport()          { Current = ReportVm;       ActivePage = "Report"; }
+        [RelayCommand] private void NavigateCategories()      { Current = CategoriesVm;   ActivePage = "Categories"; }
+        [RelayCommand] private void NavigateObligations()     { Current = ObligationsVm;  ActivePage = "Obligations"; }
+        [RelayCommand] private void NavigateSettings()        { Current = SettingsVm;     ActivePage = "Settings"; }
     }
 }

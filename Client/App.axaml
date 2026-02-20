@@ -215,5 +215,39 @@
       <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
+    <!-- ══ BOTTOM NAV BAR ITEMS ═════════════════════════════ -->
+    <Style Selector="Button.navItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="20"/>
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="Margin" Value="3,0"/>
+      <Setter Property="Foreground" Value="#CCE0E0E0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.navItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#29B6F618"/>
+      <Setter Property="Foreground" Value="#E0E0E0"/>
+    </Style>
+
+    <!-- Active nav item: dark-blue pill + bright blue text -->
+    <Style Selector="Button.navActive">
+      <Setter Property="Background" Value="#1A237E"/>
+      <Setter Property="Foreground" Value="#4A85F6"/>
+    </Style>
+    <Style Selector="Button.navActive /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1A237E"/>
+      <Setter Property="Foreground" Value="#4A85F6"/>
+    </Style>
+    <Style Selector="Button.navActive TextBlock">
+      <Setter Property="Foreground" Value="#4A85F6"/>
+    </Style>
+    <Style Selector="Button.navActive:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1A237E"/>
+      <Setter Property="Foreground" Value="#4A85F6"/>
+    </Style>
+
   </Application.Styles>
 </Application>
