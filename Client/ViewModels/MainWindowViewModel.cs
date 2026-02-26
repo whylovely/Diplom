@@ -44,7 +44,7 @@ namespace Client.ViewModels
 
         public MainWindowViewModel()
         {
-            _data = new MockDS();
+            _data = new LocalDbService();
             _notify = new NotificationService();
             _settings = new SettingsService();
 
