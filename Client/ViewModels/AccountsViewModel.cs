@@ -30,7 +30,31 @@ namespace Client.ViewModels
         [ObservableProperty] 
         private Account? _selectedAccount;
 
+        public decimal TotalBalance
+        {
+            get
+            {
+                if (Accounts == null) return 0;
+                return Accounts.Sum(a => a.Balance);
+            }
+        }
+
         private bool hasSelectedAccount() => SelectedAccount is not null;
+
+        [ObservableProperty]
+        private bool _isLoading;
+
+        [ObservableProperty]
+        private string _syncStatusText = "Синхронизировано";
+
+        [ObservableProperty]
+        private string _syncIconColor = "#00E676"; // Green
+
+        [ObservableProperty]
+        private string _syncIconData = "M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z";
+
+        [ObservableProperty]
+        private bool _isSyncing = false;
 
         public AccountsViewModel(
             IDataService data, 
@@ -50,7 +74,23 @@ namespace Client.ViewModels
             _onQuickTx = onQuickTx;
             _getWindow = getWindow;
 
-            Accounts = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
+            Accounts = new ObservableCollection<Account>();
+            _ = LoadDataAsync();
+        }
+
+        private async Task LoadDataAsync()
+        {
+            IsLoading = true;
+            await Task.Delay(2000); // Имитация долгой загрузки
+            
+            var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets);
+            foreach (var acc in loadedAccounts)
+            {
+                Accounts.Add(acc);
+            }
+            OnPropertyChanged(nameof(TotalBalance));
+
+            IsLoading = false;
         }
 
         [RelayCommand]
@@ -69,12 +109,13 @@ namespace Client.ViewModels
 
             _data.AddAccount(acc);
             Accounts.Insert(0, acc);
+            OnPropertyChanged(nameof(TotalBalance));
 
             await _notify.ShowInfoAsync($"Счет \"{acc.Name}\" добавлен.");
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task RenameAccountAsync() // Переименование счета
+        private async Task RenameAccountAsync()
         {
             var acc = SelectedAccount;
 
@@ -101,12 +142,13 @@ namespace Client.ViewModels
 
             _data.RenameAccount(acc.Id, newName);
             acc.Name = newName;
+            OnPropertyChanged(nameof(TotalBalance));
 
             await _notify.ShowInfoAsync("Счёт переименован.");
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task DeleteAccountAsync() // Удаление счета
+        private async Task DeleteAccountAsync()
         {
             var acc = SelectedAccount;
 
@@ -126,17 +168,18 @@ namespace Client.ViewModels
 
             _data.RemoveAccount(acc.Id); 
             Accounts.Remove(acc);
+            OnPropertyChanged(nameof(TotalBalance));
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickExpense() // кнопка "Быстрый расход"
+        private void QuickExpense()
         {
             if (_onQuickTx is null) return;
             _onQuickTx(SelectedAccount!, TxKindChoice.Expense);
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickIncome()  // кнопка "Быстрый доход"
+        private void QuickIncome()
         {
             if (_onQuickTx is null) return;
             _onQuickTx(SelectedAccount!, TxKindChoice.Income);

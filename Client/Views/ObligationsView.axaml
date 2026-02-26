@@ -26,13 +26,13 @@
         <Border Classes="cardSmall" Margin="0,0,8,0">
           <StackPanel Spacing="4">
             <TextBlock Text="Я должен" Classes="dim"/>
-            <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed" FontSize="20"/>
+            <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed heroBalance" FontSize="36"/>
           </StackPanel>
         </Border>
         <Border Grid.Column="1" Classes="cardSmall" Margin="8,0,0,0">
           <StackPanel Spacing="4">
             <TextBlock Text="Мне должны" Classes="dim"/>
-            <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen" FontSize="20"/>
+            <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen heroBalance" FontSize="36"/>
           </StackPanel>
         </Border>
       </Grid>
@@ -52,14 +52,14 @@
             <DataGridTemplateColumn Header="Сумма" Width="120">
               <DataTemplate>
                 <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
-                  <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" FontWeight="SemiBold" />
-                  <TextBlock Text="{Binding Currency}" Foreground="#9E9E9E" />
+                  <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" Classes="amount" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding Currency}" Classes="amount" Foreground="#9E9E9E" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 </StackPanel>
               </DataTemplate>
             </DataGridTemplateColumn>
 
             <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="100" />
-            <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100" />
+            <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120" FontFamily="Fira Code, Consolas, monospace" />
             
             <DataGridTemplateColumn Header="Статус" Width="100">
               <DataTemplate>
@@ -83,5 +83,13 @@
             <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*" />
           </DataGrid.Columns>
     </DataGrid>
+
+    <!-- Empty State -->
+    <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
+                IsVisible="{Binding !Items.Count}">
+      <Path Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M11,19.93C7.05,19.43 4,16.05 4,12C4,7.95 7.05,4.57 11,4.07V19.93M13,4.07C16.95,4.57 20,7.95 20,12C20,16.05 16.95,19.43 13,19.93V4.07Z" 
+            Fill="#9E9E9E" Opacity="0.15" Width="120" Height="120" Stretch="Uniform" HorizontalAlignment="Center"/>
+      <TextBlock Text="Список обязательств пуст..." Classes="dim" FontSize="16" HorizontalAlignment="Center"/>
+    </StackPanel>
   </Grid>
 </UserControl>

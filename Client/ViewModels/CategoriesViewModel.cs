@@ -45,7 +45,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     private bool HasSelection() => Selected is not null;
 
     [RelayCommand]
-    private async Task AddAsync()   // Добавление категории
+    private async Task AddAsync()
     {
         var created = await _catDialog.ShowAddCategoryDialogAsync();
         if (created is null) return;
@@ -63,7 +63,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task RenameAsync()    // Переименование ктегории
+    private async Task RenameAsync()
     {
         if (Selected is null) return;
 
@@ -85,7 +85,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task DeleteAsync()    // Удаление категории
+    private async Task DeleteAsync()
     {
         if (Selected is null) return;
 

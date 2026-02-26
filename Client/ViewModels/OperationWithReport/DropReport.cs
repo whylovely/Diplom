@@ -97,7 +97,6 @@ namespace Client.ViewModels.OperationWithReport
             sb.AppendLine(sep);
             sb.AppendLine();
 
-            // Расходы по категориям
             sb.AppendLine("  РАСХОДЫ ПО КАТЕГОРИЯМ");
             sb.AppendLine($"  {"Категория",-30} {"Сумма",15}");
             sb.AppendLine("  " + new string('─', 47));
@@ -105,7 +104,6 @@ namespace Client.ViewModels.OperationWithReport
                 sb.AppendLine($"  {r.CategoryName,-30} {r.Total,15:N2}");
             sb.AppendLine();
 
-            // Доходы по категориям
             sb.AppendLine("  ДОХОДЫ ПО КАТЕГОРИЯМ");
             sb.AppendLine($"  {"Категория",-30} {"Сумма",15}");
             sb.AppendLine("  " + new string('─', 47));
@@ -113,7 +111,6 @@ namespace Client.ViewModels.OperationWithReport
                 sb.AppendLine($"  {r.CategoryName,-30} {r.Total,15:N2}");
             sb.AppendLine();
 
-            // По месяцам
             sb.AppendLine("  ПОМЕСЯЧНАЯ ДИНАМИКА");
             sb.AppendLine($"  {"Месяц",-18} {"Доходы",12} {"Расходы",12} {"Итог",12}");
             sb.AppendLine("  " + new string('─', 56));
@@ -121,7 +118,6 @@ namespace Client.ViewModels.OperationWithReport
                 sb.AppendLine($"  {r.Month,-18} {r.Income,12:N2} {r.Expense,12:N2} {r.Net,12:N2}");
             sb.AppendLine();
 
-            // Счета
             sb.AppendLine("  ОБОРОТЫ ПО СЧЕТАМ");
             sb.AppendLine($"  {"Счет",-20} {"Валюта",-6} {"Начало",12} {"Доходы",12} {"Расходы",12} {"Конец",12}");
             sb.AppendLine("  " + new string('─', 76));
@@ -129,7 +125,6 @@ namespace Client.ViewModels.OperationWithReport
                 sb.AppendLine($"  {r.AccountName,-20} {r.CurrencyCode,-6} {r.Opening,12:N2} {r.DebitTurnOver,12:N2} {r.CreditTurnOver,12:N2} {r.Closing,12:N2}");
             sb.AppendLine();
 
-            // Баланс на дату
             sb.AppendLine($"  БАЛАНС НА {BalanceDate:dd.MM.yyyy}");
             sb.AppendLine($"  {"Счет",-30} {"Валюта",-6} {"Остаток",15}");
             sb.AppendLine("  " + new string('─', 53));

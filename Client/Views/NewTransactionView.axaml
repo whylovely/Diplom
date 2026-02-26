@@ -106,7 +106,7 @@
           <!-- Сумма -->
           <StackPanel Spacing="4">
             <TextBlock Text="Сумма" Classes="dim"/>
-            <TextBox Text="{Binding Amount}" Width="200"/>
+            <TextBox Text="{Binding Amount}" Width="200" FontFamily="Fira Code, Consolas, monospace" FontFeatures="tnum, zero"/>
           </StackPanel>
 
           <Separator/>

@@ -89,7 +89,13 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
                             <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
-                            <DataGridTextColumn Header="Остаток" Binding="{Binding Balance, StringFormat=N2}" Width="150"/>
+                            <DataGridTemplateColumn Header="Остаток" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -109,9 +115,15 @@
                 <DataGrid Grid.Row="1" ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="150"/>
-                            <DataGridTextColumn Header="Доходы" Binding="{Binding Income, StringFormat=N2}" Width="*"/>
-                            <DataGridTextColumn Header="Расходы" Binding="{Binding Expense, StringFormat=N2}" Width="*"/>
-                            <DataGridTextColumn Header="Итог" Binding="{Binding Net, StringFormat=N2}" Width="*"/>
+                            <DataGridTemplateColumn Header="Доходы" Width="*">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Income, StringFormat={}{0:N2}}" Classes="moneyGreen" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Расходы" Width="*">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Expense, StringFormat={}{0:N2}}" Classes="moneyRed" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Итог" Width="*">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Net, StringFormat={}{0:N2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                 </DataGrid>
 
@@ -136,10 +148,18 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
                             <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
-                            <DataGridTextColumn Header="Начало" Binding="{Binding Opening, StringFormat=N2}" Width="100"/>
-                            <DataGridTextColumn Header="Доходы" Binding="{Binding DebitTurnOver, StringFormat=N2}" Width="120"/>
-                            <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver, StringFormat=N2}" Width="120"/>
-                            <DataGridTextColumn Header="Конец" Binding="{Binding Closing, StringFormat=N2}" Width="100"/>
+                            <DataGridTemplateColumn Header="Начало" Width="100">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Opening, StringFormat={}{0:N2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Доходы" Width="120">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding DebitTurnOver, StringFormat={}{0:N2}}" Classes="moneyGreen" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Расходы" Width="120">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding CreditTurnOver, StringFormat={}{0:N2}}" Classes="moneyRed" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Конец" Width="100">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Closing, StringFormat={}{0:N2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -163,8 +183,12 @@
                 <DataGrid Grid.Row="1" ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
-                            <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
+                            <DataGridTemplateColumn Header="Сумма" Width="150">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Total, StringFormat={}{0:N2}}" Classes="moneyRed" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Доля, %" Width="100">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding SharePercent, StringFormat={}{0:P2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                 </DataGrid>
 
@@ -190,8 +214,12 @@
                 <DataGrid Grid.Row="1" ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
-                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
-                            <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
+                            <DataGridTemplateColumn Header="Сумма" Width="150">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Total, StringFormat={}{0:N2}}" Classes="moneyGreen" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Доля, %" Width="100">
+                                <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding SharePercent, StringFormat={}{0:P2}}" Classes="amount" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                 </DataGrid>
 
@@ -228,8 +256,10 @@
                                                   IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
                                                   MaxHeight="400">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
-                                                <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120" FontFamily="Fira Code, Consolas, monospace"/>
+                                                <DataGridTemplateColumn Header="Сумма" Width="130">
+                                                    <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" Classes="moneyRed" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
                                                 <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
@@ -270,8 +300,10 @@
                                                   IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
                                                   MaxHeight="400">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
-                                                <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="130"/>
+                                                <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120" FontFamily="Fira Code, Consolas, monospace"/>
+                                                <DataGridTemplateColumn Header="Сумма" Width="130">
+                                                    <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" Classes="moneyGreen" VerticalAlignment="Center" Margin="4,0"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
                                                 <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
                                             </DataGrid.Columns>
                                         </DataGrid>

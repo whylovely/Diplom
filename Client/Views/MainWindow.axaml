@@ -89,7 +89,7 @@
                 Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" />
         </Button>
 
-        <!-- 4. Центральная (+ Транзакция) -->
+        <!-- 4. + Транзакция -->
         <Button Command="{Binding NavigateNewTransactionCommand}"
                 Classes="dockCenterItem"
                 ToolTip.Tip="Новая операция">
