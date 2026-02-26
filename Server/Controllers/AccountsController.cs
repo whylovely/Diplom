@@ -174,7 +174,7 @@ public sealed class AccountsController : ControllerBase
 
     // Soft delete
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<IActionResult> Delete(Guid id, [FromQuery] bool force = false, CancellationToken ct = default)
     {
         var userId = UserContext.GetUserId(User);
 
@@ -182,6 +182,16 @@ public sealed class AccountsController : ControllerBase
             x => x.UserId == userId && !x.IsDeleted && x.Id == id, ct);
 
         if (entity is null) return NotFound();
+
+        if (!force)
+        {
+            var relatedEntriesCount = await _db.Entries
+                .Where(e => e.AccountId == id)
+                .CountAsync(ct);
+
+            if (relatedEntriesCount > 0)
+                return BadRequest(new { Message = $"Cannot delete account because it has {relatedEntriesCount} related transaction(s). Use ?force=true to override." });
+        }
 
         entity.IsDeleted = true;
         entity.DeletedAt = DateTimeOffset.UtcNow;

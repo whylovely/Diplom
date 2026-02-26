@@ -99,7 +99,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<IActionResult> Delete(Guid id, [FromQuery] bool force = false, CancellationToken ct = default)
     {
         var userId = UserContext.GetUserId(User);
 
@@ -107,6 +107,16 @@ public sealed class CategoriesController : ControllerBase
             .SingleOrDefaultAsync(x => x.UserId == userId && !x.IsDeleted && x.Id == id, ct);
 
         if (entity is null) return NotFound();
+
+        if (!force)
+        {
+            var relatedTransactionsCount = await _db.Entries
+                .Where(e => e.CategoryId == id)
+                .CountAsync(ct);
+
+            if (relatedTransactionsCount > 0)
+                return BadRequest(new { Message = $"Cannot delete category because it has {relatedTransactionsCount} related transaction(s). Use ?force=true to override." });
+        }
 
         entity.IsDeleted = true;
         entity.DeletedAt = DateTimeOffset.UtcNow;
