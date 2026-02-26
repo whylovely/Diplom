@@ -39,7 +39,7 @@
   <Grid RowDefinitions="*,Auto">
 
     <!-- ═══ MAIN CONTENT AREA ══════════════════════════════════ -->
-    <Border Grid.Row="0" Background="#0B1021" Padding="24,20,24,10">
+    <Border Grid.Row="0" Background="#080C1A" Padding="24,20,24,10">
       <ContentControl Content="{Binding Current}" />
     </Border>
 
@@ -49,10 +49,11 @@
       <!-- ── Pill navigation bar ──────────────────────────── -->
       <Border Grid.Column="0"
               CornerRadius="35"
-              Background="#E61C1C1E"
-              BorderBrush="#2A3150"
+              Background="#901010140"
+              BorderBrush="#18FFFFFF"
               BorderThickness="1"
-              Padding="8,4"
+              Padding="6,3"
+              BoxShadow="0 -2 20 0 #30000000"
               HorizontalAlignment="Stretch">
 
         <UniformGrid Columns="6">
@@ -62,9 +63,9 @@
                   Classes.navActive="{Binding IsAccountsActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="🏦" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Счета" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="🏦" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Счета" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -73,9 +74,9 @@
                   Classes.navActive="{Binding IsCategoriesActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="📂" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Категории" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="📂" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Категории" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -84,9 +85,9 @@
                   Classes.navActive="{Binding IsJournalActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="📋" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Журнал" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="📋" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Журнал" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -95,9 +96,9 @@
                   Classes.navActive="{Binding IsReportActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="📊" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Отчёты" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="📊" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Отчёты" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -106,9 +107,9 @@
                   Classes.navActive="{Binding IsObligationsActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="🤝" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Долги" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="🤝" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Долги" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -117,9 +118,9 @@
                   Classes.navActive="{Binding IsSettingsActive}"
                   Classes="navItem"
                   HorizontalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="⚙️" FontSize="18" HorizontalAlignment="Center"/>
-              <TextBlock Text="Настройки" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center" Spacing="1">
+              <TextBlock Text="⚙️" FontSize="16" HorizontalAlignment="Center"/>
+              <TextBlock Text="Настройки" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"/>
             </StackPanel>
           </Button>
 
@@ -129,34 +130,23 @@
       <!-- ── FAB «+» button (Новая операция) ──────────────── -->
       <Button Grid.Column="1"
               Command="{Binding NavigateNewTransactionCommand}"
-              Width="56" Height="56"
-              CornerRadius="28"
+              Width="48" Height="48"
+              CornerRadius="24"
               Padding="0"
-              Margin="12,0,0,0"
-              BorderThickness="0"
+              Margin="10,0,0,0"
+              BorderBrush="#18FFFFFF"
+              BorderThickness="1"
+              Background="Transparent"
               HorizontalContentAlignment="Center"
               VerticalContentAlignment="Center"
               VerticalAlignment="Center">
-        <Button.Background>
-          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-            <GradientStop Color="#29B6F6" Offset="0"/>
-            <GradientStop Color="#AA00FF" Offset="1"/>
-          </LinearGradientBrush>
-        </Button.Background>
         <Button.Styles>
           <Style Selector="Button:pointerover /template/ ContentPresenter">
-            <Setter Property="Background">
-              <Setter.Value>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                  <GradientStop Color="#4FC3F7" Offset="0"/>
-                  <GradientStop Color="#CE93D8" Offset="1"/>
-                </LinearGradientBrush>
-              </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="#201E88C8"/>
           </Style>
         </Button.Styles>
-        <TextBlock Text="➕" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Foreground="#FFFFFF"/>
+        <TextBlock Text="+" FontSize="26" FontWeight="Light" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="#80D8F0"/>
       </Button>
 
     </Grid>

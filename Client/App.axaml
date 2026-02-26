@@ -19,21 +19,21 @@
 
     <!-- ══ WINDOW ═══════════════════════════════════════════════ -->
     <Style Selector="Window">
-      <Setter Property="Background" Value="#0B1021"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
+      <Setter Property="Background" Value="#080C1A"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
     </Style>
 
     <!-- ══ BUTTONS ══════════════════════════════════════════════ -->
     <Style Selector="Button">
-      <Setter Property="Background" Value="#1C2235"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
+      <Setter Property="Background" Value="#151A2E"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
       <Setter Property="CornerRadius" Value="8"/>
       <Setter Property="Padding" Value="14,8"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="BorderThickness" Value="1"/>
     </Style>
     <Style Selector="Button:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#29B6F6"/>
+      <Setter Property="Background" Value="#1E88C8"/>
       <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
@@ -64,9 +64,9 @@
 
     <!-- Danger button class -->
     <Style Selector="Button.danger">
-      <Setter Property="Background" Value="#2A1525"/>
-      <Setter Property="Foreground" Value="#FF5252"/>
-      <Setter Property="BorderBrush" Value="#FF525240"/>
+      <Setter Property="Background" Value="#1F0F1C"/>
+      <Setter Property="Foreground" Value="#E04848"/>
+      <Setter Property="BorderBrush" Value="#E0484830"/>
     </Style>
     <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="#FF5252"/>
@@ -75,20 +75,20 @@
 
     <!-- ══ TEXT INPUTS ══════════════════════════════════════════ -->
     <Style Selector="TextBox">
-      <Setter Property="Background" Value="#141929"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#0D1120"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="CornerRadius" Value="8"/>
       <Setter Property="Padding" Value="10,8"/>
     </Style>
     <Style Selector="TextBox:focus /template/ Border">
-      <Setter Property="BorderBrush" Value="#29B6F6"/>
+      <Setter Property="BorderBrush" Value="#1E88C8"/>
     </Style>
 
     <Style Selector="ComboBox">
-      <Setter Property="Background" Value="#141929"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#0D1120"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
@@ -97,9 +97,9 @@
     </Style>
 
     <Style Selector="NumericUpDown">
-      <Setter Property="Background" Value="#141929"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#0D1120"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
@@ -114,50 +114,50 @@
 
     <!-- ══ SEPARATOR ═══════════════════════════════════════════ -->
     <Style Selector="Separator">
-      <Setter Property="Background" Value="#2A3150"/>
+      <Setter Property="Background" Value="#222845"/>
       <Setter Property="Height" Value="1"/>
       <Setter Property="Margin" Value="0,4"/>
     </Style>
 
     <!-- ══ DATAGRID ════════════════════════════════════════════ -->
     <Style Selector="DataGrid">
-      <Setter Property="Background" Value="#0E1325"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#0A0E1E"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="RowBackground" Value="Transparent"/>
       <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-      <Setter Property="HorizontalGridLinesBrush" Value="#1C2235"/>
+      <Setter Property="HorizontalGridLinesBrush" Value="#151A2E"/>
     </Style>
     <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="#29B6F618"/>
+      <Setter Property="Fill" Value="#1E88C815"/>
     </Style>
     <Style Selector="DataGridColumnHeader">
-      <Setter Property="Background" Value="#141929"/>
-      <Setter Property="Foreground" Value="#9E9E9E"/>
+      <Setter Property="Background" Value="#0D1120"/>
+      <Setter Property="Foreground" Value="#888888"/>
       <Setter Property="FontSize" Value="12"/>
       <Setter Property="Padding" Value="10,8"/>
     </Style>
 
     <!-- ══ EXPANDER ════════════════════════════════════════════ -->
     <Style Selector="Expander">
-      <Setter Property="Background" Value="#141929"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#0D1120"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
     <!-- ══ CONTEXT MENU ═══════════════════════════════════════ -->
     <Style Selector="ContextMenu">
-      <Setter Property="Background" Value="#1C2235"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="Background" Value="#151A2E"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="CornerRadius" Value="8"/>
     </Style>
     <Style Selector="MenuItem">
-      <Setter Property="Foreground" Value="#E0E0E0"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
     </Style>
     <Style Selector="MenuItem:pointerover /template/ Border">
-      <Setter Property="Background" Value="#29B6F625"/>
+      <Setter Property="Background" Value="#1E88C820"/>
     </Style>
 
     <!-- ══ SCROLLBAR ══════════════════════════════════════════ -->
@@ -167,17 +167,17 @@
 
     <!-- ══ CARD STYLE CLASS ═══════════════════════════════════ -->
     <Style Selector="Border.card">
-      <Setter Property="Background" Value="#CC1C2235"/>
+      <Setter Property="Background" Value="#B0111528"/>
       <Setter Property="CornerRadius" Value="16"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Padding" Value="20"/>
     </Style>
 
     <Style Selector="Border.cardSmall">
-      <Setter Property="Background" Value="#CC1C2235"/>
+      <Setter Property="Background" Value="#B0111528"/>
       <Setter Property="CornerRadius" Value="12"/>
-      <Setter Property="BorderBrush" Value="#2A3150"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Padding" Value="14"/>
     </Style>
@@ -219,34 +219,34 @@
     <Style Selector="Button.navItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="CornerRadius" Value="20"/>
-      <Setter Property="Padding" Value="10,8"/>
-      <Setter Property="Margin" Value="3,0"/>
-      <Setter Property="Foreground" Value="#CCE0E0E0"/>
+      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="Padding" Value="6,5"/>
+      <Setter Property="Margin" Value="2,0"/>
+      <Setter Property="Foreground" Value="#99D8D8D8"/>
       <Setter Property="HorizontalContentAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Cursor" Value="Hand"/>
     </Style>
     <Style Selector="Button.navItem:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#29B6F618"/>
-      <Setter Property="Foreground" Value="#E0E0E0"/>
+      <Setter Property="Background" Value="#1E88C812"/>
+      <Setter Property="Foreground" Value="#D8D8D8"/>
     </Style>
 
-    <!-- Active nav item: dark-blue pill + bright blue text -->
+    <!-- Active nav item: subtle translucent pill + soft blue text -->
     <Style Selector="Button.navActive">
-      <Setter Property="Background" Value="#1A237E"/>
-      <Setter Property="Foreground" Value="#4A85F6"/>
+      <Setter Property="Background" Value="#1E88C818"/>
+      <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
     <Style Selector="Button.navActive /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1A237E"/>
-      <Setter Property="Foreground" Value="#4A85F6"/>
+      <Setter Property="Background" Value="#1E88C818"/>
+      <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
     <Style Selector="Button.navActive TextBlock">
-      <Setter Property="Foreground" Value="#4A85F6"/>
+      <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
     <Style Selector="Button.navActive:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1A237E"/>
-      <Setter Property="Foreground" Value="#4A85F6"/>
+      <Setter Property="Background" Value="#1E88C822"/>
+      <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
 
   </Application.Styles>
