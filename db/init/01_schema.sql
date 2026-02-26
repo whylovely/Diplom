@@ -1,0 +1,4 @@
+-- Схема БД создаётся через EF Core Migrations (dotnet ef database update).
+-- Этот файл оставлен пустым намеренно.
+-- При первом запуске docker compose init-скрипты не нужны —
+-- сервер сам применит миграции в Development-режиме.

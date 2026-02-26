@@ -79,6 +79,14 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
+    // Авто-миграция в Development
+    if (app.Environment.IsDevelopment())
+    {
+        await db.Database.MigrateAsync();
+        Console.WriteLine("[DB] Migrations applied.");
+    }
+
+    // --- Seed: Admin ---
     var adminSection = cfg.GetSection("Admin");
     var adminEmail = adminSection["Email"];
     var adminPassword = adminSection["Password"];
@@ -106,6 +114,79 @@ using (var scope = app.Services.CreateScope())
             await db.SaveChangesAsync();
             Console.WriteLine($"[Seed] Admin role updated for existing user: {adminEmail}");
         }
+    }
+
+    // --- Seed: Demo-пользователь ---
+    const string demoEmail = "demo@finance.local";
+    const string demoPassword = "Demo123";
+
+    if (!await db.Users.AnyAsync(u => u.Email == demoEmail))
+    {
+        var hasher = new PasswordHasher<UserEntity>();
+        var demoUser = new UserEntity
+        {
+            Email = demoEmail,
+            Role = "User"
+        };
+        demoUser.PasswordHash = hasher.HashPassword(demoUser, demoPassword);
+        db.Users.Add(demoUser);
+        await db.SaveChangesAsync();
+
+        var uid = demoUser.Id;
+        var now = DateTimeOffset.UtcNow;
+
+        // Счета
+        var accCard = new AccountEntity { UserId = uid, Name = "Карта", Kind = 0, Currency = "RUB" };
+        var accCash = new AccountEntity { UserId = uid, Name = "Наличные", Kind = 0, Currency = "RUB" };
+        var accCrypto = new AccountEntity { UserId = uid, Name = "USDT Wallet", Kind = 0, Currency = "USD", AccountType = 1, SecondaryCurrency = "RUB", ExchangeRate = 92.0m };
+        db.Accounts.AddRange(accCard, accCash, accCrypto);
+
+        // Категории
+        var catSalary = new CategoryEntity { UserId = uid, Name = "Зарплата" };
+        var catFood = new CategoryEntity { UserId = uid, Name = "Продукты" };
+        var catTransport = new CategoryEntity { UserId = uid, Name = "Транспорт" };
+        var catFun = new CategoryEntity { UserId = uid, Name = "Развлечения" };
+        var catCafe = new CategoryEntity { UserId = uid, Name = "Кафе" };
+        db.Categories.AddRange(catSalary, catFood, catTransport, catFun, catCafe);
+        await db.SaveChangesAsync(); // сохраняем чтобы получить Id
+
+        // Транзакции (10 штук за последний месяц)
+        void AddTx(DateTimeOffset date, string desc, Guid accId, Guid? catId, decimal amount, string cur, int dirFrom, int dirTo, Guid? accToId = null)
+        {
+            var tx = new TransactionEntity { UserId = uid, Date = date, Description = desc };
+            db.Transactions.Add(tx);
+            db.SaveChanges();
+
+            db.Entries.Add(new EntryEntity { UserId = uid, TransactionId = tx.Id, AccountId = accId, CategoryId = catId, Direction = dirFrom, Amount = amount, Currency = cur });
+            if (accToId.HasValue)
+                db.Entries.Add(new EntryEntity { UserId = uid, TransactionId = tx.Id, AccountId = accToId.Value, CategoryId = catId, Direction = dirTo, Amount = amount, Currency = cur });
+        }
+
+        // Доходы: Credit из Income-счёта, Debit на Assets-счёт (серверные Direction: 1=Debit, 2=Credit)
+        AddTx(now.AddDays(-25), "Зарплата (аванс)", accCard.Id, catSalary.Id, 85000, "RUB", 1, 0);
+        AddTx(now.AddDays(-10), "Зарплата (остаток)", accCard.Id, catSalary.Id, 70000, "RUB", 1, 0);
+
+        // Расходы: Credit из Assets-счёта, Debit на Expense-счёт
+        AddTx(now.AddDays(-28), "Ашан", accCard.Id, catFood.Id, 3500, "RUB", 2, 0);
+        AddTx(now.AddDays(-21), "Фрукты на рынке", accCash.Id, catFood.Id, 500, "RUB", 2, 0);
+        AddTx(now.AddDays(-18), "Лента", accCard.Id, catFood.Id, 4100, "RUB", 2, 0);
+        AddTx(now.AddDays(-12), "Такси", accCard.Id, catTransport.Id, 800, "RUB", 2, 0);
+        AddTx(now.AddDays(-8), "Кино", accCard.Id, catFun.Id, 1200, "RUB", 2, 0);
+        AddTx(now.AddDays(-5), "Кафе с друзьями", accCard.Id, catCafe.Id, 2500, "RUB", 2, 0);
+        AddTx(now.AddDays(-3), "Проездной", accCard.Id, catTransport.Id, 2500, "RUB", 2, 0);
+        AddTx(now.AddDays(-1), "Боулинг", accCard.Id, catFun.Id, 2500, "RUB", 2, 0);
+
+        await db.SaveChangesAsync();
+
+        // Обязательства
+        db.Obligations.AddRange(
+            new ObligationEntity { UserId = uid, Counterparty = "Максим", Amount = 5000, Currency = "RUB", Type = 0, DueDate = now.AddDays(7), Note = "Одолжил до зарплаты" },
+            new ObligationEntity { UserId = uid, Counterparty = "Альфа-Банк", Amount = 12400, Currency = "RUB", Type = 1, DueDate = now.AddDays(15), Note = "Льготный период кредитки" }
+        );
+        await db.SaveChangesAsync();
+
+        Console.WriteLine($"[Seed] Demo user created: {demoEmail} / {demoPassword}");
+        Console.WriteLine($"[Seed]   → 3 accounts, 5 categories, 10 transactions, 2 obligations");
     }
 }
 
