@@ -215,38 +215,56 @@
       <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
-    <!-- ══ BOTTOM NAV BAR ITEMS ═════════════════════════════ -->
-    <Style Selector="Button.navItem">
+    <!-- ══ BOTTOM NAV BAR (MAC-OS DOCK) ITEMS ═════════════════════════════ -->
+    <Style Selector="Button.dockItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="CornerRadius" Value="16"/>
-      <Setter Property="Padding" Value="6,5"/>
+      <Setter Property="CornerRadius" Value="24"/>
+      <Setter Property="Width" Value="48"/>
+      <Setter Property="Height" Value="48"/>
+      <Setter Property="Padding" Value="0"/>
       <Setter Property="Margin" Value="2,0"/>
       <Setter Property="Foreground" Value="#99D8D8D8"/>
       <Setter Property="HorizontalContentAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Cursor" Value="Hand"/>
     </Style>
-    <Style Selector="Button.navItem:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1E88C812"/>
+    <Style Selector="Button.dockItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#10FFFFFF"/>
       <Setter Property="Foreground" Value="#D8D8D8"/>
     </Style>
 
-    <!-- Active nav item: subtle translucent pill + soft blue text -->
-    <Style Selector="Button.navActive">
-      <Setter Property="Background" Value="#1E88C818"/>
+    <!-- Active dock item -->
+    <Style Selector="Button.navDock">
+      <Setter Property="Background" Value="#20000000"/>
       <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
-    <Style Selector="Button.navActive /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1E88C818"/>
+    <Style Selector="Button.navDock /template/ ContentPresenter">
+      <Setter Property="Background" Value="#20000000"/>
       <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
-    <Style Selector="Button.navActive TextBlock">
+    <Style Selector="Button.navDock:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#30000000"/>
       <Setter Property="Foreground" Value="#5C9FD6"/>
     </Style>
-    <Style Selector="Button.navActive:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1E88C822"/>
-      <Setter Property="Foreground" Value="#5C9FD6"/>
+
+    <!-- Center Add Button -->
+    <Style Selector="Button.dockCenterItem">
+      <Setter Property="Background" Value="#1E88C8"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="24"/>
+      <Setter Property="Width" Value="48"/>
+      <Setter Property="Height" Value="48"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="6,0"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.dockCenterItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#29B6F6"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
   </Application.Styles>
