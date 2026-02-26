@@ -7,8 +7,10 @@ public sealed partial class AddAccountDialogViewModel : ViewModelBase
 {
     public static string[] Currencies { get; } =
     {
-        "RUB", "USD", "EUR", "GBP", "CNY",
-        "BTC", "ETH", "USDT"
+        "RUB", "USD", "EUR", "GBP", "CNY", 
+        "JPY", "CHF", "CAD", "AUD", "KZT",
+        "BYN", "TRY", "GEL", "AMD", "RSD",
+        "BTC", "ETH", "USDT", "BNB", "TON"
     };
 
     public string BaseCurrency { get; }

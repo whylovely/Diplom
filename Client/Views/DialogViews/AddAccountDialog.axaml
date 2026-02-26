@@ -34,9 +34,15 @@
 
       <StackPanel Spacing="4" IsVisible="{Binding IsMultiCurrency}">
         <TextBlock Text="Дополнительная валюта" Classes="dim"/>
-        <ComboBox ItemsSource="{Binding SecondaryCurrencies}"
-                  SelectedItem="{Binding SelectedSecondaryCurrency}"
-                  Width="220" />
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Text="💵" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+          <AutoCompleteBox Grid.Column="1"
+                           ItemsSource="{Binding SecondaryCurrencies}"
+                           Text="{Binding SelectedSecondaryCurrency, Mode=TwoWay}"
+                           FilterMode="Contains"
+                           Watermark="Введите валюту (USD, EUR...)"
+                           Width="188"/>
+        </Grid>
       </StackPanel>
 
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
