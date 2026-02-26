@@ -6,7 +6,7 @@ using Client.Models;
 
 namespace Client.Services
 {
-    public sealed class MockDS : IDataService // по сути заглушка (пока не написал сервер)
+    public sealed class MockDS : IDataService
     {
         public event Action? DataChanged;
         private void RaiseChanged() => DataChanged?.Invoke();
@@ -42,9 +42,10 @@ namespace Client.Services
                 Balance = 250, 
                 InitialBalance = 250, 
                 Type = AccountType.Assets,
-                IsMultiCurrency = true,
+                AccountMultiType = MultiCurrencyType.MultiCurrency,
                 SecondaryCurrencyCode = "RUB",
-                SecondaryBalance = 23000
+                SecondaryBalance = 23000,
+                ExchangeRate = 92.0m
             };
 
             _accounts.AddRange([accCard, accCash, accSavings, accCrypto]);
@@ -102,9 +103,9 @@ namespace Client.Services
 
 
             _obligations.AddRange([
-                new Obligation { Counterparty = "Максим", Amount = 5000, Type = ObligationType.Debt, DueDate = today.AddDays(7), Note = "Одолжил до зарплаты" },
-                new Obligation { Counterparty = "Альфа-Банк (Кредитка)", Amount = 12400, Type = ObligationType.Credit, DueDate = today.AddDays(15), Note = "Льготный период" },
-                new Obligation { Counterparty = "Ипотека", Amount = 25000, Type = ObligationType.Credit, IsPaid = true, PaidAt = today.AddDays(-1), Note = "Платеж за текущий месяц" }
+                new Obligation { Counterparty = "Максим", Amount = 5000, Currency = "RUB", Type = ObligationType.Debt, DueDate = today.AddDays(7), Note = "Одолжил до зарплаты" },
+                new Obligation { Counterparty = "Альфа-Банк (Кредитка)", Amount = 12400, Currency = "RUB", Type = ObligationType.Credit, DueDate = today.AddDays(15), Note = "Льготный период" },
+                new Obligation { Counterparty = "Ипотека", Amount = 25000, Currency = "RUB", Type = ObligationType.Credit, IsPaid = true, PaidAt = today.AddDays(-1), Note = "Платеж за текущий месяц" }
             ]);
         }
 
