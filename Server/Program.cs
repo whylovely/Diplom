@@ -85,8 +85,8 @@ using (var scope = app.Services.CreateScope())
 
     if (!string.IsNullOrEmpty(adminEmail) && !string.IsNullOrEmpty(adminPassword))
     {
-        var exists = await db.Users.AnyAsync(u => u.Email == adminEmail);
-        if (!exists)
+        var existingAdmin = await db.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+        if (existingAdmin == null)
         {
             var admin = new UserEntity
             {
@@ -100,12 +100,19 @@ using (var scope = app.Services.CreateScope())
 
             Console.WriteLine($"[Seed] Admin user created: {adminEmail}");
         }
+        else if (existingAdmin.Role != "Admin")
+        {
+            existingAdmin.Role = "Admin";
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Admin role updated for existing user: {adminEmail}");
+        }
     }
 }
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseAuthentication();

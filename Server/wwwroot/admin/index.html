@@ -402,7 +402,7 @@
                 }
 
                 const data = await res.json();
-                token = data.token;
+                token = data.accessToken;
                 localStorage.setItem('admin_token', token);
                 showDashboard();
             } catch (e) {
