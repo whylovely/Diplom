@@ -41,9 +41,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                         <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                         <Button Content="Обновить" Command="{Binding RefreshSummaryCommand}" Classes="accent"/>
                     </StackPanel>
                 </Border>
@@ -76,7 +76,7 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="Дата:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding BalanceDate}" Width="260"/>
+                        <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
                         <Button Content="Обновить" Command="{Binding RefreshBalanceCommand}" Classes="accent"/>
                         <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого: {0:N2}}" 
                                    VerticalAlignment="Center" FontWeight="Bold" Foreground="#29B6F6" Margin="16,0,0,0"/>
@@ -100,9 +100,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                        <Button Content="Обновить" Command="{Binding RefreshMonthlyCommand}" Classes="accent"/>
                     </StackPanel>
                 </Border>
@@ -130,9 +130,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                        <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                        <Button Content="Обновить" Command="{Binding RefreshAccountsCommand}" Classes="accent"/>
                     </StackPanel>
                 </Border>
@@ -156,9 +156,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateFrom}" Width="220"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                         <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateTo}" Width="220"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                         <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshExpenseTopCommand}" Classes="accent"/>
@@ -187,9 +187,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateFrom}" Width="220"/>
+                        <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                         <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                        <DatePicker SelectedDate="{Binding DateTo}" Width="220"/>
+                        <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                         <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" Classes="accent"/>
@@ -218,9 +218,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                        <Button Content="Обновить" Command="{Binding RefreshExpenseCategoryCommand}" Classes="accent"/>
                     </StackPanel>
                 </Border>
@@ -262,9 +262,9 @@
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateFrom}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateFrom}" Width="300"/>
                        <TextBlock Text="По:" VerticalAlignment="Center" Classes="dim"/>
-                       <DatePicker SelectedDate="{Binding DateTo}" Width="260"/>
+                       <DatePicker SelectedDate="{Binding DateTo}" Width="300"/>
                        <Button Content="Обновить" Command="{Binding RefreshIncomeCategoryCommand}" Classes="accent"/>
                     </StackPanel>
                 </Border>

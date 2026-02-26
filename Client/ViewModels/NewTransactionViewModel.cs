@@ -16,14 +16,10 @@ namespace Client.ViewModels
         private readonly INotificationService _notify;
         private readonly Action _onPosted;
 
-        public Array KindValues => Enum.GetValues(typeof(TXKind));
-
         public ObservableCollection<Account> Accounts { get; }
         public ObservableCollection<Category> Categories { get; }
 
         public ObservableCollection<Category> FilteredCategories { get; } = new();
-
-        [ObservableProperty] private TXKind _kind = TXKind.Expense;
         [ObservableProperty] private DateTimeOffset _date = DateTimeOffset.Now;
         [ObservableProperty] private string _description = "";
 
@@ -119,19 +115,19 @@ namespace Client.ViewModels
                 return;
             }
 
-            if (_kind != TXKind.Transfer && _category is null)
+            if (Choice != TxKindChoice.Transfer && _category is null)
             {
                 await _notify.ShowErrorAsync("Не выбрана категория");
                 return;
             }
 
-            if (_kind == TXKind.Transfer && _toAccount is null)
+            if (Choice == TxKindChoice.Transfer && _toAccount is null)
             {
                 await _notify.ShowErrorAsync("Не выбран счет назначения");
                 return;
             }
 
-            if (_kind == TXKind.Transfer && _toAccount!.Id == _fromAccount.Id)
+            if (Choice == TxKindChoice.Transfer && _toAccount!.Id == _fromAccount.Id)
             {
                 await _notify.ShowErrorAsync("Счета должны отличаться");
                 return;
@@ -140,14 +136,14 @@ namespace Client.ViewModels
             var tx = new Transaction
             {
                 Date = _date,
-                Description = string.IsNullOrWhiteSpace(_description) ? _kind.ToString() : _description
+                Description = string.IsNullOrWhiteSpace(_description) ? Choice.ToString() : _description
             };
 
             var money = new Money(_amount, _fromAccount.CurrencyCode);
 
-            switch (_kind)
+            switch (Choice)
             {
-                case TXKind.Expense:
+                case TxKindChoice.Expense:
                 {
                     var expAcc = _data.GetExpenseAccountForCategory(_category!.Id);
 
@@ -171,7 +167,7 @@ namespace Client.ViewModels
                 }
 
 
-                case TXKind.Income:
+                case TxKindChoice.Income:
                     {
                         var incAcc = _data.GetIncomeAccountForCategory(_category!.Id);
 
@@ -179,7 +175,7 @@ namespace Client.ViewModels
                         {
                             AccountId = _fromAccount.Id,
                             CategoryId = _category.Id,
-                            Direction = EntryDirection.Credit,
+                            Direction = EntryDirection.Debit,
                             Amount = money
                         });
 
@@ -187,7 +183,7 @@ namespace Client.ViewModels
                         {
                             AccountId = incAcc.Id,
                             CategoryId = _category.Id,
-                            Direction = EntryDirection.Debit,
+                            Direction = EntryDirection.Credit,
                             Amount = money
                         });
 
@@ -195,7 +191,7 @@ namespace Client.ViewModels
                     }
      
 
-                case TXKind.Transfer:
+                case TxKindChoice.Transfer:
                     {
                         if (_toAccount.CurrencyCode != _fromAccount.CurrencyCode)
                         {
