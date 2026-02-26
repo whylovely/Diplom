@@ -5,9 +5,8 @@
              x:Class="Client.Views.CategoriesView"
              x:DataType="vm:CategoriesViewModel">
              
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="16">
-
+  <Grid RowDefinitions="Auto,*">
+    <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="Категории" Classes="heading"/>
@@ -16,15 +15,17 @@
                 Command="{Binding AddCommand}"
                 Width="160"/>
       </Grid>
+    </StackPanel>
 
-      <!-- Categories Table -->
-      <Border Classes="card">
-        <dg:DataGrid x:Name="CategoriesGrid"
-                     ItemsSource="{Binding Categories}"
-                     SelectedItem="{Binding Selected}"
-                     AutoGenerateColumns="False"
-                     Height="480"
-                     IsReadOnly="True">
+    <!-- Categories Table -->
+    <dg:DataGrid Grid.Row="1" x:Name="CategoriesGrid"
+                 ItemsSource="{Binding Categories}"
+                 SelectedItem="{Binding Selected}"
+                 AutoGenerateColumns="False"
+                 IsReadOnly="True"
+                 BorderThickness="0"
+                 Background="Transparent"
+                 GridLinesVisibility="Horizontal">
 
           <dg:DataGrid.ContextMenu>
             <ContextMenu x:CompileBindings="False">
@@ -36,9 +37,6 @@
           <dg:DataGrid.Columns>
             <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
           </dg:DataGrid.Columns>
-        </dg:DataGrid>
-      </Border>
-
-    </StackPanel>
-  </ScrollViewer>
+    </dg:DataGrid>
+  </Grid>
 </UserControl>

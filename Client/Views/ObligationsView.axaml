@@ -4,8 +4,8 @@
              x:Class="Client.Views.ObligationsView"
              x:DataType="vm:ObligationsViewModel">
   
-  <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <StackPanel Spacing="16">
+  <Grid RowDefinitions="Auto,*">
+    <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
 
       <!-- Header -->
       <TextBlock Text="Обязательства" Classes="heading"/>
@@ -36,15 +36,16 @@
           </StackPanel>
         </Border>
       </Grid>
+    </StackPanel>
 
-      <!-- Table -->
-      <Border Classes="card">
-        <DataGrid ItemsSource="{Binding Items}" 
-                  SelectedItem="{Binding SelectedItem}"
-                  AutoGenerateColumns="False" 
-                  IsReadOnly="True" 
-                  Height="400"
-                  GridLinesVisibility="Horizontal">
+    <!-- Table -->
+    <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" 
+              SelectedItem="{Binding SelectedItem}"
+              AutoGenerateColumns="False" 
+              IsReadOnly="True" 
+              BorderThickness="0"
+              Background="Transparent"
+              GridLinesVisibility="Horizontal">
           <DataGrid.Columns>
             <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="200" />
             
@@ -81,9 +82,6 @@
             
             <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*" />
           </DataGrid.Columns>
-        </DataGrid>
-      </Border>
-
-    </StackPanel>
-  </ScrollViewer>
+    </DataGrid>
+  </Grid>
 </UserControl>

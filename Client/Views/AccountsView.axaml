@@ -4,9 +4,8 @@
              x:Class="Client.Views.AccountsView"
              x:DataType="vm:AccountsViewModel">
 
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-    <StackPanel Spacing="16">
-
+  <Grid RowDefinitions="Auto,*">
+    <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="Счета" Classes="heading"/>
@@ -15,15 +14,17 @@
                 Command="{Binding AddAccountCommand}"
                 Width="180"/>
       </Grid>
+    </StackPanel>
 
-      <!-- Accounts Table -->
-      <Border Classes="card">
-        <DataGrid x:Name="AccountsGrid"
-                  ItemsSource="{Binding Accounts}"
-                  SelectedItem="{Binding SelectedAccount}"
-                  AutoGenerateColumns="False"
-                  Height="480"
-                  IsReadOnly="True">
+    <!-- Accounts Table -->
+    <DataGrid Grid.Row="1" x:Name="AccountsGrid"
+              ItemsSource="{Binding Accounts}"
+              SelectedItem="{Binding SelectedAccount}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              BorderThickness="0"
+              Background="Transparent"
+              GridLinesVisibility="Horizontal">
 
           <DataGrid.ContextMenu>
             <ContextMenu x:CompileBindings="False">
@@ -60,9 +61,6 @@
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
           </DataGrid.Columns>
-        </DataGrid>
-      </Border>
-
-    </StackPanel>
-  </ScrollViewer>
+    </DataGrid>
+  </Grid>
 </UserControl>

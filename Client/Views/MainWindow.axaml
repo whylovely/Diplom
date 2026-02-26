@@ -49,7 +49,7 @@
       <!-- ── Pill navigation bar ──────────────────────────── -->
       <Border Grid.Column="0"
               CornerRadius="35"
-              Background="#901010140"
+              Background="#90101018"
               BorderBrush="#18FFFFFF"
               BorderThickness="1"
               Padding="6,3"

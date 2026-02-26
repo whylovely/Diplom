@@ -83,16 +83,15 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Classes="card">
-                    <DataGrid ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" IsReadOnly="True"
-                              GridLinesVisibility="Horizontal">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding BalanceRows}" AutoGenerateColumns="False" IsReadOnly="True"
+                          Background="Transparent" BorderThickness="0"
+                          GridLinesVisibility="Horizontal">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
                             <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="90"/>
                             <DataGridTextColumn Header="Остаток" Binding="{Binding Balance, StringFormat=N2}" Width="150"/>
                         </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                </DataGrid>
             </Grid>
 
             <!-- ══ MONTHLY DYNAMICS ═══════════════════════════ -->
@@ -107,22 +106,18 @@
                     </StackPanel>
                 </Border>
                 
-                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
-                    <DataGrid ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding MonthlyRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Месяц" Binding="{Binding Month}" Width="150"/>
                             <DataGridTextColumn Header="Доходы" Binding="{Binding Income, StringFormat=N2}" Width="*"/>
                             <DataGridTextColumn Header="Расходы" Binding="{Binding Expense, StringFormat=N2}" Width="*"/>
                             <DataGridTextColumn Header="Итог" Binding="{Binding Net, StringFormat=N2}" Width="*"/>
                         </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                </DataGrid>
 
-                <Border Grid.Row="2" Classes="card">
-                    <lvc:CartesianChart Series="{Binding MonthlySeries}"
-                                        XAxes="{Binding XAxes}"
-                                        YAxes="{Binding YAxes}" />
-                </Border>
+                <lvc:CartesianChart Grid.Row="2" Series="{Binding MonthlySeries}"
+                                    XAxes="{Binding XAxes}"
+                                    YAxes="{Binding YAxes}" />
             </Grid> 
 
             <!-- ══ ACCOUNTS TURNOVER ══════════════════════════ -->
@@ -137,8 +132,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Classes="card">
-                    <DataGrid ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding AccountRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
                             <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
@@ -147,8 +141,7 @@
                             <DataGridTextColumn Header="Расходы" Binding="{Binding CreditTurnOver, StringFormat=N2}" Width="120"/>
                             <DataGridTextColumn Header="Конец" Binding="{Binding Closing, StringFormat=N2}" Width="100"/>
                         </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                </DataGrid>
             </Grid>
 
             <!-- ══ EXPENSE TOP ════════════════════════════════ -->
@@ -167,19 +160,15 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
-                    <DataGrid ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding ExpenseShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
                             <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
                             <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
                         </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                </DataGrid>
 
-                <Border Grid.Row="2" Classes="card">
-                    <lvc:PieChart Series="{Binding ExpensePieSeries}" />
-                </Border>
+                <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" />
             </Grid>
 
             <!-- ══ INCOME TOP ═════════════════════════════════ -->
@@ -198,19 +187,15 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Classes="card" Margin="0,0,0,12">
-                    <DataGrid ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding IncomeShareRows}" AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
                             <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat=N2}" Width="150"/>
                             <DataGridTextColumn Header="Доля, %" Binding="{Binding SharePercent, StringFormat=P2}" Width="100"/>
                         </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                </DataGrid>
 
-                <Border Grid.Row="2" Classes="card">
-                    <lvc:PieChart Series="{Binding IncomePieSeries}" />
-                </Border>
+                <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" />
             </Grid>
 
             <!-- ══ EXPENSE BY CATEGORY ════════════════════════ -->
@@ -228,8 +213,7 @@
                 <TextBlock Grid.Row="1" Text="{Binding TotalExpense, StringFormat=Итого расходов: {0:N2}}" 
                            FontSize="16" Margin="0,0,0,8" Classes="moneyRed"/>
 
-                <Border Grid.Row="2" Classes="card">
-                    <ScrollViewer>
+                <ScrollViewer Grid.Row="2">
                         <ItemsControl ItemsSource="{Binding ExpenseGroups}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="m:CategoryDetailGroup">
@@ -241,7 +225,7 @@
                                             </Grid>
                                         </Expander.Header>
                                         <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
-                                                  IsReadOnly="True" HeadersVisibility="Column"
+                                                  IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
                                                   MaxHeight="400">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
@@ -253,8 +237,7 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
-                </Border>
+                </ScrollViewer>
             </Grid>
 
             <!-- ══ INCOME BY CATEGORY ═════════════════════════ -->
@@ -272,8 +255,7 @@
                 <TextBlock Grid.Row="1" Text="{Binding TotalIncome, StringFormat=Итого доходов: {0:N2}}" 
                            FontSize="16" Margin="0,0,0,8" Classes="moneyGreen"/>
 
-                <Border Grid.Row="2" Classes="card">
-                    <ScrollViewer>
+                <ScrollViewer Grid.Row="2">
                         <ItemsControl ItemsSource="{Binding IncomeGroups}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="m:CategoryDetailGroup">
@@ -285,7 +267,7 @@
                                             </Grid>
                                         </Expander.Header>
                                         <DataGrid ItemsSource="{Binding Days}" AutoGenerateColumns="False"
-                                                  IsReadOnly="True" HeadersVisibility="Column"
+                                                  IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
                                                   MaxHeight="400">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="120"/>
@@ -297,8 +279,7 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
-                </Border>
+                </ScrollViewer>
             </Grid>
 
         </Panel>
