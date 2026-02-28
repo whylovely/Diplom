@@ -533,6 +533,107 @@ public sealed class LocalDbService : IDataService
         return Task.CompletedTask;
     }
 
+    // ───────────────────── Sync: Replace All Data ─────────────────────
+
+    /// <summary>
+    /// Заменить все данные в SQLite на серверные (pull sync).
+    /// </summary>
+    public void ReplaceAllData(
+        List<Account> accounts,
+        List<Category> categories,
+        List<Obligation> obligations,
+        List<Transaction> transactions)
+    {
+        using var conn = Open();
+        using var tran = conn.BeginTransaction();
+
+        // Очистить все таблицы
+        Exec(conn, "DELETE FROM Entries");
+        Exec(conn, "DELETE FROM Transactions");
+        Exec(conn, "DELETE FROM Obligations");
+        Exec(conn, "DELETE FROM Categories");
+        Exec(conn, "DELETE FROM Accounts");
+
+        // Вставить счета
+        foreach (var a in accounts)
+        {
+            Exec(conn, @"INSERT INTO Accounts (Id, Name, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType, SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, CreatedAt, UpdatedAt)
+                         VALUES (@Id, @Name, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @Created, @Updated)",
+                ("@Id", a.Id.ToString()),
+                ("@Name", a.Name),
+                ("@Cur", a.CurrencyCode),
+                ("@Init", (double)a.InitialBalance),
+                ("@Bal", (double)a.Balance),
+                ("@Type", (int)a.Type),
+                ("@Multi", (int)a.AccountMultiType),
+                ("@Sec", (object?)a.SecondaryCurrencyCode ?? DBNull.Value),
+                ("@Rate", a.ExchangeRate.HasValue ? (object)(double)a.ExchangeRate.Value : DBNull.Value),
+                ("@SecBal", (double)a.SecondaryBalance),
+                ("@Created", a.CreatedAt.ToString("O")),
+                ("@Updated", a.UpdatedAt.ToString("O")));
+        }
+
+        // Вставить категории
+        var now = DateTimeOffset.Now;
+        foreach (var c in categories)
+        {
+            Exec(conn, @"INSERT INTO Categories (Id, Name, Kind, CreatedAt, UpdatedAt)
+                         VALUES (@Id, @Name, @Kind, @Created, @Updated)",
+                ("@Id", c.Id.ToString()),
+                ("@Name", c.Name),
+                ("@Kind", (int)c.Kind),
+                ("@Created", now.ToString("O")),
+                ("@Updated", now.ToString("O")));
+        }
+
+        // Вставить транзакции и проводки
+        foreach (var tx in transactions)
+        {
+            Exec(conn, @"INSERT INTO Transactions (Id, Date, Description, CreatedAt)
+                         VALUES (@Id, @Date, @Desc, @Created)",
+                ("@Id", tx.Id.ToString()),
+                ("@Date", tx.Date.ToString("O")),
+                ("@Desc", tx.Description),
+                ("@Created", now.ToString("O")));
+
+            foreach (var e in tx.Entries)
+            {
+                Exec(conn, @"INSERT INTO Entries (Id, TransactionId, AccountId, CategoryId, Direction, Amount, CurrencyCode)
+                             VALUES (@Id, @TxId, @AccId, @CatId, @Dir, @Amt, @Cur)",
+                    ("@Id", e.Id.ToString()),
+                    ("@TxId", tx.Id.ToString()),
+                    ("@AccId", e.AccountId.ToString()),
+                    ("@CatId", e.CategoryId.HasValue ? (object)e.CategoryId.Value.ToString() : DBNull.Value),
+                    ("@Dir", (int)e.Direction),
+                    ("@Amt", (double)e.Amount.Amount),
+                    ("@Cur", e.Amount.CurrencyCode));
+            }
+        }
+
+        // Вставить обязательства
+        foreach (var o in obligations)
+        {
+            Exec(conn, @"INSERT INTO Obligations (Id, Counterparty, Amount, Currency, Type, CreatedAt, DueDate, IsPaid, PaidAt, Note)
+                         VALUES (@Id, @Cp, @Amt, @Cur, @Type, @Created, @Due, @Paid, @PaidAt, @Note)",
+                ("@Id", o.Id.ToString()),
+                ("@Cp", o.Counterparty),
+                ("@Amt", (double)o.Amount),
+                ("@Cur", o.Currency),
+                ("@Type", (int)o.Type),
+                ("@Created", o.CreatedAt.ToString("O")),
+                ("@Due", o.DueDate.HasValue ? (object)o.DueDate.Value.ToString("O") : DBNull.Value),
+                ("@Paid", o.IsPaid ? 1 : 0),
+                ("@PaidAt", o.PaidAt.HasValue ? (object)o.PaidAt.Value.ToString("O") : DBNull.Value),
+                ("@Note", (object?)o.Note ?? DBNull.Value));
+        }
+
+        tran.Commit();
+
+        // Перезагрузить in-memory кэш
+        LoadAll();
+        RaiseChanged();
+    }
+
     // ───────────────────── Helpers ─────────────────────
 
     private static void Exec(SqliteConnection conn, string sql, params (string name, object value)[] parameters)

@@ -162,19 +162,19 @@ using (var scope = app.Services.CreateScope())
                 db.Entries.Add(new EntryEntity { UserId = uid, TransactionId = tx.Id, AccountId = accToId.Value, CategoryId = catId, Direction = dirTo, Amount = amount, Currency = cur });
         }
 
-        // Доходы: Credit из Income-счёта, Debit на Assets-счёт (серверные Direction: 1=Debit, 2=Credit)
-        AddTx(now.AddDays(-25), "Зарплата (аванс)", accCard.Id, catSalary.Id, 85000, "RUB", 1, 0);
-        AddTx(now.AddDays(-10), "Зарплата (остаток)", accCard.Id, catSalary.Id, 70000, "RUB", 1, 0);
+        // Доходы: Debit (0) = деньги ПРИХОДЯТ на счёт
+        AddTx(now.AddDays(-25), "Зарплата (аванс)", accCard.Id, catSalary.Id, 85000, "RUB", 0, 0);
+        AddTx(now.AddDays(-10), "Зарплата (остаток)", accCard.Id, catSalary.Id, 70000, "RUB", 0, 0);
 
-        // Расходы: Credit из Assets-счёта, Debit на Expense-счёт
-        AddTx(now.AddDays(-28), "Ашан", accCard.Id, catFood.Id, 3500, "RUB", 2, 0);
-        AddTx(now.AddDays(-21), "Фрукты на рынке", accCash.Id, catFood.Id, 500, "RUB", 2, 0);
-        AddTx(now.AddDays(-18), "Лента", accCard.Id, catFood.Id, 4100, "RUB", 2, 0);
-        AddTx(now.AddDays(-12), "Такси", accCard.Id, catTransport.Id, 800, "RUB", 2, 0);
-        AddTx(now.AddDays(-8), "Кино", accCard.Id, catFun.Id, 1200, "RUB", 2, 0);
-        AddTx(now.AddDays(-5), "Кафе с друзьями", accCard.Id, catCafe.Id, 2500, "RUB", 2, 0);
-        AddTx(now.AddDays(-3), "Проездной", accCard.Id, catTransport.Id, 2500, "RUB", 2, 0);
-        AddTx(now.AddDays(-1), "Боулинг", accCard.Id, catFun.Id, 2500, "RUB", 2, 0);
+        // Расходы: Credit (1) = деньги УХОДЯТ со счёта
+        AddTx(now.AddDays(-28), "Ашан", accCard.Id, catFood.Id, 3500, "RUB", 1, 0);
+        AddTx(now.AddDays(-21), "Фрукты на рынке", accCash.Id, catFood.Id, 500, "RUB", 1, 0);
+        AddTx(now.AddDays(-18), "Лента", accCard.Id, catFood.Id, 4100, "RUB", 1, 0);
+        AddTx(now.AddDays(-12), "Такси", accCard.Id, catTransport.Id, 800, "RUB", 1, 0);
+        AddTx(now.AddDays(-8), "Кино", accCard.Id, catFun.Id, 1200, "RUB", 1, 0);
+        AddTx(now.AddDays(-5), "Кафе с друзьями", accCard.Id, catCafe.Id, 2500, "RUB", 1, 0);
+        AddTx(now.AddDays(-3), "Проездной", accCard.Id, catTransport.Id, 2500, "RUB", 1, 0);
+        AddTx(now.AddDays(-1), "Боулинг", accCard.Id, catFun.Id, 2500, "RUB", 1, 0);
 
         await db.SaveChangesAsync();
 

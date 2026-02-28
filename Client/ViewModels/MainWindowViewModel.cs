@@ -52,6 +52,8 @@ namespace Client.ViewModels
 
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
+            var apiService = new ApiService(_settings);
+            var syncService = new SyncService(apiService, (LocalDbService)_data);
 
             AccountsVm = new AccountsViewModel(
                 _data, 
@@ -60,7 +62,8 @@ namespace Client.ViewModels
                 input, 
                 _settings,
                 onQuickTx: openQuickTx,
-                getWindow: () => App.MainWindow!);
+                getWindow: () => App.MainWindow!,
+                syncService: syncService);
 
             JournalVm = new JournalViewModel(_data);
 

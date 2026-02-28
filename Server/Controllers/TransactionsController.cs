@@ -17,6 +17,32 @@ public sealed class TransactionsController : ControllerBase
     private readonly AppDbContext _db;
     public TransactionsController(AppDbContext db) => _db = db;
 
+    [HttpGet]
+    public async Task<ActionResult<List<TransactionDto>>> GetAll(CancellationToken ct)
+    {
+        var userId = UserContext.GetUserId(User);
+
+        var items = await _db.Transactions
+            .AsNoTracking()
+            .Where(t => t.UserId == userId)
+            .OrderByDescending(t => t.Date)
+            .Select(t => new TransactionDto(
+                t.Id,
+                t.Date,
+                t.Description,
+                t.Entries.Select(e => new EntryDto(
+                    e.Id,
+                    e.AccountId,
+                    e.CategoryId,
+                    (EntryDirection)e.Direction,
+                    new MoneyDto(e.Amount, e.Currency)
+                )).ToList()
+            ))
+            .ToListAsync(ct);
+
+        return Ok(items);
+    }
+
     [HttpPost]
     public async Task<ActionResult<TransactionDto>> Create(CreateTransactionRequest req, CancellationToken ct)
     {

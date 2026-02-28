@@ -20,6 +20,7 @@ namespace Client.ViewModels
         private readonly Action<Account, TxKindChoice> _onQuickTx;
         private readonly Func<Avalonia.Controls.Window> _getWindow;
         private readonly SettingsService _settings;
+        private readonly SyncService? _syncService;
 
         public ObservableCollection<Account> Accounts { get; }
 
@@ -63,7 +64,8 @@ namespace Client.ViewModels
             IInputDialogService input,
             SettingsService settings,
             Action<Account, TxKindChoice> onQuickTx,
-            Func<Avalonia.Controls.Window> getWindow
+            Func<Avalonia.Controls.Window> getWindow,
+            SyncService? syncService = null
             )
         {
             _data = data;
@@ -73,6 +75,7 @@ namespace Client.ViewModels
             _settings = settings;
             _onQuickTx = onQuickTx;
             _getWindow = getWindow;
+            _syncService = syncService;
 
             Accounts = new ObservableCollection<Account>();
             _ = LoadDataAsync();
@@ -183,6 +186,39 @@ namespace Client.ViewModels
         {
             if (_onQuickTx is null) return;
             _onQuickTx(SelectedAccount!, TxKindChoice.Income);
+        }
+
+        [RelayCommand]
+        private async Task SyncAsync()
+        {
+            if (_syncService is null || IsSyncing) return;
+
+            IsSyncing = true;
+            SyncStatusText = "Синхронизация...";
+            SyncIconColor = "#29B6F6"; // Blue
+
+            var result = await Task.Run(() => _syncService.SyncAsync());
+
+            if (result.Success)
+            {
+                // Перезагрузить список счетов
+                Accounts.Clear();
+                foreach (var acc in _data.Accounts.Where(a => a.Type == AccountType.Assets))
+                    Accounts.Add(acc);
+                OnPropertyChanged(nameof(TotalBalance));
+
+                SyncStatusText = $"Синхронизировано";
+                SyncIconColor = "#00E676"; // Green
+            }
+            else
+            {
+                var err = result.ErrorMessage ?? "Неизвестная ошибка";
+                if (err.Length > 60) err = err[..60] + "…";
+                SyncStatusText = $"Ошибка: {err}";
+                SyncIconColor = "#FF5252"; // Red
+            }
+
+            IsSyncing = false;
         }
     }
 }
