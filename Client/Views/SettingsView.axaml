@@ -21,5 +21,18 @@
                   Width="200"/>
       </StackPanel>
     </Border>
+
+    <!-- Logout Card -->
+    <Border Classes="card">
+      <StackPanel Spacing="12">
+        <TextBlock Text="Аккаунт" Classes="subheading"/>
+        <TextBlock Text="Выйти из текущего аккаунта. Потребуется повторный вход." 
+                   Classes="dim" TextWrapping="Wrap"/>
+        <Button Content="🚪 Выйти из аккаунта"
+                Command="{Binding LogoutCommand}"
+                Classes="danger"
+                Width="220" Height="36"/>
+      </StackPanel>
+    </Border>
   </StackPanel>
 </UserControl>

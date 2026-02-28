@@ -1,5 +1,7 @@
 using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Client.ViewModels
@@ -16,6 +18,8 @@ namespace Client.ViewModels
             "RUB", "USD", "EUR", "GBP", "CNY", "KZT", "BYN"
         };
 
+        public event Action? OnLogoutRequested;
+
         public SettingsViewModel(SettingsService settingsService)
         {
             _settingsService = settingsService;
@@ -29,5 +33,13 @@ namespace Client.ViewModels
                 _settingsService.BaseCurrency = value;
             }
         }
+
+        [RelayCommand]
+        private void Logout()
+        {
+            _settingsService.Logout();
+            OnLogoutRequested?.Invoke();
+        }
     }
 }
+

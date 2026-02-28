@@ -12,6 +12,7 @@ namespace Client.ViewModels
         private readonly IDataService _data;
         private readonly INotificationService _notify;
         private readonly SettingsService _settings;
+        private readonly AuthService _auth;
 
         [ObservableProperty]
         private ViewModelBase _current;
@@ -47,6 +48,7 @@ namespace Client.ViewModels
             _data = new LocalDbService();
             _notify = new NotificationService();
             _settings = new SettingsService();
+            _auth = new AuthService(_settings);
 
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
@@ -75,12 +77,33 @@ namespace Client.ViewModels
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
             ObligationsVm = new ObligationsViewModel(_data, _notify);
             SettingsVm = new SettingsViewModel(_settings);
+            SettingsVm.OnLogoutRequested += async () =>
+            {
+                await ShowLoginDialog();
+                if (!_auth.IsLoggedIn)
+                {
+                    App.MainWindow?.Close();
+                }
+            };
 
             _current = AccountsVm;
         }
 
         public async Task OnWindowLoaded()
         {
+            // --- Auth check ---
+            if (!_auth.IsLoggedIn)
+            {
+                await ShowLoginDialog();
+                if (!_auth.IsLoggedIn)
+                {
+                    // User closed dialog without logging in — exit
+                    App.MainWindow?.Close();
+                    return;
+                }
+            }
+
+            // --- First run dialog ---
             if (_settings.IsFirstRun)
             {
                 var vm = new Client.ViewModels.DialogWindow.FirstRunDialogViewModel();
@@ -98,6 +121,22 @@ namespace Client.ViewModels
 
                 await dialog.ShowDialog(App.MainWindow!);
             }
+        }
+
+        public async Task ShowLoginDialog()
+        {
+            var vm = new Client.ViewModels.DialogWindow.LoginDialogViewModel(_auth);
+            var dialog = new Client.Views.DialogViews.LoginDialog
+            {
+                DataContext = vm
+            };
+
+            vm.OnSuccess += () =>
+            {
+                dialog.Close();
+            };
+
+            await dialog.ShowDialog(App.MainWindow!);
         }
 
         private void openQuickTx(Account account, TxKindChoice choice)

@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Client.ViewModels.DialogWindow"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="420"
+        Width="440" Height="420"
+        x:Class="Client.Views.DialogViews.LoginDialog"
+        x:DataType="vm:LoginDialogViewModel"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CanResize="False"
+        Background="#0B1021"
+        Title="Авторизация">
+
+  <Border Background="#CC1C2235" CornerRadius="16" BorderBrush="#2A3150" BorderThickness="1" Margin="8">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+
+      <!-- Header -->
+      <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Center">
+        <TextBlock Text="🔐" FontSize="32" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding Title}" 
+                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"
+                   Foreground="#29B6F6"/>
+      </StackPanel>
+
+      <!-- Form -->
+      <StackPanel Grid.Row="1" Spacing="14" VerticalAlignment="Center">
+
+        <!-- Email -->
+        <StackPanel Spacing="4">
+          <TextBlock Text="Email" Foreground="#9E9E9E" FontSize="12"/>
+          <TextBox Text="{Binding Email}" 
+                   Watermark="user@example.com"
+                   Width="320"/>
+        </StackPanel>
+
+        <!-- Password -->
+        <StackPanel Spacing="4">
+          <TextBlock Text="Пароль" Foreground="#9E9E9E" FontSize="12"/>
+          <TextBox Text="{Binding Password}" 
+                   PasswordChar="●"
+                   Watermark="••••••••"
+                   Width="320"/>
+        </StackPanel>
+
+        <!-- Error -->
+        <TextBlock Text="{Binding ErrorMessage}"
+                   Foreground="#FF5252"
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+        <!-- Submit Button -->
+        <Button Content="{Binding ActionText}"
+                Command="{Binding SubmitCommand}"
+                Classes="accent"
+                HorizontalAlignment="Center"
+                Width="320" Height="40"
+                IsEnabled="{Binding !IsLoading}"/>
+
+        <!-- Loading indicator -->
+        <TextBlock Text="Подключение..."
+                   Foreground="#29B6F6"
+                   FontSize="12"
+                   HorizontalAlignment="Center"
+                   IsVisible="{Binding IsLoading}"/>
+      </StackPanel>
+
+      <!-- Toggle mode -->
+      <Button Grid.Row="2" 
+              Content="{Binding ToggleText}"
+              Command="{Binding ToggleModeCommand}"
+              Background="Transparent"
+              BorderThickness="0"
+              Foreground="#6688AA"
+              FontSize="13"
+              HorizontalAlignment="Center"
+              Cursor="Hand"/>
+    </Grid>
+  </Border>
+</Window>

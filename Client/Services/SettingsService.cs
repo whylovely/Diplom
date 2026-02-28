@@ -79,5 +79,34 @@ namespace Client.Services
             Settings.IsFirstRun = false;
             Save();
         }
+
+        public string? AuthToken
+        {
+            get => Settings.AuthToken;
+            set
+            {
+                Settings.AuthToken = value;
+                Save();
+            }
+        }
+
+        public string ServerUrl
+        {
+            get => Settings.ServerUrl;
+            set
+            {
+                if (Settings.ServerUrl != value)
+                {
+                    Settings.ServerUrl = value;
+                    Save();
+                }
+            }
+        }
+
+        public void Logout()
+        {
+            Settings.AuthToken = null;
+            Save();
+        }
     }
 }
