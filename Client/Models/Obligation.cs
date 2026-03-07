@@ -11,7 +11,9 @@ public partial class Obligation : ObservableObject  // Долги
     [ObservableProperty] private string _counterparty = string.Empty;
     [ObservableProperty] private decimal _amount;
     [ObservableProperty] private string _currency = "RUB";
-    [ObservableProperty] private ObligationType _type;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TypeLabel))]
+    private ObligationType _type;
     [ObservableProperty] private DateTimeOffset _createdAt = DateTimeOffset.Now;
 
     [ObservableProperty]

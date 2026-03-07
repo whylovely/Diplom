@@ -28,20 +28,18 @@
         <TextBlock Text="Валюта" Classes="dim"/>
         <Grid ColumnDefinitions="Auto,*">
           <TextBlock Grid.Column="0" Text="💵" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
-          <AutoCompleteBox Grid.Column="1"
-                           ItemsSource="{Binding Currencies}"
-                           Text="{Binding CurrencyCode, Mode=TwoWay}"
-                           FilterMode="Contains"
-                           Watermark="Введите валюту (USD, EUR...)"
-                           Width="188" HorizontalAlignment="Left"/>
+          <ComboBox Grid.Column="1"
+                    ItemsSource="{Binding Currencies}"
+                    SelectedItem="{Binding CurrencyCode}"
+                    Width="188" HorizontalAlignment="Left"/>
         </Grid>
       </StackPanel>
 
       <StackPanel Spacing="4">
         <TextBlock Text="Тип обязательства" Classes="dim"/>
         <StackPanel Orientation="Horizontal" Spacing="16">
-          <RadioButton Content="Должен" IsChecked="{Binding IsDebt}" GroupName="ObligationTypeGroup" />
-          <RadioButton Content="Должны" IsChecked="{Binding IsCredit}" GroupName="ObligationTypeGroup" />
+          <RadioButton Content="Должен" IsChecked="{Binding IsDebt, Mode=TwoWay}" GroupName="ObligationTypeGroup" />
+          <RadioButton Content="Должны" IsChecked="{Binding IsCredit, Mode=TwoWay}" GroupName="ObligationTypeGroup" />
         </StackPanel>
       </StackPanel>
 
