@@ -4,6 +4,11 @@ using Client.Views;
 
 namespace Client.Services;
 
+public interface IInputDialogService
+{
+    Task<string?> PromptAsync(string title, string message, string? initialText = null);
+}
+
 public sealed class InputDialogService : IInputDialogService
 {
     public async Task<string?> PromptAsync(string title, string message, string? initialText = null)

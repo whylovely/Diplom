@@ -8,12 +8,12 @@ namespace Client.Models
         Credit = 1
     }
 
-    public sealed class Entry
+    public sealed class Entry   // проводка
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public Guid AccountId { get; set; }
         public Guid? CategoryId { get; set; }
         public EntryDirection Direction { get; set; }
-        public Money Amount { get; set; } // храним все в исходной валюте
+        public required Money Amount { get; set; }
     }
 }

@@ -23,6 +23,8 @@ namespace Client.Models
         None,
         Expense,
         Income,
-        Transfer
+        Transfer,
+        DebtRepayment, // отдал деньги
+        DebtReceive // получил деньги
     }
 }

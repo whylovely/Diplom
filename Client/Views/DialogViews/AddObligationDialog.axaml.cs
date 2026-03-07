@@ -6,7 +6,11 @@ namespace Client.Views;
 
 public partial class AddObligationDialog : Window
 {
-    public AddObligationDialog() => InitializeComponent();
+    public AddObligationDialog()
+    {
+        InitializeComponent();
+        DataContext = new AddObligationDialogViewModel(this);
+    }
 
     public AddObligationDialog(Obligation? existing = null)
     {

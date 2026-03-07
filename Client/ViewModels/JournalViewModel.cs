@@ -1,36 +1,40 @@
 ﻿using Client.Models;
 using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Client.ViewModels
 {
-    public sealed partial class JournalViewModel : ViewModelBase
+    public sealed partial class JournalViewModel : ViewModelBase    // управление Журналом
     {
         private readonly IDataService _data;
+        private readonly INotificationService _notify;
         private List<JournalRow> _allRows = new();
 
         public ObservableCollection<JournalRow> FilteredRows { get; } = new();
+        [ObservableProperty] private string _searchText = "";   // Строка поиска
 
+        [NotifyCanExecuteChangedFor(nameof(DeleteTransactionCommand))]
         [ObservableProperty]
-        private string _searchText = "";
+        private JournalRow? _selectedRow;
+        private bool hasSelectedRow() => SelectedRow is not null;
 
-        public JournalViewModel(IDataService data)
+        public JournalViewModel(IDataService data, INotificationService notify)
         {
             _data = data;
+            _notify = notify;
             RebuildRows();
             _data.DataChanged += Refresh;
         }
 
-        partial void OnSearchTextChanged(string value) => ApplyFilter();
+        partial void OnSearchTextChanged(string value) => ApplyFilter();    // ввели один символ - меняем
 
-        public void Refresh()
-        {
-            RebuildRows();
-        }
+        public void Refresh() => RebuildRows();
 
         private void RebuildRows()
         {
@@ -55,7 +59,29 @@ namespace Client.ViewModels
             }
         }
 
-        private static bool MatchesFilter(JournalRow row, string query)
+        [RelayCommand(CanExecute = nameof(hasSelectedRow))]
+        private async System.Threading.Tasks.Task DeleteTransactionAsync()
+        {
+            var row = SelectedRow;
+            if (row is null) return;
+            var confirmed = await _notify.ShowConfirmAsync(
+                "Вы уверены, что хотите удалить выбранную операцию? Средства будут возвращены на исходные счета.",
+                "Удаление операции");
+            if (!confirmed) return;
+
+            try
+            {
+                await _data.RemoveTransactionAsync(row.TransactionId);
+                await _notify.ShowInfoAsync("Операция успешно удалена.");
+                Refresh();
+            }
+            catch (Exception ex)
+            {
+                await _notify.ShowErrorAsync(ex.Message);
+            }
+        }
+
+        private static bool MatchesFilter(JournalRow row, string query) // Мега-удобный поиск
         {
             return row.Description.Contains(query, StringComparison.OrdinalIgnoreCase)
                 || row.AccountName.Contains(query, StringComparison.OrdinalIgnoreCase)
@@ -66,14 +92,12 @@ namespace Client.ViewModels
 
         private IEnumerable<JournalRow> ConvertToRows(Transaction tx)
         {
-            // Находим проводку по активному счёту
             var assetEntries = tx.Entries
                 .Where(e => FindAccount(e.AccountId)?.Type == AccountType.Assets)
                 .ToList();
 
             if (assetEntries.Count == 0)
             {
-                // Нет проводок 
                 var first = tx.Entries.FirstOrDefault();
                 if (first is null) yield break;
 
@@ -90,7 +114,6 @@ namespace Client.ViewModels
                 yield break;
             }
 
-            // Перевод
             if (assetEntries.Count >= 2)
             {
                 var debitEntry = assetEntries.FirstOrDefault(e => e.Direction == EntryDirection.Debit);
@@ -115,7 +138,6 @@ namespace Client.ViewModels
                 yield break;
             }
 
-            // расход или доход
             foreach (var entry in assetEntries)
             {
                 var acc = FindAccount(entry.AccountId);

@@ -3,8 +3,9 @@
         xmlns:vm="using:Client.ViewModels.DialogWindow"
         x:Class="Client.Views.AddObligationDialog"
         x:DataType="vm:AddObligationDialogViewModel"
-        Width="450" Height="560"
+        Width="450" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
+        CanResize="False"
         Background="#0B1021"
         Title="{Binding Title}">
   
@@ -15,37 +16,42 @@
 
       <StackPanel Spacing="4">
         <TextBlock Text="Контрагент" Classes="dim"/>
-        <TextBox Text="{Binding Counterparty}" Watermark="Имя или название компании" />
+        <TextBox Text="{Binding Counterparty}" Watermark="Имя или название компании" Classes.error="{Binding HasCounterpartyError}" />
       </StackPanel>
 
       <StackPanel Spacing="4">
         <TextBlock Text="Сумма" Classes="dim"/>
-        <NumericUpDown Value="{Binding Amount}" Minimum="0.01" FormatString="N2" />
+        <NumericUpDown Value="{Binding Amount}" Minimum="0.01" FormatString="N2" Classes.error="{Binding HasAmountError}" />
       </StackPanel>
 
       <StackPanel Spacing="4">
         <TextBlock Text="Валюта" Classes="dim"/>
-        <ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding CurrencyCode}" HorizontalAlignment="Stretch" />
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Text="💵" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+          <AutoCompleteBox Grid.Column="1"
+                           ItemsSource="{Binding Currencies}"
+                           Text="{Binding CurrencyCode, Mode=TwoWay}"
+                           FilterMode="Contains"
+                           Watermark="Введите валюту (USD, EUR...)"
+                           Width="188" HorizontalAlignment="Left"/>
+        </Grid>
       </StackPanel>
 
       <StackPanel Spacing="4">
         <TextBlock Text="Тип обязательства" Classes="dim"/>
-        <ComboBox ItemsSource="{Binding Types}" SelectedItem="{Binding Type}" HorizontalAlignment="Stretch">
-          <ComboBox.ItemTemplate>
-            <DataTemplate>
-              <TextBlock Text="{Binding}" />
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
-        </ComboBox>
+        <StackPanel Orientation="Horizontal" Spacing="16">
+          <RadioButton Content="Должен" IsChecked="{Binding IsDebt}" GroupName="ObligationTypeGroup" />
+          <RadioButton Content="Должны" IsChecked="{Binding IsCredit}" GroupName="ObligationTypeGroup" />
+        </StackPanel>
       </StackPanel>
 
       <StackPanel Spacing="4">
-        <TextBlock Text="Дата погашения (необязательно)" Classes="dim"/>
-        <DatePicker SelectedDate="{Binding DueDate}" HorizontalAlignment="Stretch"/>
+        <TextBlock Text="Дата погашения" Classes="dim"/>
+        <DatePicker SelectedDate="{Binding DueDate}" HorizontalAlignment="Stretch" Classes.error="{Binding HasDueDateError}"/>
       </StackPanel>
 
       <StackPanel Spacing="4">
-        <TextBlock Text="Заметка" Classes="dim"/>
+        <TextBlock Text="Заметка (необязательно)" Classes="dim"/>
         <TextBox Text="{Binding Note}" AcceptsReturn="True" Height="60" Watermark="Дополнительная информация" />
       </StackPanel>
 

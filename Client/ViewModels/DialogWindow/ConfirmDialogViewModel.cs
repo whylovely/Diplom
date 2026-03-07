@@ -5,7 +5,7 @@ using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class ConfirmDialogViewModel : ViewModelBase
+public sealed partial class ConfirmDialogViewModel : ViewModelBase  // подтверждение действия
 {
     public string Title { get; }
     public string Message { get; }
@@ -28,9 +28,6 @@ public sealed partial class ConfirmDialogViewModel : ViewModelBase
         IconColor = new SolidColorBrush(Color.Parse("#FF8C00"));
     }
 
-    [RelayCommand]
-    private void Confirm() => _window.Close(true);
-
-    [RelayCommand]
-    private void Cancel() => _window.Close(false);
+    [RelayCommand] private void Confirm() => _window.Close(true);
+    [RelayCommand] private void Cancel() => _window.Close(false);
 }

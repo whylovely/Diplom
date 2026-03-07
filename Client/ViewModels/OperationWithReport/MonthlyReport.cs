@@ -9,13 +9,14 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public partial class MonthlyReport
+    public partial class MonthlyReport  // класс-помощник для отчетов по месяцам
     {
         public static void RefreshMonthlyRows(
             IDataService _data,
+            SettingsService _settings,
             DateTimeOffset DateFrom,
             DateTimeOffset DateTo,
-            ObservableCollection<MonthlyTotalRow> MonthlyRows)
+            ObservableCollection<MonthlyTotalRow> MonthlyRows)  // сортировка категорий по месяцам
         {
             MonthlyRows.Clear();
             var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
@@ -35,7 +36,7 @@ namespace Client.ViewModels
                         var acc = accountById[e.AccountId];
                         return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
                     })
-                    .Sum(e => e.Amount.Amount);
+                    .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
 
                 var income = enteries
                     .Where(e =>
@@ -43,7 +44,7 @@ namespace Client.ViewModels
                         var acc = accountById[e.AccountId];
                         return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
                     })
-                    .Sum(e => e.Amount.Amount);
+                    .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
 
                 MonthlyRows.Add(new MonthlyTotalRow
                 {
@@ -59,7 +60,7 @@ namespace Client.ViewModels
             ObservableCollection<ISeries> MonthlySeries,
             ObservableCollection<string> MonthlyLabels,
             out Axis[] XAxes,
-            out Axis[] YAxes)
+            out Axis[] YAxes)   // диаграмма месяцев
         {
             MonthlySeries.Clear();
             MonthlyLabels.Clear();

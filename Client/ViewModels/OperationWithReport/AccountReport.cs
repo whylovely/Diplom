@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public partial class AccountReport
+    public partial class AccountReport  // класс-помощник для отчетов с счетами
     {
         public static void RefreshAccountsRows(
             IDataService _data,
@@ -21,10 +21,11 @@ namespace Client.ViewModels
                 .Where(a => a.Type == AccountType.Assets)
                 .ToList();
 
-            var allTx = _data.Transactions.ToList();
+            var allTx = _data.Transactions.ToList();    
 
             foreach (var acc in assetAccounts)
-            {
+            {   
+                // рассчитываем сумму всех транзакций ДО
                 var deltaBeforeFrom = allTx
                     .Where(t => t.Date < DateFrom)
                     .SelectMany(t => t.Entries)

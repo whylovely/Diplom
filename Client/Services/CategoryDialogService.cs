@@ -5,6 +5,11 @@ using Client.Views;
 
 namespace Client.Services;
 
+public interface ICategoryDialogService
+{
+    Task<Category?> ShowAddCategoryDialogAsync(string? initialName = null);
+}
+
 public sealed class CategoryDialogService : ICategoryDialogService
 {
     public async Task<Category?> ShowAddCategoryDialogAsync(string? initialName = null)

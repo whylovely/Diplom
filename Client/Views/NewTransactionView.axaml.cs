@@ -6,8 +6,5 @@ namespace Client.Views;
 
 public partial class NewTransactionView : UserControl
 {
-    public NewTransactionView()
-    {
-        InitializeComponent();
-    }
+    public NewTransactionView() => InitializeComponent();
 }

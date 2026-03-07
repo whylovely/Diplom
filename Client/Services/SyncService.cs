@@ -103,7 +103,7 @@ public sealed class SyncService
             }
 
             // 6. Заменить локальные данные
-            _localDb.ReplaceAllData(accounts, categories, obligations, transactions);
+            //_localDb.ReplaceAllData(accounts, categories, obligations, transactions);
 
             return new SyncResult
             {

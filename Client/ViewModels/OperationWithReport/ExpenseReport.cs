@@ -13,13 +13,13 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public partial class ExpenseReport
+    public partial class ExpenseReport  // класс-помощник для отчета с расходами
     {
         public static decimal RefreshExpenseRows(
             IDataService _data, 
             DateTimeOffset DateFrom, 
             DateTimeOffset DateTo, 
-            ObservableCollection<CategoryTotalRow> ExpenseRows)
+            ObservableCollection<CategoryShareRow> ExpenseRows) // список суммы на категории
         {
             ExpenseRows.Clear();
             var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
@@ -35,8 +35,8 @@ namespace Client.ViewModels
                 .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key).Name;
-                    return new CategoryTotalRow
+                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                    return new CategoryShareRow
                     {
                         CategoryName = catName,
                         Total = g.Sum(x => x.Amount.Amount)
@@ -53,8 +53,8 @@ namespace Client.ViewModels
             IDataService _data, 
             DateTimeOffset DateFrom, 
             DateTimeOffset DateTo, 
-            ObservableCollection<CategoryDetailGroup> ExpenseGroups)
-        {
+                ObservableCollection<CategoryDetailGroup> ExpenseGroups)    // за какой день
+            {
             ExpenseGroups.Clear();
             var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
@@ -103,7 +103,7 @@ namespace Client.ViewModels
             int TopN,
             decimal TopExpensesSum,
             decimal TopExpensesShare,
-            ObservableCollection<CategoryTotalRow> ExpenseRows)
+            ObservableCollection<CategoryShareRow> ExpenseRows) // диаграмма расходов
         {
             ExpenseShareRows.Clear();
 

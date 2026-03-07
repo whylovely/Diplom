@@ -17,19 +17,32 @@ public partial class ObligationsViewModel : ViewModelBase
 {
     private readonly IDataService _data;
     private readonly INotificationService _notify;
+    private readonly SettingsService _settings;
+    private readonly Action<Obligation> _onPayDebt;
 
     public ObservableCollection<Obligation> Items { get; } = new();
 
     [ObservableProperty] private Obligation? _selectedItem;
+
     [ObservableProperty] private bool _showPaid;
+
     [ObservableProperty] private decimal _totalDebt;
     [ObservableProperty] private decimal _totalCredit;
 
-    public ObligationsViewModel(IDataService data, INotificationService notify)
+    public string BaseCurrencyCode => _settings.BaseCurrency;
+
+    public ObligationsViewModel(
+        IDataService data, 
+        INotificationService notify,
+        SettingsService settings, 
+        Action<Obligation> onPayDebt)
     {
         _data = data;
         _notify = notify;
+        _settings = settings;
+        _onPayDebt = onPayDebt;
         _data.DataChanged += Refresh;
+        _settings.SettingsChanged += Refresh;
         Refresh();
     }
 
@@ -43,8 +56,10 @@ public partial class ObligationsViewModel : ViewModelBase
         var filtered = all.Where(o => ShowPaid || !o.IsPaid).OrderBy(o => o.DueDate).ToList();
         foreach (var item in filtered) Items.Add(item);
 
-        TotalDebt = all.Where(o => o.Type == ObligationType.Debt && !o.IsPaid).Sum(o => o.Amount);
-        TotalCredit = all.Where(o => o.Type == ObligationType.Credit && !o.IsPaid).Sum(o => o.Amount);
+        TotalDebt = all.Where(o => o.Type == ObligationType.Debt && !o.IsPaid)
+        .Sum(o => o.Amount * _data.GetRate(o.Currency, _settings.BaseCurrency));
+        TotalCredit = all.Where(o => o.Type == ObligationType.Credit && !o.IsPaid)
+        .Sum(o => o.Amount * _data.GetRate(o.Currency, _settings.BaseCurrency));
     }
 
     [RelayCommand]
@@ -100,6 +115,13 @@ public partial class ObligationsViewModel : ViewModelBase
         await _data.MarkObligationPaidAsync(SelectedItem.Id, !SelectedItem.IsPaid);
     }
 
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private void PayDebt()  // открытие окна для погашения
+    {
+        if (SelectedItem == null) return;
+        _onPayDebt(SelectedItem);
+    }
+
     private bool HasSelection => SelectedItem is not null;
 
     partial void OnSelectedItemChanged(Obligation? value)
@@ -107,5 +129,6 @@ public partial class ObligationsViewModel : ViewModelBase
         EditCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
         MarkPaidCommand.NotifyCanExecuteChanged();
+        PayDebtCommand.NotifyCanExecuteChanged();
     }
 }

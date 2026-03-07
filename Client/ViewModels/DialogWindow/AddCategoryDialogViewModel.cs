@@ -4,20 +4,20 @@ using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddCategoryDialogViewModel : ViewModelBase
+public sealed partial class AddCategoryDialogViewModel : ViewModelBase  // Создание категорий
 {
     public sealed record KindItem(CategoryKind Kind, string Title);
 
     public KindItem[] KindItems { get; } =
     {
         new(CategoryKind.Expense, "Расход"),
-        new(CategoryKind.Income,  "Доход"),
+        new(CategoryKind.Income,  "Доход")
     };
 
     [ObservableProperty] private string _name = "";
     [ObservableProperty] private KindItem _selectedKind;
 
-    public bool CanOk => !string.IsNullOrWhiteSpace(Name);
+    public bool CanOk => !string.IsNullOrWhiteSpace(Name);  // Серые кнопки
 
     public Action<bool>? Close { get; set; }
 

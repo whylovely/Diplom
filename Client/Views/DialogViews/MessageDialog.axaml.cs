@@ -8,8 +8,7 @@ public partial class MessageDialog : Window
 {
     public MessageDialog() => InitializeComponent();
 
-    public MessageDialog(string title, string message,
-                         MessageLevel level = MessageLevel.Info)
+    public MessageDialog(string title, string message, MessageLevel level = MessageLevel.Info)
     {
         InitializeComponent();
         DataContext = new MessageDialogViewModel(this, title, message, level);

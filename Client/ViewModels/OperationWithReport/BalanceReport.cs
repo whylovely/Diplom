@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public partial class BalanceReport
+    public partial class BalanceReport  // класс-помощник для отчетов баланса
     {
         public static decimal RefreshBalanceRows(
             IDataService _data,
@@ -20,6 +20,7 @@ namespace Client.ViewModels
                 .Where(a => a.Type == AccountType.Assets)
                 .ToList();
 
+            // Транзакции до или в день даты
             var txUpToDate = _data.Transactions
                 .Where(t => t.Date <= BalanceDate)
                 .ToList();

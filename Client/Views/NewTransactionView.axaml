@@ -9,7 +9,6 @@
 
       <TextBlock Text="Новая операция" Classes="heading"/>
 
-      <!-- Transaction Type Selector -->
       <Border Classes="cardSmall">
         <StackPanel Orientation="Horizontal" Spacing="20">
           <RadioButton Content="Расход"
@@ -24,77 +23,93 @@
                        IsChecked="{Binding IsTransfer}"
                        Command="{Binding SetTransferCommand}"
                        Foreground="#29B6F6"/>
+          <RadioButton Content="Отдал долг"
+                       IsChecked="{Binding IsDebtRepayment}"
+                       Command="{Binding SetDebtRepaymentCommand}"
+                       Foreground="#FFB74D"/>
+          <RadioButton Content="Мне вернули"
+                       IsChecked="{Binding IsDebtReceive}"
+                       Command="{Binding SetDebtReceiveCommand}"
+                       Foreground="#BA68C8"/>
         </StackPanel>
       </Border>
 
-      <!-- Form Fields -->
       <Border Classes="card">
         <StackPanel Spacing="14">
 
-          <!-- Дата -->
           <StackPanel Spacing="4">
             <TextBlock Text="Дата" Classes="dim"/>
-            <DatePicker SelectedDate="{Binding Date}" Width="300"/>
+            <DatePicker SelectedDate="{Binding Date}" Width="400" HorizontalAlignment="Left"/>
           </StackPanel>
 
-          <!-- Описание -->
           <StackPanel Spacing="4">
             <TextBlock Text="Описание" Classes="dim"/>
-            <TextBox Text="{Binding Description}" Width="400"/>
+            <TextBox Text="{Binding Description}" Width="400" HorizontalAlignment="Left"/>
           </StackPanel>
 
-          <!-- Счёт (для расхода/дохода) -->
           <StackPanel Spacing="4"
                       IsVisible="{Binding IsSingleAccount}">
             <TextBlock Text="Счёт" Classes="dim"/>
             <ComboBox ItemsSource="{Binding Accounts}"
                       SelectedItem="{Binding FromAccount}"
-                      Width="300">
+                      Width="400" HorizontalAlignment="Left">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Name}"/>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrencyCode}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                  </StackPanel>
                 </DataTemplate>
               </ComboBox.ItemTemplate>
             </ComboBox>
           </StackPanel>
 
-          <!-- Откуда (для перевода) -->
           <StackPanel Spacing="4"
                       IsVisible="{Binding IsTransfer}">
             <TextBlock Text="Откуда" Classes="dim"/>
             <ComboBox ItemsSource="{Binding Accounts}"
                       SelectedItem="{Binding FromAccount}"
-                      Width="300">
+                      Width="400" HorizontalAlignment="Left">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Name}"/>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrencyCode}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                  </StackPanel>
                 </DataTemplate>
               </ComboBox.ItemTemplate>
             </ComboBox>
           </StackPanel>
 
-          <!-- Куда (для перевода) -->
           <StackPanel Spacing="4"
                       IsVisible="{Binding IsTransfer}">
             <TextBlock Text="Куда" Classes="dim"/>
             <ComboBox ItemsSource="{Binding Accounts}"
                       SelectedItem="{Binding ToAccount}"
-                      Width="300">
+                      Width="400" HorizontalAlignment="Left">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
-                  <TextBlock Text="{Binding Name}"/>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrencyCode}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                  </StackPanel>
                 </DataTemplate>
               </ComboBox.ItemTemplate>
             </ComboBox>
           </StackPanel>
 
-          <!-- Категория -->
           <StackPanel Spacing="4"
                       IsVisible="{Binding IsCategoryRequire}">
             <TextBlock Text="Категория" Classes="dim"/>
             <ComboBox ItemsSource="{Binding FilteredCategories}"
                       SelectedItem="{Binding Category}"
-                      Width="300">
+                      Width="400" HorizontalAlignment="Left">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
                   <TextBlock Text="{Binding Name}"/>
@@ -103,10 +118,28 @@
             </ComboBox>
           </StackPanel>
 
-          <!-- Сумма -->
+          <StackPanel Spacing="4"
+                      IsVisible="{Binding IsObligationRequire}">
+            <TextBlock Text="Долг" Classes="dim"/>
+            <ComboBox ItemsSource="{Binding ActiveObligations}"
+                      SelectedItem="{Binding SelectedObligation}"
+                      Width="400" HorizontalAlignment="Left">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Counterparty}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Currency}" Foreground="#A0A0A0" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
           <StackPanel Spacing="4">
             <TextBlock Text="Сумма" Classes="dim"/>
-            <TextBox Text="{Binding Amount}" Width="200" FontFamily="Fira Code, Consolas, monospace" FontFeatures="tnum, zero"/>
+            <NumericUpDown Value="{Binding Amount}" Minimum="0" FormatString="N2" ShowButtonSpinner="False" AllowSpin="False" Width="400" HorizontalAlignment="Left" FontFamily="Fira Code, Consolas, monospace" FontFeatures="tnum, zero"/>
           </StackPanel>
 
           <Separator/>

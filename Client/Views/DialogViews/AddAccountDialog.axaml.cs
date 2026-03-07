@@ -9,14 +9,11 @@ namespace Client.Views;
 
 public partial class AddAccountDialog : Window
 {
-    public AddAccountDialog()
-    {
-        InitializeComponent();
-    }
+    public AddAccountDialog() => InitializeComponent();
 
     public Task<Account?> ShowDialogAsync(Window owner, string baseCurrency)
     {
-        DataContext = new AddAccountDialogViewModel(baseCurrency);
+        DataContext = new AddAccountDialogViewModel { SelectedCurrency = baseCurrency };
         return ShowDialog<Account?>(owner);
     }
 
@@ -25,6 +22,7 @@ public partial class AddAccountDialog : Window
         if (DataContext is not AddAccountDialogViewModel vm) return;
         if (string.IsNullOrWhiteSpace(vm.Name)) return;
 
+        var isMulti = vm.SelectedCurrency != "RUB";
         var acc = new Account
         {
             Id = Guid.NewGuid(),
@@ -33,8 +31,8 @@ public partial class AddAccountDialog : Window
             InitialBalance = vm.InitialBalance,
             Balance = vm.InitialBalance,
             Type = AccountType.Assets,
-            IsMultiCurrency = vm.IsMultiCurrency,
-            SecondaryCurrencyCode = vm.IsMultiCurrency ? vm.SelectedSecondaryCurrency : null,
+            IsMultiCurrency = isMulti,
+            SecondaryCurrencyCode = isMulti ? "RUB" : null,
             SecondaryBalance = 0
         };
 

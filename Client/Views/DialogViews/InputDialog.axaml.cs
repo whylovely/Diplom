@@ -7,10 +7,7 @@ namespace Client.Views;
 
 public partial class InputDialog : Window
 {
-    public InputDialog()
-    {
-        InitializeComponent();
-    }
+    public InputDialog() => InitializeComponent();
 
     public Task<string?> ShowDialogAsync(Window owner, string title, string message, string? initialText)
     {

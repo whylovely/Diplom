@@ -14,7 +14,7 @@ using ClosedXML.Excel;
 
 namespace Client.ViewModels.OperationWithReport
 {
-    public partial class DropReport
+    public partial class DropReport // Экспорт отчетов
     {
         public static string BuildCSVReport(
             DateTimeOffset DateFrom,
@@ -22,13 +22,12 @@ namespace Client.ViewModels.OperationWithReport
             decimal TotalIncome,
             decimal TotalExpense,
             decimal Net,
-            ObservableCollection<CategoryTotalRow> ExpenseRows,
-            ObservableCollection<CategoryTotalRow> IncomeRows,
+            ObservableCollection<CategoryShareRow> ExpenseRows,
+            ObservableCollection<CategoryShareRow> IncomeRows,
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows
-            )
+            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в CSV
         {
             var sb = new StringBuilder();
 
@@ -77,12 +76,12 @@ namespace Client.ViewModels.OperationWithReport
             decimal TotalIncome,
             decimal TotalExpense,
             decimal Net,
-            ObservableCollection<CategoryTotalRow> ExpenseRows,
-            ObservableCollection<CategoryTotalRow> IncomeRows,
+            ObservableCollection<CategoryShareRow> ExpenseRows,
+            ObservableCollection<CategoryShareRow> IncomeRows,
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows)
+            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в TXT
         {
             var sb = new StringBuilder();
             var sep = new string('═', 60);
@@ -143,12 +142,12 @@ namespace Client.ViewModels.OperationWithReport
             decimal TotalIncome,
             decimal TotalExpense,
             decimal Net,
-            ObservableCollection<CategoryTotalRow> ExpenseRows,
-            ObservableCollection<CategoryTotalRow> IncomeRows,
+            ObservableCollection<CategoryShareRow> ExpenseRows,
+            ObservableCollection<CategoryShareRow> IncomeRows,
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows)
+            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в Excel
         {
             using var wb = new XLWorkbook();
 

@@ -4,7 +4,7 @@ using System;
 
 namespace Client.Models;
 
-public partial class Obligation : ObservableObject
+public partial class Obligation : ObservableObject  // Долги
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -13,8 +13,15 @@ public partial class Obligation : ObservableObject
     [ObservableProperty] private string _currency = "RUB";
     [ObservableProperty] private ObligationType _type;
     [ObservableProperty] private DateTimeOffset _createdAt = DateTimeOffset.Now;
-    [ObservableProperty] private DateTimeOffset? _dueDate;
-    [ObservableProperty] private bool _isPaid;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusLabel))]
+    private DateTimeOffset? _dueDate;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusLabel))]
+    private bool _isPaid;
+    
     [ObservableProperty] private DateTimeOffset? _paidAt;
     [ObservableProperty] private string? _note;
 

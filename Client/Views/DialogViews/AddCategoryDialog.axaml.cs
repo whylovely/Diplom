@@ -9,10 +9,7 @@ namespace Client.Views;
 
 public partial class AddCategoryDialog : Window
 {
-    public AddCategoryDialog()
-    {
-        InitializeComponent();
-    }
+    public AddCategoryDialog() => InitializeComponent();
 
     public Task<Category?> ShowDialogAsync(Window owner, string? initialName = null)
     {

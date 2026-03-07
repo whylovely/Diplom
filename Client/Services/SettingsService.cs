@@ -11,7 +11,7 @@ namespace Client.Services
         private const string FileName = "user_settings.json";
         private readonly string _filePath;
 
-        public UserSettings Settings { get; private set; }
+        public UserSettings Settings { get; private set; } = new();
 
         public event Action? SettingsChanged;
 
@@ -59,7 +59,7 @@ namespace Client.Services
             }
         }
 
-        public string BaseCurrency
+        public string BaseCurrency  // Установление базовой валюты
         {
             get => Settings.BaseCurrency;
             set

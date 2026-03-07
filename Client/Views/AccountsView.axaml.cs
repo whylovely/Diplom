@@ -14,14 +14,13 @@ public partial class AccountsView : UserControl
 
     private void AccountsGrid_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(AccountsGrid).Properties.IsRightButtonPressed)
-            return;
+        if (!e.GetCurrentPoint(AccountsGrid).Properties.IsRightButtonPressed) return;
 
         var pos = e.GetPosition(AccountsGrid);
         var hit = AccountsGrid.InputHitTest(pos) as Control;
+        
         var row = hit?.FindAncestorOfType<DataGridRow>();
 
-        if (row?.DataContext is not null)
-            AccountsGrid.SelectedItem = row.DataContext;
+        if (row?.DataContext is not null) AccountsGrid.SelectedItem = row.DataContext;
     }
 }

@@ -3,44 +3,33 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.Models
 {
-    public sealed partial class Account : ObservableObject
+    public sealed partial class Account : ObservableObject  // счет
     {
         public Guid Id { get; init; } = Guid.NewGuid();
+        [ObservableProperty] private string _name = "";
 
-        [ObservableProperty]
-        private string _name = "";
-
-        public string CurrencyCode { get; set; } = "RUB";
+        public string CurrencyCode { get; set; } = "RUB";   // Основная валюта
+        public string? SecondaryCurrencyCode { get; set; }
 
         public decimal InitialBalance { get; set; } 
-
-        [ObservableProperty]
-        private decimal _balance;
+        [ObservableProperty] private decimal _balance;
 
         public AccountType Type { get; set; } = AccountType.Assets;
-
-        // Многовалютность (выровнено с Shared.Accounts.MultiCurrencyType)
         public MultiCurrencyType AccountMultiType { get; set; } = MultiCurrencyType.Standard;
-
-        /// <summary>Вычисляемое свойство для совместимости с XAML-биндингами.</summary>
         public bool IsMultiCurrency
         {
             get => AccountMultiType == MultiCurrencyType.MultiCurrency;
             set => AccountMultiType = value ? MultiCurrencyType.MultiCurrency : MultiCurrencyType.Standard;
         }
 
-        public string? SecondaryCurrencyCode { get; set; }
-        public decimal? ExchangeRate { get; set; }   // курс конвертации (из Shared)
+        public decimal? ExchangeRate { get; set; }   // курс валют
+        [ObservableProperty] private decimal _secondaryBalance;
 
-        [ObservableProperty]
-        private decimal _secondaryBalance;
-
-        // Метки времени для синхронизации
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.Now;
+        public bool IsDeleted { get; set; }
     }
 
-    /// <summary>Выровнено с Shared.Accounts.AccountKind.</summary>
     public enum AccountType
     {
         Assets  = 0,   // активы
@@ -48,7 +37,6 @@ namespace Client.Models
         Expense = 2    // расход
     }
 
-    /// <summary>Выровнено с Shared.Accounts.MultiCurrencyType.</summary>
     public enum MultiCurrencyType
     {
         Standard      = 0,

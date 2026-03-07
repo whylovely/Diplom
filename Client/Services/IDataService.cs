@@ -9,26 +9,32 @@ namespace Client.Services
     {
         event Action? DataChanged;
 
+        IReadOnlyList<CurrencyRate> CurrencyRates { get; }
         IReadOnlyList<Account> Accounts { get; }
         IReadOnlyList<Category> Categories { get; }
         IReadOnlyList<Transaction> Transactions { get; }
         IReadOnlyList<Obligation> Obligations { get; }
 
-        void AddAccount(Account account);
-        void AddCategory(Category category);
-        void RemoveCategory(Category category);
-        void RenameAccount(Guid id, string newName);
-        void RemoveAccount(Guid id);
-        bool IsAccountUsed(Guid id);
+        void AddAccount(Account account);   // Добавление счета
+        void RenameAccount(Guid id, string newName);    // Переименовывание счета
+        void RemoveAccount(Guid id);    // soft-delete счета
+        bool IsAccountUsed(Guid id);    // Использовался ли аккаунт
 
-        Task AddObligationAsync(Obligation obligation);
-        Task UpdateObligationAsync(Obligation obligation);
-        Task DeleteObligationAsync(Guid id);
-        Task MarkObligationPaidAsync(Guid id, bool isPaid);
+        void AddCategory(Category category);    // Добавление категории
+        void RemoveCategory(Category category); // Удаление категории
 
-        Account GetExpenseAccountForCategory(Guid categoryId);
-        Account GetIncomeAccountForCategory(Guid categoryId);
+        Task AddObligationAsync(Obligation obligation); // Добавление обязательства
+        Task UpdateObligationAsync(Obligation obligation);  // Изменение обязательства
+        Task DeleteObligationAsync(Guid id);    // Удаление обязательства
+        Task MarkObligationPaidAsync(Guid id, bool isPaid); // Статус обязательства
 
-        Task PostTransactionAsync(Transaction tx);
+        Account GetExpenseAccountForCategory(Guid categoryId);  // Возвращение категории расходов
+        Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов
+
+        Task PostTransactionAsync(Transaction tx);  // Проводка транзакции
+        Task RemoveTransactionAsync(Guid transactionId);    // Удаление транзакции
+
+        decimal GetRate(string fromCurrency, string toCurrency = "RUB");    // Получение курса валют
+        void SetCurrencyRate(string code, decimal rate);    // Обновление курса валют
     }
 }

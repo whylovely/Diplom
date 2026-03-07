@@ -5,8 +5,5 @@ namespace Client.Views;
 
 public partial class SettingsView : UserControl
 {
-    public SettingsView()
-    {
-        InitializeComponent();
-    }
+    public SettingsView() => InitializeComponent();
 }

@@ -7,38 +7,37 @@
   <Grid RowDefinitions="Auto,*">
     <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
 
-      <!-- Header -->
       <TextBlock Text="Обязательства" Classes="heading"/>
 
-      <!-- Action Bar -->
       <Border Classes="cardSmall">
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button Content="＋ Добавить" Classes="accent" Command="{Binding AddCommand}" Width="130" />
-          <Button Content="Изменить" Command="{Binding EditCommand}" Width="110" />
-          <Button Content="Удалить" Classes="danger" Command="{Binding DeleteCommand}" Width="110" />
-          <Button Content="Статус" Command="{Binding MarkPaidCommand}" Width="110" ToolTip.Tip="Переключить статус оплачено/активно" />
           <CheckBox IsChecked="{Binding ShowPaid}" Content="Показывать оплаченные" VerticalAlignment="Center" Margin="14,0"/>
         </StackPanel>
       </Border>
 
-      <!-- Summary -->
       <Grid ColumnDefinitions="*,*" Margin="0,0,0,4">
         <Border Classes="cardSmall" Margin="0,0,8,0">
           <StackPanel Spacing="4">
             <TextBlock Text="Я должен" Classes="dim"/>
-            <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed heroBalance" FontSize="36"/>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed heroBalance" FontSize="36"/>
+              <TextBlock Text="{Binding BaseCurrencyCode}" Classes="dim" FontSize="16" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+            </StackPanel>
           </StackPanel>
         </Border>
         <Border Grid.Column="1" Classes="cardSmall" Margin="8,0,0,0">
           <StackPanel Spacing="4">
             <TextBlock Text="Мне должны" Classes="dim"/>
-            <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen heroBalance" FontSize="36"/>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen heroBalance" FontSize="36"/>
+              <TextBlock Text="{Binding BaseCurrencyCode}" Classes="dim" FontSize="16" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+            </StackPanel>
           </StackPanel>
         </Border>
       </Grid>
     </StackPanel>
 
-    <!-- Table -->
     <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" 
               SelectedItem="{Binding SelectedItem}"
               AutoGenerateColumns="False" 
@@ -46,6 +45,17 @@
               BorderThickness="0"
               Background="Transparent"
               GridLinesVisibility="Horizontal">
+              
+      <DataGrid.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Погасить долг" Command="{Binding PayDebtCommand}"/>
+          <Separator/>
+          <MenuItem Header="Изменить" Command="{Binding EditCommand}"/>
+          <MenuItem Header="Переключить статус" Command="{Binding MarkPaidCommand}"/>
+          <Separator/>
+          <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" Foreground="#FF5252"/>
+        </ContextMenu>
+      </DataGrid.ContextMenu>
           <DataGrid.Columns>
             <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="200" />
             
@@ -84,7 +94,6 @@
           </DataGrid.Columns>
     </DataGrid>
 
-    <!-- Empty State -->
     <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
                 IsVisible="{Binding !Items.Count}">
       <Path Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M11,19.93C7.05,19.43 4,16.05 4,12C4,7.95 7.05,4.57 11,4.07V19.93M13,4.07C16.95,4.57 20,7.95 20,12C20,16.05 16.95,19.43 13,19.93V4.07Z" 

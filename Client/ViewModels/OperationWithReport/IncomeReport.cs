@@ -13,17 +13,18 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public partial class IncomeReport
+    public partial class IncomeReport   // класс-помощник для доходов
     {
         public static decimal RefreshIncomeRows(
-            IDataService _data, 
+            IDataService dataServ,
+            SettingsService settings,
             DateTimeOffset DateFrom, 
             DateTimeOffset DateTo, 
-            ObservableCollection<CategoryTotalRow> IncomeRows)
+            ObservableCollection<CategoryShareRow> IncomeRows)  // список суммы за доходы
         {
             IncomeRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList(); 
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
+            var txInRange = dataServ.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList(); 
+            var accountById = dataServ.Accounts.ToDictionary(a => a.Id);
 
             var incomeGroups = txInRange
                 .SelectMany(t => t.Entries)
@@ -35,11 +36,11 @@ namespace Client.ViewModels
                 .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key).Name;
-                    return new CategoryTotalRow
+                    var catName = dataServ.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                    return new CategoryShareRow
                     {
                         CategoryName = catName,
-                        Total = g.Sum(x => x.Amount.Amount)
+                        Total = g.Sum(x => x.Amount.Amount * dataServ.GetRate(x.Amount.CurrencyCode, settings.BaseCurrency))
                     };
                 })
                 .OrderByDescending(r => r.Total);
@@ -50,14 +51,15 @@ namespace Client.ViewModels
         }
 
         public static void RefreshIncomeGroups(
-            IDataService _data, 
+            IDataService dataServ,
+            SettingsService settings,
             DateTimeOffset DateFrom, 
             DateTimeOffset DateTo, 
-            ObservableCollection<CategoryDetailGroup> IncomeGroups)
+            ObservableCollection<CategoryDetailGroup> IncomeGroups) // доход за день
         {
             IncomeGroups.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
-            var accountById = _data.Accounts.ToDictionary(a => a.Id);
+            var txInRange = dataServ.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            var accountById = dataServ.Accounts.ToDictionary(a => a.Id);
 
             var groups = txInRange
                 .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
@@ -69,14 +71,14 @@ namespace Client.ViewModels
                 .GroupBy(x => x.Entry.CategoryId)
                 .Select(g =>
                 {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                    var catName = dataServ.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
                     var days = g
                         .GroupBy(x => x.Tx.Date.Date)
                         .OrderBy(d => d.Key)
                         .Select(d => new DailyDetailRow
                         {
                             Date = d.Key.ToString("dd.MM.yyyy"),
-                            Amount = d.Sum(x => x.Entry.Amount.Amount),
+                            Amount = d.Sum(x => x.Entry.Amount.Amount * dataServ.GetRate(x.Entry.Amount.CurrencyCode, settings.BaseCurrency)),
                             Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
                         })
                         .ToList();
@@ -84,7 +86,7 @@ namespace Client.ViewModels
                     return new CategoryDetailGroup
                     {
                         CategoryName = catName,
-                        Total = g.Sum(x => x.Entry.Amount.Amount),
+                        Total = g.Sum(x => x.Entry.Amount.Amount * dataServ.GetRate(x.Entry.Amount.CurrencyCode, settings.BaseCurrency)),
                         Days = days
                     };
                 })
@@ -94,7 +96,7 @@ namespace Client.ViewModels
         }
 
         public static void RefreshIncomeChart(
-            IDataService _data,
+            IDataService dataServ,
             DateTimeOffset DateFrom,
             DateTimeOffset DateTo,
             ObservableCollection<CategoryShareRow> IncomeShareRows,
@@ -102,8 +104,8 @@ namespace Client.ViewModels
             decimal TotalIncome,
             int TopN,
             decimal TopIncomesSum,
-            decimal TopIncomesShare,
-            ObservableCollection<CategoryTotalRow> IncomeRows)
+            decimal TopIncomesShare,    
+            ObservableCollection<CategoryShareRow> IncomeRows)  // диаграмма доходов
         {
             IncomeShareRows.Clear();
 

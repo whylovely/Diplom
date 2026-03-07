@@ -19,6 +19,11 @@
         <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                   SelectedItem="{Binding SelectedCurrency}"
                   Width="200"/>
+        
+        <Button Content="💾 Сохранить настройки"
+                Command="{Binding SaveCommand}"
+                Classes="accent"
+                Width="200" Height="36"/>
       </StackPanel>
     </Border>
 

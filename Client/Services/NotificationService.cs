@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Client.Services
 {
+
+    public interface INotificationService
+    {
+        Task ShowErrorAsync(string message, string title = "Ошибка");
+        Task ShowWarningAsync(string message, string title = "Предупреждение");
+        Task ShowInfoAsync(string message, string title = "Информация");
+        Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение");
+    }
+
     public sealed class NotificationService : INotificationService
     {
         public Task ShowErrorAsync(string message, string title = "Ошибка")
@@ -19,6 +28,7 @@ namespace Client.Services
 
         public async Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение")
         {
+            // Получаем ссылку на главное окно приложения для отображения модального диалога
             var lifetime = (IClassicDesktopStyleApplicationLifetime)Application.Current!.ApplicationLifetime!;
             var owner = lifetime.MainWindow;
 

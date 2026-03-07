@@ -6,7 +6,7 @@
 
   <Grid RowDefinitions="Auto,*">
     <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
-      <!-- Header -->
+      
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Общий баланс" Classes="dim"/>
@@ -15,7 +15,6 @@
         
         <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="16" HorizontalAlignment="Right">
             
-            <!-- Sync Button -->
             <Button Command="{Binding SyncCommand}"
                     Background="Transparent" BorderThickness="0" Padding="0"
                     Cursor="Hand" ToolTip.Tip="Синхронизировать с сервером"
@@ -59,7 +58,6 @@
       <TextBlock Text="Ваши счета" Classes="heading"/>
     </StackPanel>
 
-    <!-- Skeleton Loading -->
     <StackPanel Grid.Row="1" Spacing="8" IsVisible="{Binding IsLoading}" Margin="0,16,0,0">
       <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
       <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
@@ -68,7 +66,6 @@
       <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
     </StackPanel>
 
-    <!-- Accounts Table -->
     <DataGrid Grid.Row="1" x:Name="AccountsGrid"
               ItemsSource="{Binding Accounts}"
               SelectedItem="{Binding SelectedAccount}"
@@ -126,7 +123,6 @@
           </DataGrid.Columns>
     </DataGrid>
 
-    <!-- Empty State -->
     <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
                 IsVisible="{Binding !Accounts.Count}">
       <StackPanel.IsVisible>

@@ -14,8 +14,7 @@ namespace Client.ViewModels
         private readonly SettingsService _settings;
         private readonly AuthService _auth;
 
-        [ObservableProperty]
-        private ViewModelBase _current;
+        [ObservableProperty] private ViewModelBase _current;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsAccountsActive))]
@@ -27,13 +26,13 @@ namespace Client.ViewModels
         [NotifyPropertyChangedFor(nameof(IsSettingsActive))]
         private string _activePage = "Accounts";
 
-        public bool IsAccountsActive      => ActivePage == "Accounts";
-        public bool IsCategoriesActive     => ActivePage == "Categories";
-        public bool IsJournalActive        => ActivePage == "Journal";
-        public bool IsReportActive         => ActivePage == "Report";
-        public bool IsObligationsActive    => ActivePage == "Obligations";
+        public bool IsAccountsActive => ActivePage == "Accounts";
+        public bool IsCategoriesActive => ActivePage == "Categories";
+        public bool IsJournalActive => ActivePage == "Journal";
+        public bool IsReportActive => ActivePage == "Report";
+        public bool IsObligationsActive => ActivePage == "Obligations";
         public bool IsNewTransactionActive => ActivePage == "NewTransaction";
-        public bool IsSettingsActive       => ActivePage == "Settings";
+        public bool IsSettingsActive => ActivePage == "Settings";
 
         public AccountsViewModel AccountsVm { get; }
         public JournalViewModel JournalVm { get; }
@@ -65,7 +64,7 @@ namespace Client.ViewModels
                 getWindow: () => App.MainWindow!,
                 syncService: syncService);
 
-            JournalVm = new JournalViewModel(_data);
+            JournalVm = new JournalViewModel(_data, _notify);
 
             NewTxVm = new NewTransactionViewModel(
                 _data, 
@@ -76,9 +75,9 @@ namespace Client.ViewModels
                 NavigateJournal();
             });
 
-            ReportVm = new ReportViewModel(_data);
+            ReportVm = new ReportViewModel(_data, _notify, _settings);
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
-            ObligationsVm = new ObligationsViewModel(_data, _notify);
+            ObligationsVm = new ObligationsViewModel(_data, _notify, _settings, openDebtTx);
             SettingsVm = new SettingsViewModel(_settings);
             SettingsVm.OnLogoutRequested += async () =>
             {
@@ -94,19 +93,16 @@ namespace Client.ViewModels
 
         public async Task OnWindowLoaded()
         {
-            // --- Auth check ---
             if (!_auth.IsLoggedIn)
             {
                 await ShowLoginDialog();
                 if (!_auth.IsLoggedIn)
                 {
-                    // User closed dialog without logging in — exit
                     App.MainWindow?.Close();
                     return;
                 }
             }
 
-            // --- First run dialog ---
             if (_settings.IsFirstRun)
             {
                 var vm = new Client.ViewModels.DialogWindow.FirstRunDialogViewModel();
@@ -146,6 +142,12 @@ namespace Client.ViewModels
         {
             NavigateNewTransaction();
             NewTxVm.PresetForQuickTx(account, choice);
+        }
+
+        private void openDebtTx(Obligation obligation)
+        {
+            NavigateNewTransaction();
+            NewTxVm.PresetForDebtTx(obligation);
         }
 
         [RelayCommand] private void NavigateAccounts()        { Current = AccountsVm;     ActivePage = "Accounts"; }

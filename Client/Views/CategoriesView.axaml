@@ -7,17 +7,15 @@
              
   <Grid RowDefinitions="Auto,*">
     <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
-      <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="Категории" Classes="heading"/>
         <Button Grid.Column="1" Content="＋ Добавить"
                 Classes="accent"
-                Command="{Binding AddCommand}"
+                Command="{Binding AddCategoryCommand}"
                 Width="160"/>
       </Grid>
     </StackPanel>
 
-    <!-- Categories Table -->
     <dg:DataGrid Grid.Row="1" x:Name="CategoriesGrid"
                  ItemsSource="{Binding Categories}"
                  SelectedItem="{Binding Selected}"
@@ -29,8 +27,8 @@
 
           <dg:DataGrid.ContextMenu>
             <ContextMenu x:CompileBindings="False">
-              <MenuItem Header="Переименовать" Command="{Binding RenameCommand}" />
-              <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" />
+              <MenuItem Header="Переименовать" Command="{Binding RenameCategoryCommand}" />
+              <MenuItem Header="Удалить" Command="{Binding DeleteCategoryCommand}" />
             </ContextMenu>
           </dg:DataGrid.ContextMenu>
 
@@ -39,7 +37,6 @@
           </dg:DataGrid.Columns>
     </dg:DataGrid>
 
-    <!-- Empty State -->
     <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
                 IsVisible="{Binding !Categories.Count}">
       <Path Data="M6.5,10C7.3,10 8,9.3 8,8.5C8,7.7 7.3,7 6.5,7C5.7,7 5,7.7 5,8.5C5,9.3 5.7,10 6.5,10M9,13H22V11H9V13M6.5,17C7.3,17 8,16.3 8,15.5C8,14.7 7.3,14 6.5,14C5.7,14 5,14.7 5,15.5C5,16.3 5.7,17 6.5,17M9,20H22V18H9V20M6.5,3C7.3,3 8,2.3 8,1.5C8,0.7 7.3,0 6.5,0C5.7,0 5,0.7 5,1.5C5,2.3 5.7,3 6.5,3M9,6H22V4H9V6Z" 

@@ -10,20 +10,21 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
-    public sealed partial class AccountsViewModel : ViewModelBase
+    public sealed partial class AccountsViewModel : ViewModelBase   // упраление страницей "Счета"
     {
         private readonly IDataService _data;
         private readonly INotificationService _notify;
         private readonly ICategoryDialogService _catDialog;
 
         private readonly IInputDialogService _input;
-        private readonly Action<Account, TxKindChoice> _onQuickTx;
+        private readonly Action<Account, TxKindChoice> _onQuickTx;  // Быстрые действия
         private readonly Func<Avalonia.Controls.Window> _getWindow;
         private readonly SettingsService _settings;
         private readonly SyncService? _syncService;
 
         public ObservableCollection<Account> Accounts { get; }
 
+        // доступная/недоступная кнопка
         [NotifyCanExecuteChangedFor(nameof(RenameAccountCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteAccountCommand))]
         [NotifyCanExecuteChangedFor(nameof(QuickExpenseCommand))]
@@ -31,7 +32,7 @@ namespace Client.ViewModels
         [ObservableProperty] 
         private Account? _selectedAccount;
 
-        public decimal TotalBalance
+        public decimal TotalBalance // Общий баланс
         {
             get
             {
@@ -97,7 +98,7 @@ namespace Client.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddAccount()
+        private async Task AddAccountAsync()
         {
             var dlg = new AddAccountDialog();
             var acc = await dlg.ShowDialogAsync(_getWindow(), _settings.BaseCurrency);
@@ -195,27 +196,26 @@ namespace Client.ViewModels
 
             IsSyncing = true;
             SyncStatusText = "Синхронизация...";
-            SyncIconColor = "#29B6F6"; // Blue
+            SyncIconColor = "#29B6F6";
 
             var result = await Task.Run(() => _syncService.SyncAsync());
 
             if (result.Success)
             {
-                // Перезагрузить список счетов
                 Accounts.Clear();
                 foreach (var acc in _data.Accounts.Where(a => a.Type == AccountType.Assets))
                     Accounts.Add(acc);
                 OnPropertyChanged(nameof(TotalBalance));
 
                 SyncStatusText = $"Синхронизировано";
-                SyncIconColor = "#00E676"; // Green
+                SyncIconColor = "#00E676";
             }
             else
             {
                 var err = result.ErrorMessage ?? "Неизвестная ошибка";
                 if (err.Length > 60) err = err[..60] + "…";
                 SyncStatusText = $"Ошибка: {err}";
-                SyncIconColor = "#FF5252"; // Red
+                SyncIconColor = "#FF5252";
             }
 
             IsSyncing = false;

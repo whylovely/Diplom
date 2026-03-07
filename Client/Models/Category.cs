@@ -7,40 +7,26 @@ namespace Client.Models
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
-
         public CategoryKind Kind { get; set; } 
     }
 
-    public enum CategoryKind
-    {
-        Expense,
-        Income
-    }
+    public enum CategoryKind { Expense, Income }
 
-    // Расчет процентов на категории
-    public sealed class CategoryShareRow
+    public sealed class CategoryShareRow    // Доля категорий 
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Total { get; set; }
         public decimal SharePercent { get; set; }
     }
 
-    public sealed class CategoryTotalRow
-    {
-        public string CategoryName { get; set; } = string.Empty;
-        public decimal Total { get; set; }
-    }
-
-    // Детализация внутри категории по дню
-    public sealed class DailyDetailRow
+    public sealed class DailyDetailRow  // день - категория
     {
         public string Date { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string? Description { get; set; }
     }
 
-    // Группировка по категории
-    public sealed class CategoryDetailGroup
+    public sealed class CategoryDetailGroup // Группировка по категории
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Total { get; set; }

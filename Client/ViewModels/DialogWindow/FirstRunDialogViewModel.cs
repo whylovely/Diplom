@@ -6,22 +6,14 @@ using System.Linq;
 
 namespace Client.ViewModels.DialogWindow
 {
-    public partial class FirstRunDialogViewModel : ViewModelBase
+    public partial class FirstRunDialogViewModel : ViewModelBase    // первое открытие в жизни
     {
-        [ObservableProperty]
-        private string _selectedCurrency = "RUB";
+        [ObservableProperty] private string _selectedCurrency = "RUB";
 
-        public ObservableCollection<string> AvailableCurrencies { get; } = new()
-        {
-            "RUB", "USD", "EUR", "GBP", "CNY", "KZT", "BYN"
-        };
+        public string[] AvailableCurrencies => Models.CurrencyHelper.AvailableCurrencies;
 
         public event Action<string>? OnConfirmed;
 
-        [RelayCommand]
-        private void Confirm()
-        {
-            OnConfirmed?.Invoke(SelectedCurrency);
-        }
+        [RelayCommand] private void Confirm() => OnConfirmed?.Invoke(SelectedCurrency);
     }
 }

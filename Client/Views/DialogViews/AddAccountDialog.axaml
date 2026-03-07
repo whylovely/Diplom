@@ -3,7 +3,7 @@
         xmlns:vm="using:Client.ViewModels"
         x:Class="Client.Views.AddAccountDialog"
         x:DataType="vm:AddAccountDialogViewModel"
-        Width="460" Height="420"
+        Width="460" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Background="#0B1021"
@@ -20,29 +20,23 @@
       </StackPanel>
 
       <StackPanel Spacing="4">
-        <TextBlock Text="Основная валюта" Classes="dim"/>
-        <TextBox Text="{Binding BaseCurrency, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" Width="220" HorizontalAlignment="Left"/>
+        <TextBlock Text="Валюта счёта" Classes="dim"/>
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Text="💵" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+          <AutoCompleteBox Grid.Column="1"
+                           ItemsSource="{Binding Currencies}"
+                           Text="{Binding SelectedCurrency, Mode=TwoWay}"
+                           FilterMode="Contains"
+                           Watermark="Введите валюту (RUB, USD, EUR...)"
+                           Width="188"/>
+        </Grid>
       </StackPanel>
 
       <StackPanel Spacing="4">
         <TextBlock Text="Начальный баланс" Classes="dim"/>
-        <TextBox Text="{Binding InitialBalance}" Watermark="0" />
-      </StackPanel>
-
-      <CheckBox Content="Многовалютный счёт"
-                IsChecked="{Binding IsMultiCurrency}" />
-
-      <StackPanel Spacing="4" IsVisible="{Binding IsMultiCurrency}">
-        <TextBlock Text="Дополнительная валюта" Classes="dim"/>
-        <Grid ColumnDefinitions="Auto,*">
-          <TextBlock Grid.Column="0" Text="💵" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
-          <AutoCompleteBox Grid.Column="1"
-                           ItemsSource="{Binding SecondaryCurrencies}"
-                           Text="{Binding SelectedSecondaryCurrency, Mode=TwoWay}"
-                           FilterMode="Contains"
-                           Watermark="Введите валюту (USD, EUR...)"
-                           Width="188"/>
-        </Grid>
+        <NumericUpDown Value="{Binding InitialBalance}" FormatString="N2" ShowButtonSpinner="False" AllowSpin="False" Watermark="0" />
+        <TextBlock Text="Начальный остаток не может быть отрицательным" 
+        Foreground="#FF5252" FontSize="12" IsVisible="{Binding IsBalanceNegative}" />
       </StackPanel>
 
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">

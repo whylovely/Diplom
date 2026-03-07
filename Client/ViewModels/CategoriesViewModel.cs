@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels;
 
-public sealed partial class CategoriesViewModel : ViewModelBase
+public sealed partial class CategoriesViewModel : ViewModelBase // управление Категориями
 {
     private readonly IDataService _data;
     private readonly INotificationService _notify;
@@ -42,10 +42,10 @@ public sealed partial class CategoriesViewModel : ViewModelBase
         Selected ??= Categories.FirstOrDefault();
     }
 
-    private bool HasSelection() => Selected is not null;
+    private bool hasSelection() => Selected is not null;
 
     [RelayCommand]
-    private async Task AddAsync()
+    private async Task AddCategoryAsync()
     {
         var created = await _catDialog.ShowAddCategoryDialogAsync();
         if (created is null) return;
@@ -62,8 +62,8 @@ public sealed partial class CategoriesViewModel : ViewModelBase
         await _notify.ShowInfoAsync($"Категория \"{created.Name}\" добавлена.");
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task RenameAsync()
+    [RelayCommand(CanExecute = nameof(hasSelection))]
+    private async Task RenameCategoryAsync()
     {
         if (Selected is null) return;
 
@@ -84,8 +84,8 @@ public sealed partial class CategoriesViewModel : ViewModelBase
         await _notify.ShowInfoAsync("Категория переименована.");
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task DeleteAsync()
+    [RelayCommand(CanExecute = nameof(hasSelection))]
+    private async Task DeleteCategoryAsync()
     {
         if (Selected is null) return;
 
@@ -109,7 +109,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
 
     partial void OnSelectedChanged(Category? value)
     {
-        RenameCommand.NotifyCanExecuteChanged();
-        DeleteCommand.NotifyCanExecuteChanged();
+        RenameCategoryCommand.NotifyCanExecuteChanged();
+        DeleteCategoryCommand.NotifyCanExecuteChanged();
     }
 }

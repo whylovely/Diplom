@@ -1,3 +1,4 @@
+using Client.Models;
 using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,15 +11,11 @@ namespace Client.ViewModels
     {
         private readonly SettingsService _settingsService;
 
-        [ObservableProperty]
-        private string _selectedCurrency;
-
-        public ObservableCollection<string> AvailableCurrencies { get; } = new()
-        {
-            "RUB", "USD", "EUR", "GBP", "CNY", "KZT", "BYN"
-        };
-
+        [ObservableProperty] private string _selectedCurrency;
+        
         public event Action? OnLogoutRequested;
+
+        public string[] AvailableCurrencies => CurrencyHelper.AvailableCurrencies;
 
         public SettingsViewModel(SettingsService settingsService)
         {
@@ -26,11 +23,12 @@ namespace Client.ViewModels
             _selectedCurrency = _settingsService.BaseCurrency;
         }
 
-        partial void OnSelectedCurrencyChanged(string value)
+        [RelayCommand]
+        private void Save()
         {
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(SelectedCurrency))
             {
-                _settingsService.BaseCurrency = value;
+                _settingsService.BaseCurrency = SelectedCurrency;
             }
         }
 

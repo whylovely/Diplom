@@ -1,8 +1,3 @@
 namespace Client.Models;
 
-public enum MessageLevel
-{
-    Info,
-    Warning,
-    Error
-}
+public enum MessageLevel { Info, Warning, Error }

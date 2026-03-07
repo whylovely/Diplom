@@ -3,16 +3,33 @@ using System.Linq;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddAccountDialogViewModel : ViewModelBase
+public sealed partial class AddAccountDialogViewModel : ViewModelBase   // Добавление счета
 {
-    public static string[] Currencies { get; } =
-    {
-        "RUB", "USD", "EUR", "GBP", "CNY", 
-        "JPY", "CHF", "CAD", "AUD", "KZT",
-        "BYN", "TRY", "GEL", "AMD", "RSD",
-        "BTC", "ETH", "USDT", "BNB", "TON"
-    };
+    public static string[] Currencies => Models.CurrencyHelper.AvailableCurrencies;
 
+    public AddAccountDialogViewModel() {}
+
+    [ObservableProperty] private string _name = "";
+    
+    [ObservableProperty] private string _selectedCurrency = "RUB";
+    
+    [ObservableProperty] private decimal _initialBalance;
+
+    public bool CanOk => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(SelectedCurrency) && InitialBalance >= 0;   // Кнопочки серые
+
+    public bool IsBalanceNegative => InitialBalance < 0;
+
+    partial void OnNameChanged(string value) => OnPropertyChanged(nameof(CanOk));
+    partial void OnSelectedCurrencyChanged(string value) => OnPropertyChanged(nameof(CanOk));
+    partial void OnInitialBalanceChanged(decimal value)
+    {
+        OnPropertyChanged(nameof(CanOk));
+        OnPropertyChanged(nameof(IsBalanceNegative));
+    }
+}
+
+
+/*
     public string BaseCurrency { get; }
     public string[] SecondaryCurrencies { get; }
 
@@ -40,4 +57,4 @@ public sealed partial class AddAccountDialogViewModel : ViewModelBase
     partial void OnSelectedCurrencyChanged(string value) => OnPropertyChanged(nameof(CanOk));
     partial void OnSelectedSecondaryCurrencyChanged(string? value) => OnPropertyChanged(nameof(CanOk));
     partial void OnIsMultiCurrencyChanged(bool value) => OnPropertyChanged(nameof(CanOk));
-}
+*/

@@ -13,15 +13,20 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public sealed partial class ReportViewModel : ViewModelBase
+    public sealed partial class ReportViewModel : ViewModelBase 
     {
         private readonly IDataService _data;
+        private readonly INotificationService _notify;
+        private readonly SettingsService _settings;
 
-        public ReportViewModel(IDataService data)
+        public ReportViewModel(IDataService data, INotificationService notify, SettingsService settings)
         {
             _data = data;
-            _data.DataChanged += () => Refresh();
+            _notify = notify;
+            _settings = settings;
 
+            _data.DataChanged += () => Refresh();
+            _settings.SettingsChanged += () => Refresh();
             _selectedSectionItem = SectionItems[0];
         }
 
@@ -93,15 +98,15 @@ namespace Client.ViewModels
         [ObservableProperty] private DateTimeOffset _dateTo = DateTimeOffset.Now;
         [ObservableProperty] private decimal _totalExpense;
         [ObservableProperty] private decimal _net;
-        public ObservableCollection<CategoryTotalRow> ExpenseRows { get; } = new();
-        public ObservableCollection<CategoryTotalRow> IncomeRows { get; } = new();
+        public ObservableCollection<CategoryShareRow> ExpenseRows { get; } = new();
+        public ObservableCollection<CategoryShareRow> IncomeRows { get; } = new();
         [ObservableProperty] private decimal _totalIncome;
 
-        [RelayCommand] 
+        [RelayCommand]
         public void RefreshSummary()
         {
             TotalExpense = ExpenseReport.RefreshExpenseRows(_data, DateFrom, DateTo, ExpenseRows);
-            TotalIncome = IncomeReport.RefreshIncomeRows(_data, DateFrom, DateTo, IncomeRows);
+            TotalIncome = IncomeReport.RefreshIncomeRows(_data, _settings, DateFrom, DateTo, IncomeRows);
             Net = TotalIncome - TotalExpense;
         }
         //
@@ -117,7 +122,7 @@ namespace Client.ViewModels
         public ObservableCollection<CategoryDetailGroup> IncomeGroups { get; } = new();
 
         [RelayCommand]
-        public void RefreshIncomeCategory() => IncomeReport.RefreshIncomeGroups(_data, DateFrom, DateTo, IncomeGroups);
+        public void RefreshIncomeCategory() => IncomeReport.RefreshIncomeGroups(_data, _settings, DateFrom, DateTo, IncomeGroups);
         //
 
         // Подсчет помесячных итогов
@@ -130,7 +135,7 @@ namespace Client.ViewModels
         [RelayCommand]
         public void RefreshMonthly()
         {
-            MonthlyReport.RefreshMonthlyRows(_data, DateFrom, DateTo, MonthlyRows);
+            MonthlyReport.RefreshMonthlyRows(_data, _settings, DateFrom, DateTo, MonthlyRows);
             MonthlyReport.RefreshMonthlyChart(MonthlyRows, MonthlySeries, MonthlyLabels, out var xAxes, out var yAxes);
             XAxes = xAxes;
             YAxes = yAxes;
