@@ -39,7 +39,7 @@
   <Grid RowDefinitions="*,Auto">
 
     <!-- ═══ MAIN CONTENT AREA ══════════════════════════════════ -->
-    <Border Grid.Row="0" Background="#080C1A" Padding="24,20,24,10">
+    <Border Grid.Row="0" Background="#080C1A" Padding="24,20,24,100">
       <ContentControl Content="{Binding Current}" />
     </Border>
 
