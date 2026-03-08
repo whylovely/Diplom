@@ -83,7 +83,8 @@ public sealed class TransactionsController : ControllerBase
 
         foreach (var e in req.Entries)
         {
-            var cur = (e.Money?.Currency ?? "").Trim().ToUpperInvariant();
+            if (e.Money is null) return BadRequest("Entry money is missing.");
+            var cur = (e.Money.Currency ?? "").Trim().ToUpperInvariant();
             if (cur.Length != 3) return BadRequest("Entry currency must be ISO 4217 (3 letters).");
             if (!string.Equals(cur, accCurrency, StringComparison.OrdinalIgnoreCase))
                 return BadRequest("Entry currency must match account currency.");
@@ -95,7 +96,7 @@ public sealed class TransactionsController : ControllerBase
         decimal signedSum = 0m;
         foreach (var e in req.Entries)
         {
-            signedSum += e.Direction == EntryDirection.Debit ? e.Money.Amount : -e.Money.Amount;
+            signedSum += e.Direction == EntryDirection.Debit ? e.Money!.Amount : -e.Money!.Amount;
         }
 
         if (signedSum != 0m)
@@ -120,7 +121,7 @@ public sealed class TransactionsController : ControllerBase
                 AccountId = e.AccountId,
                 CategoryId = e.CategoryId,
                 Direction = (int)e.Direction,
-                Amount = e.Money.Amount,
+                Amount = e.Money!.Amount,
                 Currency = accCurrency
             });
         }
