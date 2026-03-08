@@ -188,16 +188,14 @@ namespace Client.ViewModels
         // Формирование отчета на экспорт
         public event Action<string, byte[]>? ExportRequested;
 
-        [ObservableProperty] private ExportFormat _selectedExportFormat = ExportFormat.CSV;
-
-        public ExportFormat[] ExportFormats { get; } = Enum.GetValues<ExportFormat>();
-
         [RelayCommand]
-        private void Export()
+        private void Export(string formatStr)
         {
+            if (!Enum.TryParse<ExportFormat>(formatStr, out var format)) return;
+
             var baseName = $"report_{DateFrom:yyMMdd}_{DateTo:yyMMdd}";
 
-            switch (SelectedExportFormat)
+            switch (format)
             {
                 case ExportFormat.CSV:
                     var csv = DropReport.BuildCSVReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);

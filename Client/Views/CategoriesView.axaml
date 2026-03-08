@@ -33,7 +33,8 @@
           </dg:DataGrid.ContextMenu>
 
           <dg:DataGrid.Columns>
-            <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="600"/>
+            <dg:DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+            <dg:DataGridTextColumn Header="Тип" Binding="{Binding DisplayKind}" Width="200"/>
           </dg:DataGrid.Columns>
     </dg:DataGrid>
 
