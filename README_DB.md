@@ -24,8 +24,8 @@ dotnet run
 - Создаст demo-пользователя с тестовыми данными
 
 ### 3. Проверить
-- Swagger UI: http://localhost:5000/swagger
-- Админ-панель: http://localhost:5000/admin/
+- Swagger UI: http://localhost:5273/swagger
+- Админ-панель: http://localhost:5273/admin/
 
 ## Учётные данные
 
