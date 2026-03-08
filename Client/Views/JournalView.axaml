@@ -72,7 +72,11 @@
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate x:DataType="models:JournalRow">
                 <TextBlock Text="{Binding FormattedAmount}"
-                           Classes="amount"
+                           FontFamily="Fira Code, Consolas, monospace"
+                           FontFeatures="tnum, zero"
+                           Classes.moneyRed="{Binding IsExpense}"
+                           Classes.moneyGreen="{Binding IsIncome}"
+                           Classes.cyan="{Binding IsTransfer}"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="4,0"
