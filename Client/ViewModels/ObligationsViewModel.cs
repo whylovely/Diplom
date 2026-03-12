@@ -69,7 +69,8 @@ public partial class ObligationsViewModel : ViewModelBase
         var result = await dialog.ShowDialog<Obligation?>(GetWindow());
         if (result != null)
         {
-            await _data.AddObligationAsync(result);
+            try { await _data.AddObligationAsync(result); }
+            catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
         }
     }
 
@@ -82,7 +83,8 @@ public partial class ObligationsViewModel : ViewModelBase
         var result = await dialog.ShowDialog<Obligation?>(GetWindow());
         if (result != null)
         {
-            await _data.UpdateObligationAsync(result);
+            try { await _data.UpdateObligationAsync(result); }
+            catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
         }
     }
 
@@ -103,7 +105,8 @@ public partial class ObligationsViewModel : ViewModelBase
         var confirmed = await _notify.ShowConfirmAsync($"Удалить обязательство с {SelectedItem.Counterparty}?");
         if (confirmed)
         {
-            await _data.DeleteObligationAsync(SelectedItem.Id);
+            try { await _data.DeleteObligationAsync(SelectedItem.Id); }
+            catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
         }
     }
 
@@ -112,7 +115,8 @@ public partial class ObligationsViewModel : ViewModelBase
     {
         if (SelectedItem is null) return;
         
-        await _data.MarkObligationPaidAsync(SelectedItem.Id, !SelectedItem.IsPaid);
+        try { await _data.MarkObligationPaidAsync(SelectedItem.Id, !SelectedItem.IsPaid); }
+        catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]

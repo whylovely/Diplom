@@ -1,4 +1,4 @@
-﻿using Client.Models;
+using Client.Models;
 using Client.Services;
 using Client.ViewModels;
 using System.Threading.Tasks;
@@ -333,16 +333,31 @@ namespace Client.ViewModels
                     return;
             }
 
-            await dataServ.PostTransactionAsync(tx);
+            try
+            {
+                await dataServ.PostTransactionAsync(tx);
+            }
+            catch (Exception ex)
+            {
+                await _notify.ShowErrorAsync(ex.Message);
+                return;
+            }
 
             if (IsObligationRequire && SelectedObligation != null)
             {
-                if (Amount >= SelectedObligation.Amount)
-                    await dataServ.MarkObligationPaidAsync(SelectedObligation.Id, true);
-                else
+                try
                 {
-                    SelectedObligation.Amount -= Amount;
-                    await dataServ.UpdateObligationAsync(SelectedObligation);
+                    if (Amount >= SelectedObligation.Amount)
+                        await dataServ.MarkObligationPaidAsync(SelectedObligation.Id, true);
+                    else
+                    {
+                        SelectedObligation.Amount -= Amount;
+                        await dataServ.UpdateObligationAsync(SelectedObligation);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await _notify.ShowErrorAsync($"Операция проведена, но не удалось обновить обязательство: {ex.Message}");
                 }
             }
 

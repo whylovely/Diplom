@@ -17,6 +17,8 @@
       <StackPanel Spacing="4">
         <TextBlock Text="Название счёта" Classes="dim"/>
         <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
+        <TextBlock Text="Название не может быть пустым" 
+                   Foreground="#FF5252" FontSize="12" IsVisible="{Binding HasNameError}" />
       </StackPanel>
 
       <StackPanel Spacing="4">
