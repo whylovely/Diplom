@@ -213,8 +213,43 @@ namespace Client.ViewModels
             if (_syncService is null || IsSyncing) return;
 
             IsSyncing = true;
-            SyncStatusText = "Синхронизация...";
+            SyncStatusText = "Проверка...";
             SyncIconColor = "#29B6F6";
+
+            // 1. Сравнить количество транзакций
+            var localCount = _data.GetLocalTransactionCount();
+            var serverCount = await Task.Run(() => _syncService.GetServerTransactionCountAsync());
+
+            if (serverCount >= 0 && localCount != serverCount && localCount > 0)
+            {
+                // Данные различаются — показать диалог
+                var localDate = _data.GetLocalLastChangeDate();
+                var dialog = new SyncConflictDialog(localDate, localCount, serverCount);
+                var choice = await dialog.ShowDialog<string?>(_getWindow());
+
+                if (choice == "client")
+                {
+                    // Пользователь решил оставить свои данные
+                    SyncStatusText = "Отменено пользователем";
+                    SyncIconColor = "#FF8C00";
+                    IsSyncing = false;
+                    return;
+                }
+
+                if (choice is null)
+                {
+                    // Отмена
+                    SyncStatusText = "Синхронизировано";
+                    SyncIconColor = "#00E676";
+                    IsSyncing = false;
+                    return;
+                }
+
+                // choice == "server" — продолжаем синхронизацию
+            }
+
+            // 2. Выполнить синхронизацию
+            SyncStatusText = "Синхронизация...";
 
             var result = await Task.Run(() => _syncService.SyncAsync());
 

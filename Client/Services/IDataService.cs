@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Client.Models;
@@ -36,5 +36,8 @@ namespace Client.Services
 
         decimal GetRate(string fromCurrency, string toCurrency = "RUB");    // Получение курса валют
         void SetCurrencyRate(string code, decimal rate);    // Обновление курса валют
+
+        DateTimeOffset? GetLocalLastChangeDate();   // Дата последнего изменения
+        int GetLocalTransactionCount();             // Количество транзакций
     }
 }

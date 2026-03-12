@@ -442,6 +442,17 @@ private SqliteConnection Open() // соединение с локальной б
 
     public bool IsAccountUsed(Guid id) => _transactions.Any(tx => tx.Entries.Any(e => e.AccountId == id));  // Был ли использован счет 
 
+    public DateTimeOffset? GetLocalLastChangeDate()
+    {
+        var dates = new List<DateTimeOffset>();
+        if (_accounts.Count > 0) dates.Add(_accounts.Max(a => a.UpdatedAt));
+        if (_transactions.Count > 0) dates.Add(_transactions.Max(t => t.Date));
+        if (_obligations.Count > 0) dates.Add(_obligations.Max(o => o.CreatedAt));
+        return dates.Count > 0 ? dates.Max() : null;
+    }
+
+    public int GetLocalTransactionCount() => _transactions.Count;
+
     public Account GetExpenseAccountForCategory(Guid categoryId)    // Категория - расход
     {
         if (!_expenseAccountByCategoryId.TryGetValue(categoryId, out var accId))

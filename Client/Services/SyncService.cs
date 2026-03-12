@@ -31,6 +31,19 @@ public sealed class SyncService
     public Task<bool> IsServerAvailableAsync() => _api.PingAsync();
 
     /// <summary>
+    /// Получить количество транзакций на сервере (для сравнения с локальными).
+    /// </summary>
+    public async Task<int> GetServerTransactionCountAsync()
+    {
+        try
+        {
+            var txs = await _api.GetTransactionsAsync() ?? new();
+            return txs.Count;
+        }
+        catch { return -1; }
+    }
+
+    /// <summary>
     /// Полная синхронизация: загрузить данные с сервера и записать в локальную БД.
     /// </summary>
     public async Task<SyncResult> SyncAsync()

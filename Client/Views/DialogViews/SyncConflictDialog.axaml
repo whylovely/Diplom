@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Client.Views.SyncConflictDialog"
+        Width="500"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="#0B1021"
+        Title="Конфликт синхронизации">
+
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="16">
+
+      <!-- Заголовок -->
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Text="⚠️" FontSize="24" VerticalAlignment="Center"/>
+        <TextBlock Text="Данные различаются" Classes="subheading" VerticalAlignment="Center"/>
+      </StackPanel>
+
+      <TextBlock Text="Локальные данные отличаются от серверных. Выберите, какую версию сохранить:"
+                 TextWrapping="Wrap" FontSize="14" Foreground="#B0BEC5"/>
+
+      <!-- Сравнение дат -->
+      <Border Background="#1A2035" CornerRadius="8" Padding="16">
+        <Grid ColumnDefinitions="*,Auto,*" RowDefinitions="Auto,Auto">
+
+          <!-- Клиент -->
+          <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Spacing="4">
+            <TextBlock Text="📱 Клиент" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="ClientDateText" Text="—" FontSize="13" Foreground="#90CAF9" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="ClientCountText" Text="" FontSize="12" Foreground="#78909C" HorizontalAlignment="Center"/>
+          </StackPanel>
+
+          <!-- Разделитель -->
+          <TextBlock Grid.Row="0" Grid.Column="1" Text="vs" FontSize="16" FontWeight="Bold"
+                     Foreground="#FF8C00" VerticalAlignment="Center" Margin="16,0"/>
+
+          <!-- Сервер -->
+          <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
+            <TextBlock Text="☁️ Сервер" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="ServerDateText" Text="—" FontSize="13" Foreground="#A5D6A7" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="ServerCountText" Text="" FontSize="12" Foreground="#78909C" HorizontalAlignment="Center"/>
+          </StackPanel>
+
+        </Grid>
+      </Border>
+
+      <!-- Кнопки -->
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+        <Button Content="☁️ Взять с сервера" Classes="accent" Width="170"
+                HorizontalContentAlignment="Center"
+                Click="OnTakeServer"/>
+        <Button Content="📱 Оставить мои" Width="150"
+                HorizontalContentAlignment="Center"
+                Click="OnKeepClient"/>
+        <Button Content="Отмена" Width="90"
+                IsCancel="True"
+                HorizontalContentAlignment="Center"
+                Click="OnCancel"/>
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
+</Window>
