@@ -1,4 +1,4 @@
-﻿using Avalonia.Styling;
+using Avalonia.Styling;
 using Client.Models;
 using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -30,6 +30,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase // управл�
         _notify = notify;
         _catDialog = catDialog;
 
+        _data.DataChanged += Refresh;
         Refresh();
     }
 
