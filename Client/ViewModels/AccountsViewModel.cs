@@ -1,4 +1,4 @@
-﻿using Client.Models;
+using Client.Models;
 using Client.Services;
 using Client.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -158,21 +158,39 @@ namespace Client.ViewModels
 
             if (acc is null) return;
 
-            if (_data.IsAccountUsed(acc.Id))
+            // Запрет удаления счёта с ненулевым балансом
+            if (acc.Balance != 0)
             {
-                await _notify.ShowErrorAsync("Нельзя удалить счёт: он используется в операциях.");
+                await _notify.ShowErrorAsync($"Нельзя удалить счёт: баланс = {acc.Balance:N2} {acc.CurrencyCode}. Сначала обнулите баланс.");
                 return;
             }
 
-            var confirmed = await _notify.ShowConfirmAsync(
-                $"Вы уверены, что хотите удалить счёт «{acc.Name}»?",
-                "Удаление счёта");
+            // Предупреждение если счёт использовался в операциях
+            if (_data.IsAccountUsed(acc.Id))
+            {
+                var confirmed = await _notify.ShowConfirmAsync(
+                    $"Счёт «{acc.Name}» используется в операциях. Баланс = 0.\n\nУдаление пометит счёт как удалённый, но операции сохранятся в истории.\n\nПродолжить?",
+                    "Удаление счёта");
+                if (!confirmed) return;
+            }
+            else
+            {
+                var confirmed = await _notify.ShowConfirmAsync(
+                    $"Вы уверены, что хотите удалить счёт «{acc.Name}»?",
+                    "Удаление счёта");
+                if (!confirmed) return;
+            }
 
-            if (!confirmed) return;
-
-            _data.RemoveAccount(acc.Id); 
-            Accounts.Remove(acc);
-            OnPropertyChanged(nameof(TotalBalance));
+            try
+            {
+                _data.RemoveAccount(acc.Id); 
+                Accounts.Remove(acc);
+                OnPropertyChanged(nameof(TotalBalance));
+            }
+            catch (Exception ex)
+            {
+                await _notify.ShowErrorAsync(ex.Message);
+            }
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedAccount))]

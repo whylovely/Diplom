@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Auth;
@@ -183,14 +183,26 @@ public sealed class AccountsController : ControllerBase
 
         if (entity is null) return NotFound();
 
+        // Подсчитать текущий баланс счёта по проводкам
+        var entries = await _db.Entries
+            .Where(e => e.AccountId == id)
+            .Select(e => new { e.Direction, e.Amount })
+            .ToListAsync(ct);
+
+        decimal balance = 0m;
+        foreach (var e in entries)
+        {
+            // Direction: 0 = Debit (приход), 1 = Credit (расход)
+            balance += e.Direction == 0 ? e.Amount : -e.Amount;
+        }
+
         if (!force)
         {
-            var relatedEntriesCount = await _db.Entries
-                .Where(e => e.AccountId == id)
-                .CountAsync(ct);
+            if (balance != 0m)
+                return BadRequest(new { Message = $"Нельзя удалить счёт: баланс = {balance:N2}. Сначала обнулите баланс или используйте ?force=true." });
 
-            if (relatedEntriesCount > 0)
-                return BadRequest(new { Message = $"Cannot delete account because it has {relatedEntriesCount} related transaction(s). Use ?force=true to override." });
+            if (entries.Count > 0)
+                return BadRequest(new { Message = $"Счёт содержит {entries.Count} проводок (баланс 0). Используйте ?force=true для подтверждения удаления." });
         }
 
         entity.IsDeleted = true;
