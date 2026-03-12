@@ -1,0 +1,186 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Client.ViewModels"
+             xmlns:m="using:Client.Models"
+             x:Class="Client.Views.CalendarView"
+             x:DataType="vm:CalendarViewModel">
+
+    <UserControl.Styles>
+        <!-- Calendar day cell base -->
+        <Style Selector="Button.calendarDayCell">
+            <Setter Property="Background" Value="#0DFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#15FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="MinHeight" Value="56"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.calendarDayCell:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+        <Style Selector="Button.calendarDayCell:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#25FFFFFF"/>
+        </Style>
+
+        <!-- Today highlight -->
+        <Style Selector="Button.calendarToday">
+            <Setter Property="BorderBrush" Value="#29B6F6"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+
+        <!-- Other month dim -->
+        <Style Selector="Button.calendarOtherMonth">
+            <Setter Property="Opacity" Value="0.35"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, Auto, *">
+
+        <!-- ── Header Bar ─────────────────────────────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="Календарь" Classes="heading" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                <Button Content="◀" Command="{Binding PreviousMonthCommand}" Classes="accent" 
+                        Width="36" Height="36" HorizontalContentAlignment="Center" FontSize="14"/>
+                <TextBlock Text="{Binding MonthYearLabel}" 
+                           FontSize="18" FontWeight="SemiBold" 
+                           VerticalAlignment="Center" 
+                           Foreground="#E0E0E0" 
+                           MinWidth="200"
+                           TextAlignment="Center"/>
+                <Button Content="▶" Command="{Binding NextMonthCommand}" Classes="accent"
+                        Width="36" Height="36" HorizontalContentAlignment="Center" FontSize="14"/>
+                <Button Content="Сегодня" Command="{Binding GoToTodayCommand}" Classes="accent" Margin="8,0,0,0"/>
+                <Button Content="⟳" Command="{Binding RefreshCommand}" Classes="dockItem" 
+                        ToolTip.Tip="Обновить" Width="36" Height="36" HorizontalContentAlignment="Center" FontSize="16"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ── Month Summary Cards ────────────────────────────── -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
+            <Border Classes="cardSmall" Margin="0,0,6,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Доходы (месяц)" Classes="dim"/>
+                    <TextBlock Text="{Binding MonthIncome, StringFormat={}{0:N2}}" Classes="moneyGreen" FontSize="20"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="cardSmall" Margin="6,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Расходы (месяц)" Classes="dim"/>
+                    <TextBlock Text="{Binding MonthExpense, StringFormat={}{0:N2}}" Classes="moneyRed" FontSize="20"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Classes="cardSmall" Margin="6,0,0,0">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Итог (месяц)" Classes="dim"/>
+                    <TextBlock Text="{Binding MonthNet, StringFormat={}{0:N2}}" Classes="cyan" FontSize="20"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ── Calendar Grid + Day Detail ─────────────────────── -->
+        <Grid Grid.Row="2" ColumnDefinitions="3*,2*" Margin="0,0,0,12">
+
+            <!-- Left: Calendar Grid -->
+            <Border Grid.Column="0" Classes="cardSmall" Margin="0,0,8,0" Padding="12">
+                <Grid RowDefinitions="Auto, *">
+                    <!-- Day-of-week headers -->
+                    <UniformGrid Grid.Row="0" Columns="7" Margin="0,0,0,8">
+                        <TextBlock Text="Пн" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
+                        <TextBlock Text="Вт" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
+                        <TextBlock Text="Ср" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
+                        <TextBlock Text="Чт" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
+                        <TextBlock Text="Пт" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
+                        <TextBlock Text="Сб" HorizontalAlignment="Center" Foreground="#FF8A65" FontWeight="SemiBold"/>
+                        <TextBlock Text="Вс" HorizontalAlignment="Center" Foreground="#EF5350" FontWeight="SemiBold"/>
+                    </UniformGrid>
+
+                    <!-- Day cells -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Days}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="7" Rows="6"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:CalendarDay">
+                                <Button Classes="calendarDayCell"
+                                        Classes.calendarToday="{Binding IsToday}"
+                                        Classes.calendarOtherMonth="{Binding !IsCurrentMonth}"
+                                        Command="{Binding $parent[ItemsControl].((vm:CalendarViewModel)DataContext).SelectDayCommand}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="4"
+                                        Margin="1">
+                                    <Grid RowDefinitions="Auto, *, Auto">
+                                        <!-- Day number -->
+                                        <TextBlock Grid.Row="0" 
+                                                   Text="{Binding DayNumber}" 
+                                                   FontSize="13" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#C0C0C0"
+                                                   HorizontalAlignment="Left"/>
+
+                                        <!-- Indicators -->
+                                        <StackPanel Grid.Row="2" Spacing="2" Margin="0,2,0,0">
+                                            <!-- Income indicator (green) -->
+                                            <Border Height="3" CornerRadius="1.5"
+                                                    Background="#00E676"
+                                                    IsVisible="{Binding !!TotalIncome}"/>
+                                            <!-- Expense indicator (red) -->
+                                            <Border Height="3" CornerRadius="1.5"
+                                                    Background="#FF5252"
+                                                    IsVisible="{Binding !!TotalExpense}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+
+            <!-- Right: Selected Day Detail -->
+            <Border Grid.Column="1" Classes="cardSmall" Padding="12">
+                <Grid RowDefinitions="Auto, Auto, *">
+                    <TextBlock Grid.Row="0" 
+                               Text="{Binding SelectedDay.Date, StringFormat=Операции за {0:dd.MM.yyyy}, FallbackValue=Выберите день}" 
+                               FontSize="16" FontWeight="SemiBold" 
+                               Foreground="#E0E0E0" 
+                               Margin="0,0,0,8"/>
+
+                    <!-- Day totals -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8"
+                                IsVisible="{Binding SelectedDay, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Foreground="#00E676" FontSize="13"
+                                   Text="{Binding SelectedDay.TotalIncome, StringFormat=▲ {0:N2}}"/>
+                        <TextBlock Foreground="#FF5252" FontSize="13"
+                                   Text="{Binding SelectedDay.TotalExpense, StringFormat=▼ {0:N2}}"/>
+                        <TextBlock Foreground="#29B6F6" FontSize="13"
+                                   Text="{Binding SelectedDay.Net, StringFormat=Итог: {0:N2}}"/>
+                    </StackPanel>
+
+                    <!-- Transactions DataGrid -->
+                    <DataGrid Grid.Row="2" 
+                              ItemsSource="{Binding SelectedDayTransactions}" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True"
+                              Background="Transparent" 
+                              BorderThickness="0"
+                              GridLinesVisibility="Horizontal">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="70"/>
+                            <DataGridTextColumn Header="Счёт" Binding="{Binding AccountName}" Width="*"/>
+                            <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding FormattedAmount}" Width="120"/>
+                            <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

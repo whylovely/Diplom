@@ -1,4 +1,4 @@
-﻿using Client.Models;
+using Client.Models;
 using Client.Services;
 using Client.ViewModels.OperationWithReport;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -24,6 +24,8 @@ namespace Client.ViewModels
             _data = data;
             _notify = notify;
             _settings = settings;
+
+            CalendarVm = new CalendarViewModel(data, notify);
 
             _data.DataChanged += () => Refresh();
             _settings.SettingsChanged += () => Refresh();
@@ -62,6 +64,7 @@ namespace Client.ViewModels
             new(ReportSelection.IncomeTop, "Топ доходов по категориям"),
             new(ReportSelection.ExpenseByCategory, "Расходы по категориям"),
             new(ReportSelection.IncomeByCategory, "Доходы по категориям"),
+            new(ReportSelection.Calendar, "Календарь операций"),
         };
 
         [ObservableProperty] private SectionItem _selectedSectionItem;
@@ -77,6 +80,9 @@ namespace Client.ViewModels
         public bool IsIncomeTop => SelectedSection == ReportSelection.IncomeTop;
         public bool IsExpenseByCategory => SelectedSection == ReportSelection.ExpenseByCategory;
         public bool IsIncomeByCategory => SelectedSection == ReportSelection.IncomeByCategory;
+        public bool IsCalendar => SelectedSection == ReportSelection.Calendar;
+
+        public CalendarViewModel CalendarVm { get; }
 
         partial void OnSelectedSectionItemChanged(SectionItem value)
         {
@@ -90,6 +96,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(IsIncomeTop));
             OnPropertyChanged(nameof(IsExpenseByCategory));
             OnPropertyChanged(nameof(IsIncomeByCategory));
+            OnPropertyChanged(nameof(IsCalendar));
         }
         //
 
@@ -232,6 +239,7 @@ namespace Client.ViewModels
         ExpenseTop,
         IncomeTop,
         ExpenseByCategory,
-        IncomeByCategory
+        IncomeByCategory,
+        Calendar
     }
 }
