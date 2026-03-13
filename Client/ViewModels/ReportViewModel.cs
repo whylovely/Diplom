@@ -29,7 +29,9 @@ namespace Client.ViewModels
 
             _data.DataChanged += () => Refresh();
             _settings.SettingsChanged += () => Refresh();
-            _selectedSectionItem = SectionItems[0];
+            
+            SelectedSectionItem = SectionItems[0];
+            Refresh();
         }
 
         partial void OnTopNChanged(int value)
@@ -41,14 +43,21 @@ namespace Client.ViewModels
         [RelayCommand]
         public void Refresh()
         {
-            RefreshSummary();
-            RefreshMonthly();
-            RefreshExpenseTop();
-            RefreshIncomeTop();
-            RefreshExpenseCategory();
-            RefreshIncomeCategory();
-            RefreshAccounts();
-            RefreshBalance();
+            try
+            {
+                RefreshSummary();
+                RefreshMonthly();
+                RefreshExpenseTop();
+                RefreshIncomeTop();
+                RefreshExpenseCategory();
+                RefreshIncomeCategory();
+                RefreshAccounts();
+                RefreshBalance();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ReportViewModel] Refresh error: {ex.Message}");
+            }
         }
 
         // Формирование заголовков в ComboBoxs
@@ -72,15 +81,15 @@ namespace Client.ViewModels
         public string SelectedTitle => SelectedSectionItem.Title;
         public ReportSelection SelectedSection => SelectedSectionItem.Value;
 
-        public bool IsSummary => SelectedSection == ReportSelection.Summary;
-        public bool IsBalanceAtDate => SelectedSection == ReportSelection.BalanceAtDate;
-        public bool IsMonthlyDynamics => SelectedSection == ReportSelection.MothlyDinamics;
-        public bool IsAccountsTurnover => SelectedSection == ReportSelection.AccountsTurnover;
-        public bool IsExpenseTop => SelectedSection == ReportSelection.ExpenseTop;
-        public bool IsIncomeTop => SelectedSection == ReportSelection.IncomeTop;
-        public bool IsExpenseByCategory => SelectedSection == ReportSelection.ExpenseByCategory;
-        public bool IsIncomeByCategory => SelectedSection == ReportSelection.IncomeByCategory;
-        public bool IsCalendar => SelectedSection == ReportSelection.Calendar;
+        public bool IsSummary => SelectedSectionItem?.Value == ReportSelection.Summary;
+        public bool IsBalanceAtDate => SelectedSectionItem?.Value == ReportSelection.BalanceAtDate;
+        public bool IsMonthlyDynamics => SelectedSectionItem?.Value == ReportSelection.MothlyDinamics;
+        public bool IsAccountsTurnover => SelectedSectionItem?.Value == ReportSelection.AccountsTurnover;
+        public bool IsExpenseTop => SelectedSectionItem?.Value == ReportSelection.ExpenseTop;
+        public bool IsIncomeTop => SelectedSectionItem?.Value == ReportSelection.IncomeTop;
+        public bool IsExpenseByCategory => SelectedSectionItem?.Value == ReportSelection.ExpenseByCategory;
+        public bool IsIncomeByCategory => SelectedSectionItem?.Value == ReportSelection.IncomeByCategory;
+        public bool IsCalendar => SelectedSectionItem?.Value == ReportSelection.Calendar;
 
         public CalendarViewModel CalendarVm { get; }
 

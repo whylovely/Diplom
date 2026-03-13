@@ -29,7 +29,7 @@ namespace Client.ViewModels
                 .SelectMany(t => t.Entries)
                 .Where(e =>
                 {
-                    var acc = accountById[e.AccountId];
+                    if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
                     return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
                 })
                 .GroupBy(e => e.CategoryId)
@@ -63,7 +63,7 @@ namespace Client.ViewModels
                 .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
                 .Where(x =>
                 {
-                    var acc = accountById[x.Entry.AccountId];
+                    if (!accountById.TryGetValue(x.Entry.AccountId, out var acc)) return false;
                     return acc.Type == AccountType.Expense && x.Entry.Direction == EntryDirection.Debit;
                 })
                 .GroupBy(x => x.Entry.CategoryId)

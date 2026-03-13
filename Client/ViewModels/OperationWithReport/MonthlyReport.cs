@@ -33,7 +33,7 @@ namespace Client.ViewModels
                 var expense = enteries
                     .Where(e =>
                     {
-                        var acc = accountById[e.AccountId];
+                        if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
                         return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
                     })
                     .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
@@ -41,7 +41,7 @@ namespace Client.ViewModels
                 var income = enteries
                     .Where(e =>
                     {
-                        var acc = accountById[e.AccountId];
+                        if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
                         return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
                     })
                     .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
