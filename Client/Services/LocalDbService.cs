@@ -40,6 +40,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
         _connectionString = $"Data Source={dbPath}";
 
         EnsureCreated();
+        MigrateSchema();
         LoadAll();
     }
 
@@ -122,6 +123,32 @@ private SqliteConnection Open() // соединение с локальной б
             )");    // Курсы валют
             
         SeedDataIfEmpty(conn);
+    }
+
+    private void MigrateSchema()
+    {
+        using var conn = Open();
+        
+        // Проверка наличия колонки IsDeleted в Accounts
+        bool hasIsDeleted = false;
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "PRAGMA table_info(Accounts)";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader.GetString(reader.GetOrdinal("name")).Equals("IsDeleted", StringComparison.OrdinalIgnoreCase))
+                {
+                    hasIsDeleted = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasIsDeleted)
+        {
+            Exec(conn, "ALTER TABLE Accounts ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
+        }
     }
 
     private void SeedDataIfEmpty(SqliteConnection conn) // демо-данные
