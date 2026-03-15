@@ -236,6 +236,40 @@ namespace Client.ViewModels
                     return;
                 }
 
+                if (choice == "push")
+                {
+                    var confirmed = await _notify.ShowConfirmAsync(
+                        "Вы уверены, что хотите перезаписать данные на сервере вашими локальными? Это действие нельзя отменить.",
+                        "Отправка на сервер"
+                    );
+
+                    if (!confirmed)
+                    {
+                        SyncStatusText = "Отменено пользователем";
+                        SyncIconColor = "#FF8C00";
+                        IsSyncing = false;
+                        return;
+                    }
+
+                    SyncStatusText = "Отправка на сервер...";
+                    var pushResult = await Task.Run(() => _syncService.PushAllDataToServerAsync());
+                    
+                    if (pushResult.Success)
+                    {
+                        SyncStatusText = $"Синхронизировано";
+                        SyncIconColor = "#00E676";
+                    }
+                    else
+                    {
+                        var err = pushResult.ErrorMessage ?? "Неизвестная ошибка";
+                        if (err.Length > 60) err = err[..60] + "…";
+                        SyncStatusText = $"Ошибка: {err}";
+                        SyncIconColor = "#FF5252";
+                    }
+                    IsSyncing = false;
+                    return;
+                }
+
                 if (choice is null)
                 {
                     // Отмена

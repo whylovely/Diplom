@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Client.Views.SyncConflictDialog"
-        Width="500"
+        Width="650"
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
@@ -50,6 +50,9 @@
         <Button Content="☁️ Взять с сервера" Classes="accent" Width="170"
                 HorizontalContentAlignment="Center"
                 Click="OnTakeServer"/>
+        <Button Content="📱 Отправить на сервер" Classes="accent" Width="190"
+                HorizontalContentAlignment="Center"
+                Click="OnPushServer"/>
         <Button Content="📱 Оставить мои" Width="150"
                 HorizontalContentAlignment="Center"
                 Click="OnKeepClient"/>

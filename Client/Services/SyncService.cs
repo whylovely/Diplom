@@ -137,6 +137,53 @@ public sealed class SyncService
         }
     }
 
+    /// <summary>
+    /// Полная синхронизация: отправить локальные данные на сервер с перезаписью.
+    /// </summary>
+    public async Task<SyncResult> PushAllDataToServerAsync()
+    {
+        try
+        {
+            var accounts = _localDb.Accounts.Select(a => new AccountDto(
+                a.Id, a.Name, (Shared.Accounts.AccountKind)a.Type, a.CurrencyCode,
+                (Shared.Accounts.MultiCurrencyType)a.AccountMultiType, a.SecondaryCurrencyCode, a.ExchangeRate)).ToList();
+            
+            var categories = _localDb.Categories.Select(c => new CategoryDto(
+                c.Id, c.Name)).ToList();
+
+            var obligations = _localDb.Obligations.Select(o => new ObligationDto(
+                o.Id, o.Counterparty, o.Amount, o.Currency, (Shared.Obligations.ObligationType)o.Type,
+                o.CreatedAt, o.DueDate, o.IsPaid, o.PaidAt, o.Note)).ToList();
+
+            var transactions = _localDb.Transactions.Select(t => new TransactionDto(
+                t.Id, t.Date, t.Description,
+                t.Entries.Select(e => new EntryDto(
+                    e.Id, e.AccountId, e.CategoryId, (Shared.Transactions.EntryDirection)e.Direction,
+                    new Shared.Transactions.MoneyDto(e.Amount.Amount, e.Amount.CurrencyCode))).ToList()
+            )).ToList();
+
+            var req = new Shared.Sync.SyncPushRequest(accounts, categories, obligations, transactions);
+            await _api.PushAllDataAsync(req);
+
+            return new SyncResult
+            {
+                Success = true,
+                AccountsCount = accounts.Count,
+                CategoriesCount = categories.Count,
+                ObligationsCount = obligations.Count,
+                TransactionsCount = transactions.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            return new SyncResult
+            {
+                Success = false,
+                ErrorMessage = ex.Message
+            };
+        }
+    }
+
     // ─── Маппинг DTO → Client Models ─────────────────────
 
     private static Account MapAccount(AccountDto dto) => new()

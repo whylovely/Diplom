@@ -29,6 +29,7 @@ public partial class SyncConflictDialog : Window
     }
 
     private void OnTakeServer(object? sender, RoutedEventArgs e) => Close("server");
+    private void OnPushServer(object? sender, RoutedEventArgs e) => Close("push");
     private void OnKeepClient(object? sender, RoutedEventArgs e) => Close("client");
     private void OnCancel(object? sender, RoutedEventArgs e) => Close(null);
 }

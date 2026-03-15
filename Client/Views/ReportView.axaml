@@ -38,7 +38,7 @@
                     </Button.Flyout>
                     <!-- Download/Export Icon -->
                     <Path Data="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z" 
-                          Fill="CurrentItem" Stretch="Uniform" Width="20" Height="20" />
+                          Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" />
                 </Button>
             </StackPanel>
         </Grid>
@@ -325,7 +325,9 @@
             </Grid>
 
             <!-- ══ CALENDAR ═════════════════════════════════════ -->
-            <views:CalendarView IsVisible="{Binding $parent[Panel].((vm:ReportViewModel)DataContext).IsCalendar}" DataContext="{Binding CalendarVm}"/>
+            <Grid IsVisible="{Binding IsCalendar}">
+                <views:CalendarView DataContext="{Binding CalendarVm}"/>
+            </Grid>
 
         </Panel>
     </Grid>

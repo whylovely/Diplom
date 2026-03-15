@@ -123,4 +123,13 @@ public sealed class ApiService
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<ObligationDto>();
     }
+
+    // ─── Sync ────────────────────────────────────────────
+
+    public async Task PushAllDataAsync(Shared.Sync.SyncPushRequest req)
+    {
+        SetAuth();
+        var resp = await _http.PostAsJsonAsync("api/sync/push", req);
+        resp.EnsureSuccessStatusCode();
+    }
 }
