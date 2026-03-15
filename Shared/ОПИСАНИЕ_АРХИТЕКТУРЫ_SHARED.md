@@ -94,6 +94,8 @@ Shared/
 │   └── ObligationDto.cs      ← DTO для долгов + перечисления
 ├── Reports/
 │   └── ReportDtos.cs         ← DTO для отчётов
+├── Sync/
+│   └── SyncPushRequest.cs    ← DTO для двусторонней синхронизации (отправка с клиента на сервер)
 ├── Transactions/
 │   └── TransactionDTO.cs     ← DTO для транзакций и проводок
 └── Shared.csproj             ← Файл проекта
@@ -304,6 +306,24 @@ public sealed record SummaryDto(
     IReadOnlyList<CategoryTotalDto> ExpenseByCategory,
     IReadOnlyList<CategoryTotalDto> IncomeByCategory);
 ```
+
+---
+
+### 5.8. `Sync/SyncPushRequest.cs` — Синхронизация (Push)
+
+```csharp
+namespace Shared.Sync;
+
+// Комплексный запрос на полную перезапись серверной БД из локальной БД клиента
+public sealed record SyncPushRequest(
+    IReadOnlyList<AccountDto> Accounts,
+    IReadOnlyList<CategoryDto> Categories,
+    IReadOnlyList<ObligationDto> Obligations,
+    IReadOnlyList<TransactionDto> Transactions
+);
+```
+
+Этот DTO используется для **разрешения конфликтов синхронизации**, когда пользователь решает принудительно отправить свои локальные данные на сервер, полностью затерев серверные.
 
 ---
 
