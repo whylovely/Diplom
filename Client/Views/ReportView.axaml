@@ -185,8 +185,10 @@
                         <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshExpenseTopCommand}" Classes="accent"/>
-                        <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Foreground="#FF5252" Margin="10,0,0,0"/>
-                        <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center" Foreground="#9E9E9E"/>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" Foreground="#FF5252"/>
+                            <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" Foreground="#9E9E9E"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -216,8 +218,10 @@
                         <TextBlock Text="Топ:" VerticalAlignment="Center" Classes="dim"/>
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" Classes="accent"/>
-                        <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" VerticalAlignment="Center" Foreground="#00E676" Margin="10,0,0,0"/>
-                        <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" VerticalAlignment="Center" Foreground="#9E9E9E"/>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" Foreground="#00E676"/>
+                            <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" Foreground="#9E9E9E"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
