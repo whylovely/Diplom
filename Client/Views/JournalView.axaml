@@ -25,7 +25,7 @@
               
         <DataGrid.ContextMenu>
           <ContextMenu>
-            <MenuItem Header="Удалить" Command="{Binding DeleteTransactionCommand}"/>
+            <MenuItem Header="Сторнировать" Command="{Binding StornoTransactionCommand}"/>
           </ContextMenu>
         </DataGrid.ContextMenu>
 
@@ -68,19 +68,25 @@
                               Binding="{Binding CategoryName}"
                               Width="130"/>
 
-          <DataGridTemplateColumn Header="Сумма" Width="160">
+          <DataGridTemplateColumn Header="Сумма" Width="200">
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate x:DataType="models:JournalRow">
-                <TextBlock Text="{Binding FormattedAmount}"
-                           FontFamily="Fira Code, Consolas, monospace"
-                           FontFeatures="tnum, zero"
-                           Classes.moneyRed="{Binding IsExpense}"
-                           Classes.moneyGreen="{Binding IsIncome}"
-                           Classes.cyan="{Binding IsTransfer}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="4,0"
-                           FontWeight="SemiBold"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="4,0">
+                  <TextBlock Text="⚠️ дубль?" 
+                             Foreground="#FFA726" 
+                             FontSize="12" 
+                             VerticalAlignment="Center" 
+                             IsVisible="{Binding IsDuplicate}"
+                             ToolTip.Tip="Возможно дублирующаяся операция"/>
+                  <TextBlock Text="{Binding FormattedAmount}"
+                             FontFamily="Fira Code, Consolas, monospace"
+                             FontFeatures="tnum, zero"
+                             Classes.moneyRed="{Binding IsExpense}"
+                             Classes.moneyGreen="{Binding IsIncome}"
+                             Classes.cyan="{Binding IsTransfer}"
+                             VerticalAlignment="Center"
+                             FontWeight="SemiBold"/>
+                </StackPanel>
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>

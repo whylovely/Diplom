@@ -610,7 +610,7 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
-    public Task RemoveTransactionAsync(Guid transactionId)  // Удаление транзакции
+    public Task StornoTransactionAsync(Guid transactionId)  // Сторнирование транзакции
     {
         var tx = _transactions.FirstOrDefault(t => t.Id == transactionId);
         if (tx == null) return Task.CompletedTask;
@@ -620,35 +620,31 @@ private SqliteConnection Open() // соединение с локальной б
             var acc = _accounts.FirstOrDefault(a => a.Id == e.AccountId);
             if (acc != null && acc.Type == AccountType.Assets && acc.IsDeleted)
             {
-                throw new InvalidOperationException("Нельзя удалить транзакцию: один из связанных счетов удален.");
+                throw new InvalidOperationException("Нельзя сторнировать транзакцию: один из связанных счетов удален.");
             }
         }
 
-        using var conn = Open();
-        using var tran = conn.BeginTransaction();
+        var stornoTx = new Transaction
+        {
+            Id = Guid.NewGuid(),
+            Date = DateTimeOffset.Now,
+            Description = $"[СТОРНО] {tx.Description}".Trim(),
+            Entries = new System.Collections.Generic.List<Entry>()
+        };
 
         foreach (var e in tx.Entries)
         {
-            var acc = _accounts.FirstOrDefault(a => a.Id == e.AccountId);
-            if (acc != null && acc.Type == AccountType.Assets)
+            stornoTx.Entries.Add(new Entry
             {
-                var d = e.Direction == EntryDirection.Debit ? -e.Amount.Amount : e.Amount.Amount;
-                acc.Balance += d;
-
-                Exec(conn, "UPDATE Accounts SET Balance = @Bal, UpdatedAt = @Updated WHERE Id = @Id",
-                    ("@Bal", (double)acc.Balance), ("@Updated", DateTimeOffset.Now.ToString("O")), ("@Id", acc.Id.ToString()));
-            }
+                Id = Guid.NewGuid(),
+                AccountId = e.AccountId,
+                CategoryId = e.CategoryId,
+                Direction = e.Direction == EntryDirection.Debit ? EntryDirection.Credit : EntryDirection.Debit,
+                Amount = new Money { Amount = e.Amount.Amount, CurrencyCode = e.Amount.CurrencyCode }
+            });
         }
 
-        Exec(conn, "DELETE FROM Entries WHERE TransactionId = @TxId", ("@TxId", transactionId.ToString()));
-        Exec(conn, "DELETE FROM Transactions WHERE Id = @Id", ("@Id", transactionId.ToString()));
-
-        tran.Commit();
-
-        _transactions.Remove(tx);
-        RaiseChanged();
-
-        return Task.CompletedTask;
+        return PostTransactionAsync(stornoTx);
     }
 
     public Task AddObligationAsync(Obligation obligation)   // Добавление обязательтсва

@@ -16,6 +16,7 @@ namespace Client.Models
         public bool IsExpense { get; set; }            // красный
         public bool IsIncome { get; set; }             // зелёный
         public bool IsTransfer { get; set; }           // синий
+        public bool IsDuplicate { get; set; }          // возможный дубликат
 
         public string FormattedAmount
         {

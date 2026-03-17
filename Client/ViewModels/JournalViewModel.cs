@@ -19,7 +19,7 @@ namespace Client.ViewModels
         public ObservableCollection<JournalRow> FilteredRows { get; } = new();
         [ObservableProperty] private string _searchText = "";   // Строка поиска
 
-        [NotifyCanExecuteChangedFor(nameof(DeleteTransactionCommand))]
+        [NotifyCanExecuteChangedFor(nameof(StornoTransactionCommand))]
         [ObservableProperty]
         private JournalRow? _selectedRow;
         private bool hasSelectedRow() => SelectedRow is not null;
@@ -43,6 +43,15 @@ namespace Client.ViewModels
                 .OrderByDescending(r => r.Date)
                 .ToList();
 
+            // Выявление дубликатов транзакций
+            var duplicates = _allRows.GroupBy(r => new { r.Date.Date, r.Amount, r.TypeLabel })
+                                     .Where(g => g.Count() > 1)
+                                     .SelectMany(g => g);
+            foreach (var dup in duplicates)
+            {
+                dup.IsDuplicate = true;
+            }
+
             ApplyFilter();
         }
 
@@ -60,19 +69,19 @@ namespace Client.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(hasSelectedRow))]
-        private async System.Threading.Tasks.Task DeleteTransactionAsync()
+        private async System.Threading.Tasks.Task StornoTransactionAsync()
         {
             var row = SelectedRow;
             if (row is null) return;
             var confirmed = await _notify.ShowConfirmAsync(
-                "Вы уверены, что хотите удалить выбранную операцию? Средства будут возвращены на исходные счета.",
-                "Удаление операции");
+                "Вы уверены, что хотите сторнировать выбранную операцию? Будет создана корректирующая проводка (Сторно).",
+                "Сторнирование операции");
             if (!confirmed) return;
 
             try
             {
-                await _data.RemoveTransactionAsync(row.TransactionId);
-                await _notify.ShowInfoAsync("Операция успешно удалена.");
+                await _data.StornoTransactionAsync(row.TransactionId);
+                await _notify.ShowInfoAsync("Операция успешно сторнирована.");
                 Refresh();
             }
             catch (Exception ex)

@@ -32,7 +32,7 @@ namespace Client.Services
         Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов
 
         Task PostTransactionAsync(Transaction tx);  // Проводка транзакции
-        Task RemoveTransactionAsync(Guid transactionId);    // Удаление транзакции
+        Task StornoTransactionAsync(Guid transactionId);    // Сторнирование транзакции
 
         decimal GetRate(string fromCurrency, string toCurrency = "RUB");    // Получение курса валют
         void SetCurrencyRate(string code, decimal rate);    // Обновление курса валют
