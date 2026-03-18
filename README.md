@@ -18,7 +18,6 @@
 - [Установка и запуск](#-установка-и-запуск)
 - [Структура проекта](#-структура-проекта)
 - [Разработка](#-разработка)
-- [API документация](#-api-документация)
 
 ---
 
@@ -70,29 +69,28 @@
 
 #### Сервер
 - ✅ JWT-аутентификация (регистрация, вход)
-- ✅ CRUD операции: счета, категории, транзакции
+- ✅ CRUD операции: счета, категории, транзакции, обязательства
 - ✅ **Мультивалютные счета** (основная + дополнительная валюта, курс конвертации)
 - ✅ Двойная запись (Debit/Credit entries с балансировкой)
+- ✅ API курсы валют
 - ✅ Soft delete для счетов и категорий
+- ✅ Админ-панель для управления пользователями
 - ✅ Swagger UI (автодокументация API)
 
 #### Клиент
 - ✅ Управление счетами (создание, редактирование, удаление)
 - ✅ Управление категориями доходов и расходов
 - ✅ Создание транзакций (расход, доход, перевод между счетами)
-- ✅ **Отчёты с группировкой по категориям** и детализацией по дням (Expander-группы)
+- ✅ Управление обязательствами
+- ✅ Отчёты с группировкой по категориям и детализацией по дням (Expander-группы)
 - ✅ Графики: помесячная динамика, структура расходов (pie chart), top-N категорий
 - ✅ Обороты по счетам: остатки на начало/конец периода
 - ✅ Баланс на дату
-- ✅ Экспорт отчётов в CSV
-- ✅ Mock data service для разработки без backend
+- ✅ Экспорт отчётов
+- ✅ Локальная БД + синхронизация
 
 ### В разработке
 
-- 🚧 API обязательств (долги и задолженности)
-- 🚧 API курсов валют (интеграция с ЦБ РФ / Open Exchange Rates)
-- 🚧 Локальная БД + синхронизация (offline-first режим с SQLite)
-- 🚧 Админ-панель для управления пользователями
 - 🚧 Деплой на облачный сервер (Render.com / Railway)
 
 ---
@@ -154,8 +152,6 @@ cd finance-tracker/Diplom
 
 ### 2️⃣ Запуск базы данных
 
-#### Вариант A: Docker Compose (рекомендуется)
-
 ```bash
 docker-compose up -d
 ```
@@ -164,10 +160,6 @@ docker-compose up -d
 - **Database:** finance
 - **User:** finance_user
 - **Password:** finance_pass
-
-#### Вариант B: Локальная PostgreSQL
-
-Создайте БД вручную и обновите строку подключения в `Server/appsettings.json`.
 
 ### 3️⃣ Запуск сервера
 
@@ -178,8 +170,9 @@ dotnet ef database update  # применить миграции
 dotnet run
 ```
 
-Сервер запустится на `https://localhost:7000` (или порт из launchSettings).  
-Swagger UI доступен на: `https://localhost:7000/swagger`
+Сервер запустится на `https://localhost:5432` (или порт из launchSettings).  
+Swagger UI доступен на: `https://localhost:5432/swagger`. 
+Админ панель доступна на: `https://localhost:5432/admin`. 
 
 ### 4️⃣ Запуск клиента
 
@@ -204,7 +197,6 @@ Diplom/
 │   ├── ViewModels/              # MVVM ViewModels
 │   ├── Views/                   # AXAML разметка
 │   ├── Services/                # DataService, NotificationService
-│   └── ПЛАН_КЛИЕНТ.md           # План доработки клиента
 │
 ├── Server/                      # ASP.NET Core API
 │   ├── Controllers/             # API контроллеры
@@ -212,7 +204,6 @@ Diplom/
 │   ├── Data/                    # DbContext
 │   ├── Auth/                    # JWT, UserContext
 │   ├── Migrations/              # EF миграции
-│   └── ПЛАН_СЕРВЕР.md           # План доработки сервера
 │
 ├── Shared/                      # Общие DTO между клиентом/сервером
 │   ├── Accounts/                # AccountDto, CreateAccountRequest
@@ -236,61 +227,3 @@ cd Server
 dotnet ef migrations add MigrationName
 dotnet ef database update
 ```
-
-### Тестирование API через Swagger
-
-1. Запустите сервер: `dotnet run` в папке `Server`
-2. Откройте `https://localhost:7000/swagger`
-3. Используйте `/api/auth/register` для создания пользователя
-4. Используйте `/api/auth/login` для получения JWT токена
-5. Нажмите **Authorize** и вставьте `Bearer YOUR_TOKEN`
-6. Тестируйте эндпоинты `/api/accounts`, `/api/categories`, `/api/transactions`
-
-### Mock-данные в клиенте
-
-Клиент использует `MockDS.cs` для разработки UI без backend:
-
-```csharp
-// App.axaml.cs
-IDataService dataService = new MockDS(); // имитация данных
-// IDataService dataService = new ApiDataService(); // реальный API
-```
-
----
-
-## 📡 API документация
-
-### Аутентификация
-
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| POST | `/api/auth/register` | Регистрация нового пользователя |
-| POST | `/api/auth/login` | Вход (возвращает JWT токен) |
-
-### Счета
-
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| GET | `/api/accounts` | Получить все счета пользователя |
-| GET | `/api/accounts/{id}` | Получить счёт по ID |
-| POST | `/api/accounts` | Создать новый счёт |
-| PUT | `/api/accounts/{id}` | Обновить счёт |
-| DELETE | `/api/accounts/{id}` | Удалить счёт (soft delete) |
-
-### Категории
-
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| GET | `/api/categories` | Получить все категории |
-| POST | `/api/categories` | Создать категорию |
-| PUT | `/api/categories/{id}` | Обновить категорию |
-| DELETE | `/api/categories/{id}` | Удалить категорию |
-
-### Транзакции
-
-| Метод | Эндпоинт | Описание |
-|-------|----------|----------|
-| GET | `/api/transactions/{id}` | Получить транзакцию по ID |
-| POST | `/api/transactions` | Создать транзакцию (2+ entries) |
-
-Подробнее см. Swagger UI: `https://localhost:7000/swagger`
