@@ -120,6 +120,25 @@ namespace Client.ViewModels
 
                 await dialog.ShowDialog(App.MainWindow!);
             }
+
+            var now = DateTimeOffset.Now.Date;
+            var overdue = 0;
+            var approaching = 0;
+            foreach (var ob in _data.Obligations)
+            {
+                if (ob.IsPaid || !ob.DueDate.HasValue) continue;
+                var due = ob.DueDate.Value.Date;
+                if (due < now) overdue++;
+                else if ((due - now).TotalDays <= 3) approaching++;
+            }
+
+            if (overdue > 0 || approaching > 0)
+            {
+                var msg = "";
+                if (overdue > 0) msg += $"Просроченных долгов: {overdue}.\n";
+                if (approaching > 0) msg += $"Подходит срок: {approaching}.";
+                await _notify.ShowInfoAsync(msg.Trim(), "Напоминание об обязательствах");
+            }
         }
 
         public async Task ShowLoginDialog()

@@ -34,7 +34,13 @@ public partial class Obligation : ObservableObject  // Долги
         get
         {
             if (IsPaid) return "Погашено";
-            if (DueDate.HasValue && DueDate.Value < DateTimeOffset.Now) return "Просрочено";
+            if (DueDate.HasValue)
+            {
+                var now = DateTimeOffset.Now.Date;
+                var due = DueDate.Value.Date;
+                if (due < now) return "Просрочено";
+                if ((due - now).TotalDays <= 3) return "Подходит срок";
+            }
             return "Активно";
         }
     }

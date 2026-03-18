@@ -640,7 +640,7 @@ private SqliteConnection Open() // соединение с локальной б
                 AccountId = e.AccountId,
                 CategoryId = e.CategoryId,
                 Direction = e.Direction == EntryDirection.Debit ? EntryDirection.Credit : EntryDirection.Debit,
-                Amount = new Money { Amount = e.Amount.Amount, CurrencyCode = e.Amount.CurrencyCode }
+                Amount = new Money(e.Amount.Amount, e.Amount.CurrencyCode)
             });
         }
 

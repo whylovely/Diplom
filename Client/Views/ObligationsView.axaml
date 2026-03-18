@@ -71,22 +71,32 @@
             <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="100" />
             <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120" FontFamily="Fira Code, Consolas, monospace" />
             
-            <DataGridTemplateColumn Header="Статус" Width="100">
+            <DataGridTemplateColumn Header="Статус" Width="140">
               <DataTemplate>
-                <TextBlock Text="{Binding StatusLabel}">
-                  <TextBlock.Styles>
-                    <Style Selector="TextBlock[Text=Погашено]">
-                      <Setter Property="Foreground" Value="#9E9E9E"/>
-                    </Style>
-                    <Style Selector="TextBlock[Text=Просрочено]">
-                      <Setter Property="Foreground" Value="#FF5252"/>
-                      <Setter Property="FontWeight" Value="Bold"/>
-                    </Style>
-                    <Style Selector="TextBlock[Text=Активно]">
-                      <Setter Property="Foreground" Value="#00E676"/>
-                    </Style>
-                  </TextBlock.Styles>
-                </TextBlock>
+                <StackPanel Orientation="Horizontal" Spacing="8" Background="Transparent">
+                  <CheckBox IsChecked="{Binding IsPaid, Mode=OneWay}" 
+                            Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).MarkPaidCommand}"
+                            CommandParameter="{Binding}"
+                            VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding StatusLabel}" VerticalAlignment="Center">
+                    <TextBlock.Styles>
+                      <Style Selector="TextBlock[Text=Погашено]">
+                        <Setter Property="Foreground" Value="#9E9E9E"/>
+                      </Style>
+                      <Style Selector="TextBlock[Text=Просрочено]">
+                        <Setter Property="Foreground" Value="#FF5252"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                      </Style>
+                      <Style Selector="TextBlock[Text=Активно]">
+                        <Setter Property="Foreground" Value="#00E676"/>
+                      </Style>
+                      <Style Selector="TextBlock[Text='Подходит срок']">
+                        <Setter Property="Foreground" Value="#FFA000"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                      </Style>
+                    </TextBlock.Styles>
+                  </TextBlock>
+                </StackPanel>
               </DataTemplate>
             </DataGridTemplateColumn>
             

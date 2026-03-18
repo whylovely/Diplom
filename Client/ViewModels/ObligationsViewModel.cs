@@ -110,12 +110,13 @@ public partial class ObligationsViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task MarkPaidAsync()
+    [RelayCommand]
+    private async Task MarkPaidAsync(Obligation? ob = null)
     {
-        if (SelectedItem is null) return;
+        var target = ob ?? SelectedItem;
+        if (target is null) return;
         
-        try { await _data.MarkObligationPaidAsync(SelectedItem.Id, !SelectedItem.IsPaid); }
+        try { await _data.MarkObligationPaidAsync(target.Id, !target.IsPaid); }
         catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
     }
 
@@ -132,7 +133,6 @@ public partial class ObligationsViewModel : ViewModelBase
     {
         EditCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
-        MarkPaidCommand.NotifyCanExecuteChanged();
         PayDebtCommand.NotifyCanExecuteChanged();
     }
 }
