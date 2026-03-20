@@ -39,5 +39,7 @@ namespace Client.Services
 
         DateTimeOffset? GetLocalLastChangeDate();   // Дата последнего изменения
         int GetLocalTransactionCount();             // Количество транзакций
+
+        void ClearDatabase();                       // Очистка БД (выход из аккаунта)
     }
 }

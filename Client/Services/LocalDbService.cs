@@ -14,6 +14,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     private void RaiseChanged() => DataChanged?.Invoke();
 
     private readonly string _connectionString;
+    private readonly string _dbPath;
 
     private readonly List<Account> _accounts = new();
     private readonly List<Category> _categories = new();
@@ -33,11 +34,11 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     public LocalDbService()
     {
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var dir = Path.Combine(appData, "FinanceTracker");  // корректно изменить на Diplom
+        var dir = Path.Combine(appData, "Diplom");
         Directory.CreateDirectory(dir);
-        var dbPath = Path.Combine(dir, "finance.db");
+        _dbPath = Path.Combine(dir, "finance.db");
 
-        _connectionString = $"Data Source={dbPath}";
+        _connectionString = $"Data Source={_dbPath}";
 
         EnsureCreated();
         MigrateSchema();
@@ -864,5 +865,29 @@ private SqliteConnection Open() // соединение с локальной б
         foreach (var (name, value) in parameters)
             cmd.Parameters.AddWithValue(name, value);
         cmd.ExecuteNonQuery();
+    }
+
+    public void ClearDatabase()
+    {
+        SqliteConnection.ClearAllPools();
+        
+        if (File.Exists(_dbPath))
+        {
+            File.Delete(_dbPath);
+        }
+
+        _accounts.Clear();
+        _categories.Clear();
+        _transactions.Clear();
+        _obligations.Clear();
+        _currencyRates.Clear();
+        _expenseAccountByCategoryId.Clear();
+        _incomeAccountByCategoryId.Clear();
+
+        EnsureCreated();
+        MigrateSchema();
+        LoadAll();
+        
+        RaiseChanged();
     }
 }

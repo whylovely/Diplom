@@ -84,6 +84,7 @@ namespace Client.ViewModels
             SettingsVm = new SettingsViewModel(_settings);
             SettingsVm.OnLogoutRequested += async () =>
             {
+                _data.ClearDatabase();
                 await ShowLoginDialog();
                 if (!_auth.IsLoggedIn)
                 {
