@@ -71,6 +71,8 @@ public sealed class CbrExchangeRateService : IExchangeRateService
             rates.Add(new ExchangeRateDto("USDT", usdRate, DateTimeOffset.UtcNow));
             rates.Add(new ExchangeRateDto("BTC", 96000 * usdRate, DateTimeOffset.UtcNow));
             rates.Add(new ExchangeRateDto("ETH", 2700 * usdRate, DateTimeOffset.UtcNow));
+            rates.Add(new ExchangeRateDto("SOL", 140 * usdRate, DateTimeOffset.UtcNow));
+            rates.Add(new ExchangeRateDto("TON", 3.5m * usdRate, DateTimeOffset.UtcNow));
         }
 
         // Сохраняем в кэш (1 ч + 7 дней)
@@ -112,7 +114,7 @@ public sealed class CbrExchangeRateService : IExchangeRateService
         using var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("FinanceTrackerApp/1.0");
 
-        var url = "https://api.coingecko.com/api/v3/simple/price?ids=tether,bitcoin,ethereum&vs_currencies=usd";
+        var url = "https://api.coingecko.com/api/v3/simple/price?ids=tether,bitcoin,ethereum,solana,the-open-network&vs_currencies=usd";
         var response = await client.GetFromJsonAsync<Dictionary<string, Dictionary<string, decimal>>>(url, ct);
 
         var result = new Dictionary<string, decimal>();
@@ -121,6 +123,8 @@ public sealed class CbrExchangeRateService : IExchangeRateService
             if (response.TryGetValue("tether",   out var usdt) && usdt.TryGetValue("usd", out var usdtPrice)) result["USDT"] = usdtPrice;
             if (response.TryGetValue("bitcoin",  out var btc)  && btc.TryGetValue("usd",  out var btcPrice))  result["BTC"]  = btcPrice;
             if (response.TryGetValue("ethereum", out var eth)  && eth.TryGetValue("usd",  out var ethPrice))  result["ETH"]  = ethPrice;
+            if (response.TryGetValue("solana",   out var sol)  && sol.TryGetValue("usd",  out var solPrice))  result["SOL"]  = solPrice;
+            if (response.TryGetValue("the-open-network", out var ton) && ton.TryGetValue("usd", out var tonPrice)) result["TON"] = tonPrice;
         }
         return result;
     }

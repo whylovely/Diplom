@@ -13,7 +13,8 @@ public static class CurrencyHelper
 {
     public static readonly string[] AvailableCurrencies = 
     { 
-        "RUB", "USD", "EUR", "GBP", "CNY", "TRY", "KZT", "BYN"
+        "RUB", "USD", "EUR", "GBP", "CNY", "TRY", "KZT", "BYN",
+        "BTC", "ETH", "SOL", "TON"
     };
 
     public static ObservableCollection<string> GetObservableCurrencies() 

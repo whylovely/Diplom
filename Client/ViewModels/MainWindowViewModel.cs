@@ -13,6 +13,7 @@ namespace Client.ViewModels
         private readonly INotificationService _notify;
         private readonly SettingsService _settings;
         private readonly AuthService _auth;
+        private readonly CurrencyRateService _rateService;
 
         [ObservableProperty] private ViewModelBase _current;
         [ObservableProperty] private bool _isMenuOpen;
@@ -49,6 +50,7 @@ namespace Client.ViewModels
             _notify = new NotificationService();
             _settings = new SettingsService();
             _auth = new AuthService(_settings);
+            _rateService = new CurrencyRateService(_settings);
 
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
@@ -121,6 +123,9 @@ namespace Client.ViewModels
 
                 await dialog.ShowDialog(App.MainWindow!);
             }
+
+            // Подтягиваем актуальные курсы валют из интернета
+            await _rateService.UpdateRatesAsync(_data);
 
             var now = DateTimeOffset.Now.Date;
             var overdue = 0;
