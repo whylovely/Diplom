@@ -32,12 +32,14 @@ namespace Client.ViewModels
         [ObservableProperty] 
         private Account? _selectedAccount;
 
-        public decimal TotalBalance // Общий баланс
+        public string BaseCurrencyCode => _settings.BaseCurrency;
+
+        public decimal TotalBalance // Общий баланс (в базовой валюте)
         {
             get
             {
                 if (Accounts == null) return 0;
-                return Accounts.Sum(a => a.Balance);
+                return Accounts.Sum(a => a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency));
             }
         }
 
@@ -79,7 +81,14 @@ namespace Client.ViewModels
             _syncService = syncService;
 
             Accounts = new ObservableCollection<Account>();
+            _settings.SettingsChanged += OnSettingsChanged;
             _ = LoadDataAsync();
+        }
+
+        private void OnSettingsChanged()
+        {
+            OnPropertyChanged(nameof(BaseCurrencyCode));
+            OnPropertyChanged(nameof(TotalBalance));
         }
 
         private async Task LoadDataAsync()
