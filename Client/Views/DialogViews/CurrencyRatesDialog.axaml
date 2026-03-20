@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Client.ViewModels.DialogWindow"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
+        Width="450" Height="600"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        x:Class="Client.Views.DialogViews.CurrencyRatesDialog"
+        x:DataType="vm:CurrencyRatesDialogViewModel"
+        Title="Курсы валют"
+        Background="{DynamicResource BackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="True">
+
+  <Border Padding="24" Background="{DynamicResource SurfaceBrush}" CornerRadius="12">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+      <!-- Заголовок -->
+      <TextBlock Text="Курсы валют" Classes="heading" Grid.Row="0" Margin="0,0,0,16"/>
+
+      <!-- Поиск -->
+      <TextBox Grid.Row="1" 
+               Text="{Binding SearchQuery, Mode=TwoWay}"
+               Watermark="Поиск валюты (код или название)..."
+               Margin="0,0,0,16">
+        <TextBox.InnerLeftContent>
+          <PathIcon Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
+                    Width="16" Height="16" Margin="10,0,0,0" Foreground="{DynamicResource TextDimBrush}"/>
+        </TextBox.InnerLeftContent>
+      </TextBox>
+
+      <!-- Список валют -->
+      <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Items}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Classes="card" Margin="0,0,0,8" Padding="12">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Code}" FontWeight="Bold" FontSize="16"/>
+                    <TextBlock Text="{Binding Name}" Classes="dim" FontSize="12"/>
+                  </StackPanel>
+
+                  <TextBlock Grid.Column="1" Text="{Binding FormattedRate}" VerticalAlignment="Center" Margin="0,0,16,0" FontWeight="SemiBold"/>
+
+                  <Button Grid.Column="2" 
+                          Command="{Binding ToggleCommand}"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          Padding="8"
+                          Cursor="Hand">
+                    <PathIcon Width="20" Height="20" 
+                              Foreground="{Binding FavoriteColor}"
+                              Data="{Binding FavoriteIconData}"/>
+                  </Button>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <!-- Кнопка закрыть -->
+      <Button Grid.Row="3" Content="Закрыть" Command="{Binding CloseCommand}" 
+              HorizontalAlignment="Right" Classes="outline" Margin="0,16,0,0"/>
+    </Grid>
+  </Border>
+</Window>

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Client.ViewModels
 {
@@ -11,25 +12,55 @@ namespace Client.ViewModels
     {
         private readonly SettingsService _settingsService;
 
-        [ObservableProperty] private string _selectedCurrency;
-        
         public event Action? OnLogoutRequested;
+        public event Action? OnNavigateToCurrenciesRequested;
 
-        public string[] AvailableCurrencies => CurrencyHelper.AvailableCurrencies;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasFavorites))]
+        private ObservableCollection<string> _favoriteCurrencies = new();
+
+        private string? _selectedCurrency;
+        public string? SelectedCurrency
+        {
+            get => _selectedCurrency;
+            set
+            {
+                if (SetProperty(ref _selectedCurrency, value) && value != null)
+                {
+                    _settingsService.BaseCurrency = value;
+                }
+            }
+        }
+
+        public bool HasFavorites => FavoriteCurrencies.Count > 0;
 
         public SettingsViewModel(SettingsService settingsService)
         {
             _settingsService = settingsService;
-            _selectedCurrency = _settingsService.BaseCurrency;
+            LoadFavorites();
+            
+            _settingsService.SettingsChanged += LoadFavorites;
         }
 
-        [RelayCommand]
-        private void Save()
+        private void LoadFavorites()
         {
-            if (!string.IsNullOrEmpty(SelectedCurrency))
+            var favs = _settingsService.Settings.FavoriteCurrencies ?? new System.Collections.Generic.List<string>();
+            var currentBase = _settingsService.BaseCurrency;
+
+            if (!favs.Contains(currentBase))
             {
-                _settingsService.BaseCurrency = SelectedCurrency;
+                favs.Add(currentBase);
             }
+
+            FavoriteCurrencies.Clear();
+            foreach (var code in favs)
+            {
+                FavoriteCurrencies.Add(code);
+            }
+
+            OnPropertyChanged(nameof(HasFavorites));
+
+            SelectedCurrency = currentBase;
         }
 
         [RelayCommand]
@@ -37,6 +68,12 @@ namespace Client.ViewModels
         {
             _settingsService.Logout();
             OnLogoutRequested?.Invoke();
+        }
+
+        [RelayCommand]
+        private void GoToCurrencies()
+        {
+            OnNavigateToCurrenciesRequested?.Invoke();
         }
     }
 }

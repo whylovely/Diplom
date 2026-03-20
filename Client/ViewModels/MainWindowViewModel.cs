@@ -26,6 +26,7 @@ namespace Client.ViewModels
         [NotifyPropertyChangedFor(nameof(IsObligationsActive))]
         [NotifyPropertyChangedFor(nameof(IsNewTransactionActive))]
         [NotifyPropertyChangedFor(nameof(IsSettingsActive))]
+        [NotifyPropertyChangedFor(nameof(IsCurrenciesActive))]
         private string _activePage = "Accounts";
 
         public bool IsAccountsActive => ActivePage == "Accounts";
@@ -35,6 +36,7 @@ namespace Client.ViewModels
         public bool IsObligationsActive => ActivePage == "Obligations";
         public bool IsNewTransactionActive => ActivePage == "NewTransaction";
         public bool IsSettingsActive => ActivePage == "Settings";
+        public bool IsCurrenciesActive => ActivePage == "Currencies";
 
         public AccountsViewModel AccountsVm { get; }
         public JournalViewModel JournalVm { get; }
@@ -43,6 +45,7 @@ namespace Client.ViewModels
         public CategoriesViewModel CategoriesVm { get; }
         public ObligationsViewModel ObligationsVm { get; }
         public SettingsViewModel SettingsVm { get; }
+        public CurrenciesViewModel CurrenciesVm { get; }
 
         public MainWindowViewModel()
         {
@@ -82,6 +85,8 @@ namespace Client.ViewModels
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
             ObligationsVm = new ObligationsViewModel(_data, _notify, _settings, openDebtTx);
             SettingsVm = new SettingsViewModel(_settings);
+            CurrenciesVm = new CurrenciesViewModel(_data, _settings);
+
             SettingsVm.OnLogoutRequested += async () =>
             {
                 _data.ClearDatabase();
@@ -90,6 +95,11 @@ namespace Client.ViewModels
                 {
                     App.MainWindow?.Close();
                 }
+            };
+
+            SettingsVm.OnNavigateToCurrenciesRequested += () =>
+            {
+                NavigateCurrencies();
             };
 
             _current = AccountsVm;
@@ -184,6 +194,7 @@ namespace Client.ViewModels
         [RelayCommand] private void NavigateReport() { Current = ReportVm; ActivePage = "Report"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateCategories() { Current = CategoriesVm; ActivePage = "Categories"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateObligations() { Current = ObligationsVm; ActivePage = "Obligations"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateCurrencies() { Current = CurrenciesVm; ActivePage = "Currencies"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateSettings() { Current = SettingsVm; ActivePage = "Settings"; IsMenuOpen = false; }
     }
 }

@@ -10,20 +10,46 @@
   <StackPanel Spacing="20" MaxWidth="500">
     <TextBlock Text="Настройки" Classes="heading"/>
 
-    <!-- Currency Setting Card -->
+    <!-- Base Currency Card -->
     <Border Classes="card">
       <StackPanel Spacing="12">
         <TextBlock Text="Базовая валюта" Classes="subheading"/>
-        <TextBlock Text="Валюта по умолчанию для новых счетов и отчётов." 
-                   Classes="dim" TextWrapping="Wrap"/>
-        <ComboBox ItemsSource="{Binding AvailableCurrencies}"
-                  SelectedItem="{Binding SelectedCurrency}"
-                  Width="200"/>
         
-        <Button Content="💾 Сохранить настройки"
-                Command="{Binding SaveCommand}"
-                Classes="accent"
-                Width="200" Height="36"/>
+        <Panel>
+          <!-- Show ComboBox if we have favorites -->
+          <StackPanel Spacing="12" IsVisible="{Binding HasFavorites}">
+            <TextBlock Text="Выберите базовую валюту из списка избранных." 
+                       Classes="dim" TextWrapping="Wrap"/>
+            
+            <ComboBox ItemsSource="{Binding FavoriteCurrencies}"
+                      SelectedItem="{Binding SelectedCurrency}"
+                      Width="250" Height="40"
+                      Background="#0D1120"
+                      BorderBrush="#222845"
+                      BorderThickness="1"
+                      CornerRadius="8">
+              <ComboBox.Styles>
+                <Style Selector="ComboBox:focus /template/ Border#PART_BorderElement">
+                  <Setter Property="BorderBrush" Value="#29B6F6"/>
+                  <Setter Property="BoxShadow" Value="0 0 8 0 #4029B6F6"/>
+                </Style>
+                <Style Selector="ComboBox:pointerover /template/ Border#PART_BorderElement">
+                  <Setter Property="BorderBrush" Value="#29B6F6"/>
+                </Style>
+              </ComboBox.Styles>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- Show Helper if NO favorites -->
+          <StackPanel Spacing="12" IsVisible="{Binding !HasFavorites}">
+            <TextBlock Text="Чтобы выбрать базовую валюту, сначала добавьте её в избранное." 
+                       Classes="dim" TextWrapping="Wrap" Foreground="#9E9E9E"/>
+            <Button Content="Перейти к валютам"
+                    Command="{Binding GoToCurrenciesCommand}"
+                    Classes="outline"
+                    Width="200" Height="36"/>
+          </StackPanel>
+        </Panel>
       </StackPanel>
     </Border>
 

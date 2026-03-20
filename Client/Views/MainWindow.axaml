@@ -31,6 +31,9 @@
     <DataTemplate DataType="vm:ObligationsViewModel">
       <views:ObligationsView/>
     </DataTemplate>
+    <DataTemplate DataType="vm:CurrenciesViewModel">
+      <views:CurrenciesView/>
+    </DataTemplate>
     <DataTemplate DataType="vm:SettingsViewModel">
       <views:SettingsView/>
     </DataTemplate>
@@ -166,6 +169,16 @@
                 <Path Data="M16,11C17.66,11 19,9.66 19,8C19,6.34 17.66,5 16,5C14.34,5 13,6.34 13,8C13,9.66 14.34,11 16,11M16,13C13.67,13 9,14.17 9,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,11C9.66,11 11,9.66 11,8C11,6.34 9.66,5 8,5C6.34,5 5,6.34 5,8C5,9.66 6.34,11 8,11M8,13C5.67,13 1,14.17 1,16.5V19H7V16.5C7,15.34 7.6,14.07 9,13.25C8.61,13.09 8.28,13 8,13Z"
                       Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" VerticalAlignment="Center"/>
                 <TextBlock Text="Долги" FontSize="14" FontWeight="Medium" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+
+            <!-- Валюты -->
+            <Button Command="{Binding NavigateCurrenciesCommand}"
+                    Classes="menuItem" Classes.menuItemActive="{Binding IsCurrenciesActive}">
+              <StackPanel Orientation="Horizontal" Spacing="14">
+                <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,7V8.08C9.5,8.3 8.35,9.58 8.12,11.1L10.09,11.45C10.22,10.66 10.82,10 11.5,10H12.5V13L11.5,13C9.57,13 8,14.57 8,16.5A2.5,2.5 0 0,0 10.5,19C10.7,19 10.86,18.96 11,18.92V20H13V18.92C14.5,18.7 15.65,17.42 15.88,15.9L13.91,15.55C13.78,16.34 13.18,17 12.5,17H11.5V14L12.5,14C14.43,14 16,12.43 16,10.5A2.5,2.5 0 0,0 13.5,8C13.3,8 13.14,8.04 13,8.08V7H11Z"
+                      Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" VerticalAlignment="Center"/>
+                <TextBlock Text="Валюты" FontSize="14" FontWeight="Medium" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
 
