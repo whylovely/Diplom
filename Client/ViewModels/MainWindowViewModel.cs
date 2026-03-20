@@ -15,6 +15,7 @@ namespace Client.ViewModels
         private readonly AuthService _auth;
 
         [ObservableProperty] private ViewModelBase _current;
+        [ObservableProperty] private bool _isMenuOpen;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsAccountsActive))]
@@ -169,12 +170,14 @@ namespace Client.ViewModels
             NewTxVm.PresetForDebtTx(obligation);
         }
 
-        [RelayCommand] private void NavigateAccounts()        { Current = AccountsVm;     ActivePage = "Accounts"; }
-        [RelayCommand] private void NavigateJournal()         { Current = JournalVm;      ActivePage = "Journal"; }
-        [RelayCommand] private void NavigateNewTransaction()  { Current = NewTxVm;        ActivePage = "NewTransaction"; }
-        [RelayCommand] private void NavigateReport()          { Current = ReportVm;       ActivePage = "Report"; }
-        [RelayCommand] private void NavigateCategories()      { Current = CategoriesVm;   ActivePage = "Categories"; }
-        [RelayCommand] private void NavigateObligations()     { Current = ObligationsVm;  ActivePage = "Obligations"; }
-        [RelayCommand] private void NavigateSettings()        { Current = SettingsVm;     ActivePage = "Settings"; }
+        [RelayCommand] private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+
+        [RelayCommand] private void NavigateAccounts() { Current = AccountsVm; ActivePage = "Accounts"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateJournal() { Current = JournalVm; ActivePage = "Journal"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateNewTransaction() { Current = NewTxVm; ActivePage = "NewTransaction"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateReport() { Current = ReportVm; ActivePage = "Report"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateCategories() { Current = CategoriesVm; ActivePage = "Categories"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateObligations() { Current = ObligationsVm; ActivePage = "Obligations"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateSettings() { Current = SettingsVm; ActivePage = "Settings"; IsMenuOpen = false; }
     }
 }

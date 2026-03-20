@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using System;
 using Client.ViewModels;
@@ -19,6 +20,18 @@ public partial class MainWindow : Window
         if (DataContext is MainWindowViewModel vm)
         {
             await vm.OnWindowLoaded();
+        }
+    }
+
+    /// <summary>
+    /// Click on the dimming overlay closes the floating menu.
+    /// </summary>
+    private void OnOverlayPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm && vm.IsMenuOpen)
+        {
+            vm.ToggleMenuCommand.Execute(null);
+            e.Handled = true;
         }
     }
 }

@@ -318,5 +318,134 @@
       <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
+    <!-- ══ HEADER BAR ═══════════════════════════════════════════ -->
+    <Style Selector="Border.headerBar">
+      <Setter Property="Background" Value="#0A0E1A"/>
+      <Setter Property="BorderBrush" Value="#222845"/>
+      <Setter Property="BorderThickness" Value="0,0,0,1"/>
+    </Style>
+
+    <!-- ══ HAMBURGER BUTTON (with cyan glow on hover) ═══════════ -->
+    <Style Selector="Button.hamburgerBtn">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Width" Value="42"/>
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Foreground" Value="#AAD8D8D8"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.hamburgerBtn /template/ ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.2"/>
+          <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.hamburgerBtn:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1829B6F6"/>
+      <Setter Property="Foreground" Value="#29B6F6"/>
+    </Style>
+
+    <!-- ══ DIMMING OVERLAY ══════════════════════════════════════ -->
+    <Style Selector="Border.dimOverlay">
+      <Setter Property="Background" Value="#000000"/>
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.dimOverlay.open">
+      <Setter Property="Opacity" Value="0.45"/>
+      <Setter Property="IsHitTestVisible" Value="True"/>
+    </Style>
+
+    <!-- ══ FLOATING MENU WRAPPER ════════════════════════════════ -->
+    <Style Selector="Border.floatingMenuWrapper">
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Setter Property="RenderTransformOrigin" Value="0%,0%"/>
+      <Setter Property="RenderTransform" Value="translate(-8px, -8px) scale(0.96)"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.28" Easing="CubicEaseOut"/>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.32" Easing="CubicEaseOut"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.floatingMenuWrapper.open">
+      <Setter Property="Opacity" Value="1"/>
+      <Setter Property="IsHitTestVisible" Value="True"/>
+      <Setter Property="RenderTransform" Value="translate(0px, 0px) scale(1)"/>
+    </Style>
+
+    <!-- ══ MENU ITEMS ═══════════════════════════════════════════ -->
+    <Style Selector="Button.menuItem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="14,12"/>
+      <Setter Property="Foreground" Value="#88D8D8D8"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.menuItem /template/ ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.18"/>
+          <BrushTransition Property="Foreground" Duration="0:0:0.18"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.menuItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#0DFFFFFF"/>
+      <Setter Property="Foreground" Value="#E0E0E0"/>
+    </Style>
+
+    <!-- Accent menu item (New Transaction) -->
+    <Style Selector="Button.menuItemAccent">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="14,12"/>
+      <Setter Property="Foreground" Value="#29B6F6"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.menuItemAccent /template/ ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.18"/>
+          <BrushTransition Property="Foreground" Duration="0:0:0.18"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.menuItemAccent:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1229B6F6"/>
+      <Setter Property="Foreground" Value="#4FC3F7"/>
+    </Style>
+
+    <!-- Active menu item -->
+    <Style Selector="Button.menuItemActive">
+      <Setter Property="Foreground" Value="#5C9FD6"/>
+    </Style>
+    <Style Selector="Button.menuItemActive /template/ ContentPresenter">
+      <Setter Property="Background" Value="#151E88C8"/>
+      <Setter Property="Foreground" Value="#5C9FD6"/>
+    </Style>
+    <Style Selector="Button.menuItemActive:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#201E88C8"/>
+      <Setter Property="Foreground" Value="#7BB8E8"/>
+    </Style>
+
   </Application.Styles>
 </Application>
