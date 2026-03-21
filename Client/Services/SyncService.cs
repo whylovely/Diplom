@@ -72,31 +72,6 @@ public sealed class SyncService
             var obligations = serverObligations.Select(MapObligation).ToList();
             var transactions = serverTransactions.Select(MapTransaction).ToList();
 
-            // 4. Создать технические счета для каждой категории
-            //    Клиент использует «Расходы: X» и «Доходы: X» для двойной записи
-            foreach (var cat in categories)
-            {
-                var expAcc = new Account
-                {
-                    Name = $"Расходы: {cat.Name}",
-                    CurrencyCode = "RUB",
-                    Type = AccountType.Expense,
-                    CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
-                };
-                accounts.Add(expAcc);
-
-                var incAcc = new Account
-                {
-                    Name = $"Доходы: {cat.Name}",
-                    CurrencyCode = "RUB",
-                    Type = AccountType.Income,
-                    CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
-                };
-                accounts.Add(incAcc);
-            }
-
             // 5. Пересчитать балансы из транзакций
             var accountMap = accounts.ToDictionary(a => a.Id);
             foreach (var tx in transactions)
@@ -144,7 +119,25 @@ public sealed class SyncService
     {
         try
         {
-            var accounts = _localDb.Accounts.Select(a => new AccountDto(
+            // 1. Устраняем дубликаты счетов по имени (оставляем тот, у которого есть транзакции, или первый попавшийся)
+            var uniqueAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
+            var accountIdMap = new Dictionary<Guid, Guid>(); // oldId -> newId
+
+            foreach (var acc in _localDb.Accounts)
+            {
+                if (uniqueAccounts.TryGetValue(acc.Name, out var existing))
+                {
+                    // Дубликат найден. Запоминаем, что старый ID теперь ссылается на сохраненный ID
+                    accountIdMap[acc.Id] = existing.Id;
+                }
+                else
+                {
+                    uniqueAccounts[acc.Name] = acc;
+                    accountIdMap[acc.Id] = acc.Id;
+                }
+            }
+
+            var accountsToPush = uniqueAccounts.Values.Select(a => new AccountDto(
                 a.Id, a.Name, (Shared.Accounts.AccountKind)a.Type, a.CurrencyCode,
                 (Shared.Accounts.MultiCurrencyType)a.AccountMultiType, a.SecondaryCurrencyCode, a.ExchangeRate)).ToList();
             
@@ -158,17 +151,20 @@ public sealed class SyncService
             var transactions = _localDb.Transactions.Select(t => new TransactionDto(
                 t.Id, t.Date, t.Description,
                 t.Entries.Select(e => new EntryDto(
-                    e.Id, e.AccountId, e.CategoryId, (Shared.Transactions.EntryDirection)e.Direction,
+                    e.Id, 
+                    accountIdMap.TryGetValue(e.AccountId, out var mappedId) ? mappedId : e.AccountId, // Подменяем ID счета, если он был дубликатом
+                    e.CategoryId, 
+                    (Shared.Transactions.EntryDirection)e.Direction,
                     new Shared.Transactions.MoneyDto(e.Amount.Amount, e.Amount.CurrencyCode))).ToList()
             )).ToList();
 
-            var req = new Shared.Sync.SyncPushRequest(accounts, categories, obligations, transactions);
+            var req = new Shared.Sync.SyncPushRequest(accountsToPush, categories, obligations, transactions);
             await _api.PushAllDataAsync(req);
 
             return new SyncResult
             {
                 Success = true,
-                AccountsCount = accounts.Count,
+                AccountsCount = accountsToPush.Count,
                 CategoriesCount = categories.Count,
                 ObligationsCount = obligations.Count,
                 TransactionsCount = transactions.Count

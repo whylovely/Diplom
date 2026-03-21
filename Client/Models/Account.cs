@@ -8,6 +8,8 @@ namespace Client.Models
         public Guid Id { get; init; } = Guid.NewGuid();
         [ObservableProperty] private string _name = "";
 
+        [ObservableProperty] private Guid? _groupId;
+
         public string CurrencyCode { get; set; } = "RUB";   // Основная валюта
         public string? SecondaryCurrencyCode { get; set; }
 

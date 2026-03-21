@@ -23,12 +23,14 @@ namespace Client.ViewModels
         private readonly SyncService? _syncService;
 
         public ObservableCollection<Account> Accounts { get; }
+        public ObservableCollection<AccountGroupViewModel> Groups { get; } = new();
 
         // доступная/недоступная кнопка
         [NotifyCanExecuteChangedFor(nameof(RenameAccountCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteAccountCommand))]
         [NotifyCanExecuteChangedFor(nameof(QuickExpenseCommand))]
         [NotifyCanExecuteChangedFor(nameof(QuickIncomeCommand))]
+        [NotifyCanExecuteChangedFor(nameof(MoveToGroupCommand))]
         [ObservableProperty] 
         private Account? _selectedAccount;
 
@@ -38,8 +40,8 @@ namespace Client.ViewModels
         {
             get
             {
-                if (Accounts == null) return 0;
-                return Accounts.Sum(a => a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency));
+                if (Groups == null) return 0;
+                return Groups.Sum(g => g.TotalBalance);
             }
         }
 
@@ -81,7 +83,13 @@ namespace Client.ViewModels
             _syncService = syncService;
 
             Accounts = new ObservableCollection<Account>();
+            _data.DataChanged += OnDataChanged;
             _settings.SettingsChanged += OnSettingsChanged;
+            _ = LoadDataAsync();
+        }
+
+        private void OnDataChanged()
+        {
             _ = LoadDataAsync();
         }
 
@@ -89,21 +97,105 @@ namespace Client.ViewModels
         {
             OnPropertyChanged(nameof(BaseCurrencyCode));
             OnPropertyChanged(nameof(TotalBalance));
+            foreach (var g in Groups) g.Refresh();
         }
+
+        private int _loadCounter = 0;
 
         private async Task LoadDataAsync()
         {
-            IsLoading = true;
-            await Task.Delay(2000); // Имитация долгой загрузки
+            var currentLoad = ++_loadCounter;
             
-            var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets);
+            IsLoading = true;
+            await Task.Delay(200); // Небольшая задержка для UI
+            
+            if (currentLoad != _loadCounter) return; // Была запущена новая загрузка
+
+            Accounts.Clear();
+            Groups.Clear();
+
+            var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets).ToList();
+            var loadedGroups = _data.AccountGroups.OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList();
+
+            // Создаем вьюмодели для всех групп
+            foreach (var g in loadedGroups)
+            {
+                var gvm = new AccountGroupViewModel(g, _data, _settings);
+                Groups.Add(gvm);
+            }
+
+            // Вьюмодель для "Без группы"
+            var noGroupVm = new AccountGroupViewModel(null, _data, _settings);
+            Groups.Add(noGroupVm);
+
             foreach (var acc in loadedAccounts)
             {
                 Accounts.Add(acc);
+                var gvm = Groups.FirstOrDefault(g => g.Id == acc.GroupId) ?? noGroupVm;
+                gvm.Accounts.Add(acc);
             }
-            OnPropertyChanged(nameof(TotalBalance));
 
+            // Убираем пустую "Без группы", если нет счетов
+            if (noGroupVm.Accounts.Count == 0)
+                Groups.Remove(noGroupVm);
+
+            OnPropertyChanged(nameof(TotalBalance));
             IsLoading = false;
+        }
+
+        [RelayCommand]
+        private async Task AddGroupAsync()
+        {
+            var name = await _input.PromptAsync("Новая группа", "Введите название группы счетов:");
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            var group = new AccountGroup { Name = name.Trim() };
+            await _data.AddAccountGroupAsync(group);
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task RenameGroupAsync(AccountGroupViewModel gvm)
+        {
+            if (gvm?.Group == null) return;
+            var name = await _input.PromptAsync("Переименовать группу", "Введите новое название:", gvm.Group.Name);
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            gvm.Group.Name = name.Trim();
+            await _data.UpdateAccountGroupAsync(gvm.Group);
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task DeleteGroupAsync(AccountGroupViewModel gvm)
+        {
+            if (gvm?.Group == null) return;
+            var confirmed = await _notify.ShowConfirmAsync($"Удалить группу «{gvm.Name}»?\nСчета не удалятся, а просто останутся без группы.", "Удаление группы");
+            if (!confirmed) return;
+
+            await _data.DeleteAccountGroupAsync(gvm.Group.Id);
+            await LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task MoveToGroupAsync(Account? acc)
+        {
+            if (acc == null) return;
+            
+            var groups = _data.AccountGroups.ToList();
+            var dlg = new Views.DialogViews.GroupSelectionDialog(groups);
+            var result = await dlg.ShowDialog<AccountGroup?>(_getWindow());
+            
+            if (result == null && !dlg.IsCancelled) // Выбрано "Без группы"
+            {
+                _data.SetAccountGroup(acc.Id, null);
+                await LoadDataAsync();
+            }
+            else if (result != null)
+            {
+                _data.SetAccountGroup(acc.Id, result.Id);
+                await LoadDataAsync();
+            }
         }
 
         [RelayCommand]
@@ -121,17 +213,14 @@ namespace Client.ViewModels
             }
 
             _data.AddAccount(acc);
-            Accounts.Insert(0, acc);
-            OnPropertyChanged(nameof(TotalBalance));
+            await LoadDataAsync();
 
             await _notify.ShowInfoAsync($"Счет \"{acc.Name}\" добавлен.");
         }
 
-        [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task RenameAccountAsync()
+        [RelayCommand]
+        private async Task RenameAccountAsync(Account? acc)
         {
-            var acc = SelectedAccount;
-
             if (acc is null) return;
 
             var newName = await _input.PromptAsync(
@@ -154,17 +243,14 @@ namespace Client.ViewModels
             }
 
             _data.RenameAccount(acc.Id, newName);
-            acc.Name = newName;
-            OnPropertyChanged(nameof(TotalBalance));
+            await LoadDataAsync();
 
             await _notify.ShowInfoAsync("Счёт переименован.");
         }
 
-        [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private async Task DeleteAccountAsync()
+        [RelayCommand]
+        private async Task DeleteAccountAsync(Account? acc)
         {
-            var acc = SelectedAccount;
-
             if (acc is null) return;
 
             // Запрет удаления счёта с ненулевым балансом
@@ -193,8 +279,7 @@ namespace Client.ViewModels
             try
             {
                 _data.RemoveAccount(acc.Id); 
-                Accounts.Remove(acc);
-                OnPropertyChanged(nameof(TotalBalance));
+                await LoadDataAsync();
             }
             catch (Exception ex)
             {
@@ -202,18 +287,18 @@ namespace Client.ViewModels
             }
         }
 
-        [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickExpense()
+        [RelayCommand]
+        private void QuickExpense(Account? acc)
         {
-            if (_onQuickTx is null) return;
-            _onQuickTx(SelectedAccount!, TxKindChoice.Expense);
+            if (_onQuickTx is null || acc is null) return;
+            _onQuickTx(acc, TxKindChoice.Expense);
         }
 
-        [RelayCommand(CanExecute = nameof(hasSelectedAccount))]
-        private void QuickIncome()
+        [RelayCommand]
+        private void QuickIncome(Account? acc)
         {
-            if (_onQuickTx is null) return;
-            _onQuickTx(SelectedAccount!, TxKindChoice.Income);
+            if (_onQuickTx is null || acc is null) return;
+            _onQuickTx(acc, TxKindChoice.Income);
         }
 
         [RelayCommand]
@@ -298,10 +383,7 @@ namespace Client.ViewModels
 
             if (result.Success)
             {
-                Accounts.Clear();
-                foreach (var acc in _data.Accounts.Where(a => a.Type == AccountType.Assets))
-                    Accounts.Add(acc);
-                OnPropertyChanged(nameof(TotalBalance));
+                await LoadDataAsync();
 
                 SyncStatusText = $"Синхронизировано";
                 SyncIconColor = "#00E676";

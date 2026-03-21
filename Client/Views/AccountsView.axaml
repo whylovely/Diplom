@@ -16,7 +16,7 @@
             </StackPanel>
         </StackPanel>
         
-        <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="16" HorizontalAlignment="Right">
+        <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="12" HorizontalAlignment="Right">
             
             <Button Command="{Binding SyncCommand}"
                     Background="Transparent" BorderThickness="0" Padding="0"
@@ -51,80 +51,117 @@
               </Border>
             </Button>
 
-            <Button Content="＋ Добавить счёт"
-                    Classes="accent"
-                    Command="{Binding AddAccountCommand}"
-                    Width="180"/>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Content="＋ Группа"
+                      Command="{Binding AddGroupCommand}"
+                      Padding="10,6"
+                      FontSize="12"/>
+              <Button Content="＋ Счёт"
+                      Classes="accent"
+                      Command="{Binding AddAccountCommand}"
+                      Padding="14,6"
+                      FontSize="12"/>
+            </StackPanel>
         </StackPanel>
       </Grid>
       
       <TextBlock Text="Ваши счета" Classes="heading"/>
     </StackPanel>
 
-    <StackPanel Grid.Row="1" Spacing="8" IsVisible="{Binding IsLoading}" Margin="0,16,0,0">
-      <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
-      <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
-      <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
-      <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
-      <Border Classes="skeleton animating" Height="40" Margin="0,0,0,8"/>
-    </StackPanel>
+    <ScrollViewer Grid.Row="1" IsVisible="{Binding !IsLoading}">
+      <ItemsControl ItemsSource="{Binding Groups}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="vm:AccountGroupViewModel">
+            <StackPanel Spacing="8" Margin="0,0,0,24">
+              
+              <!-- Group Header -->
+              <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                  <TextBlock Text="{Binding Name}" Classes="subheading" VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding TotalBalance, StringFormat={}{0:N2}}" 
+                             Classes="dim" FontWeight="Bold" VerticalAlignment="Center"
+                             IsVisible="{Binding !!Accounts.Count}"/>
+                  <TextBlock Text="{Binding BaseCurrency}" Classes="dim" FontSize="10" VerticalAlignment="Center"
+                             IsVisible="{Binding !!Accounts.Count}"/>
+                </StackPanel>
 
-    <DataGrid Grid.Row="1" x:Name="AccountsGrid"
-              ItemsSource="{Binding Accounts}"
-              SelectedItem="{Binding SelectedAccount}"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              BorderThickness="0"
-              Background="Transparent"
-              GridLinesVisibility="Horizontal"
-              IsVisible="{Binding !IsLoading}">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <Button Background="Transparent" BorderThickness="0" Padding="4"
+                          Command="{Binding $parent[UserControl].DataContext.RenameGroupCommand}"
+                          CommandParameter="{Binding}"
+                          IsVisible="{Binding Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <Path Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" 
+                          Fill="#606060" Width="14" Height="14" Stretch="Uniform"/>
+                  </Button>
+                  <Button Background="Transparent" BorderThickness="0" Padding="4"
+                          Command="{Binding $parent[UserControl].DataContext.DeleteGroupCommand}"
+                          CommandParameter="{Binding}"
+                          IsVisible="{Binding Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" 
+                          Fill="#606060" Width="14" Height="14" Stretch="Uniform"/>
+                  </Button>
+                </StackPanel>
+              </Grid>
 
-          <DataGrid.ContextMenu>
-            <ContextMenu x:CompileBindings="False">
-              <MenuItem Header="Переименовать" Command="{Binding RenameAccountCommand}" />
-              <MenuItem Header="Удалить" Command="{Binding DeleteAccountCommand}" />
-              <Separator/>
-              <MenuItem Header="Быстрый расход" Command="{Binding QuickExpenseCommand}" />
-              <MenuItem Header="Быстрый доход" Command="{Binding QuickIncomeCommand}" />
-            </ContextMenu>
-          </DataGrid.ContextMenu>
+              <!-- Accounts in Group -->
+              <ItemsControl ItemsSource="{Binding Accounts}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Classes="cardSmall" Width="260" Margin="0,0,12,12">
+                      <Border.ContextMenu>
+                        <ContextMenu x:CompileBindings="False">
+                          <MenuItem Header="Переименовать" 
+                                    Command="{Binding $parent[UserControl].DataContext.RenameAccountCommand}" 
+                                    CommandParameter="{Binding}" />
+                          <MenuItem Header="Удалить" 
+                                    Command="{Binding $parent[UserControl].DataContext.DeleteAccountCommand}" 
+                                    CommandParameter="{Binding}" />
+                          <MenuItem Header="Переместить в группу..." 
+                                    Command="{Binding $parent[UserControl].DataContext.MoveToGroupCommand}" 
+                                    CommandParameter="{Binding}" />
+                          <Separator/>
+                          <MenuItem Header="Быстрый расход" 
+                                    Command="{Binding $parent[UserControl].DataContext.QuickExpenseCommand}" 
+                                    CommandParameter="{Binding}" />
+                          <MenuItem Header="Быстрый доход" 
+                                    Command="{Binding $parent[UserControl].DataContext.QuickIncomeCommand}" 
+                                    CommandParameter="{Binding}" />
+                        </ContextMenu>
+                      </Border.ContextMenu>
+                      
+                      <Grid RowDefinitions="Auto,Auto"
+                            PointerPressed="OnAccountPointerPressed">
+                        <StackPanel Grid.Row="0" Spacing="2">
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                          <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}" Classes="amount" FontSize="18"/>
+                            <TextBlock Text="{Binding CurrencyCode}" Classes="dim" VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                          </StackPanel>
+                        </StackPanel>
 
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="300"/>
-            <DataGridTextColumn Header="Валюта" Binding="{Binding CurrencyCode}" Width="80"/>
-            
-            <DataGridTemplateColumn Header="Баланс" Width="140">
-              <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}"
-                             Classes="amount"
-                             VerticalAlignment="Center" Margin="4,0"/>
-                </DataTemplate>
-              </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+                        <StackPanel Grid.Row="1" Margin="0,8,0,0" Spacing="2" IsVisible="{Binding IsMultiCurrency}">
+                          <Separator Margin="0,4"/>
+                          <StackPanel Orientation="Horizontal" Spacing="4">
+                             <TextBlock Text="{Binding SecondaryBalance, StringFormat={}{0:N2}}" Classes="amount" FontSize="14" Opacity="0.7"/>
+                             <TextBlock Text="{Binding SecondaryCurrencyCode}" Classes="dim" FontSize="12" VerticalAlignment="Bottom"/>
+                          </StackPanel>
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
 
-            <DataGridTemplateColumn Header="Доп. валюта" Width="100">
-              <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBlock Text="{Binding SecondaryCurrencyCode}"
-                             IsVisible="{Binding IsMultiCurrency}"
-                             VerticalAlignment="Center" Margin="4,0"/>
-                </DataTemplate>
-              </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-
-            <DataGridTemplateColumn Header="Доп. баланс" Width="120">
-              <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBlock Text="{Binding SecondaryBalance, StringFormat={}{0:N2}}"
-                             Classes="amount"
-                             IsVisible="{Binding IsMultiCurrency}"
-                             VerticalAlignment="Center" Margin="4,0"/>
-                </DataTemplate>
-              </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-          </DataGrid.Columns>
-    </DataGrid>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
 
     <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
                 IsVisible="{Binding !Accounts.Count}">

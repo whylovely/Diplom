@@ -15,11 +15,13 @@ namespace Client.Services
         IReadOnlyList<Transaction> Transactions { get; }
         IReadOnlyList<Obligation> Obligations { get; }
         IReadOnlyList<TransactionTemplate> Templates { get; }
+        IReadOnlyList<AccountGroup> AccountGroups { get; }
 
         void AddAccount(Account account);   // Добавление счета
         void RenameAccount(Guid id, string newName);    // Переименовывание счета
         void RemoveAccount(Guid id);    // soft-delete счета
         bool IsAccountUsed(Guid id);    // Использовался ли аккаунт
+        void SetAccountGroup(Guid accountId, Guid? groupId); // Привязка счета к группе
 
         void AddCategory(Category category);    // Добавление категории
         void RemoveCategory(Category category); // Удаление категории
@@ -31,6 +33,10 @@ namespace Client.Services
 
         Task AddTemplateAsync(TransactionTemplate template); // Добавление шаблона
         Task DeleteTemplateAsync(Guid id);                   // Удаление шаблона
+
+        Task AddAccountGroupAsync(AccountGroup group);       // Добавление группы счетов
+        Task UpdateAccountGroupAsync(AccountGroup group);    // Обновление группы счетов
+        Task DeleteAccountGroupAsync(Guid id);              // Удаление группы счетов
 
         Account GetExpenseAccountForCategory(Guid categoryId);  // Возвращение категории расходов
         Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов

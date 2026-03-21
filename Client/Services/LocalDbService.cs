@@ -21,6 +21,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     private readonly List<Transaction> _transactions = new();
     private readonly List<Obligation> _obligations = new();
     private readonly List<TransactionTemplate> _templates = new();
+    private readonly List<AccountGroup> _accountGroups = new();
 
     private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();
     private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId = new();
@@ -32,6 +33,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     public IReadOnlyList<Obligation> Obligations => _obligations;
     public IReadOnlyList<CurrencyRate> CurrencyRates => _currencyRates;
     public IReadOnlyList<TransactionTemplate> Templates => _templates;
+    public IReadOnlyList<AccountGroup> AccountGroups => _accountGroups;
 
     public LocalDbService()
     {
@@ -62,6 +64,7 @@ private SqliteConnection Open() // соединение с локальной б
             CREATE TABLE IF NOT EXISTS Accounts (
                 Id TEXT PRIMARY KEY,
                 Name TEXT NOT NULL,
+                GroupId TEXT,
                 CurrencyCode TEXT NOT NULL DEFAULT 'RUB',
                 InitialBalance REAL NOT NULL DEFAULT 0,
                 Balance REAL NOT NULL DEFAULT 0,
@@ -74,6 +77,13 @@ private SqliteConnection Open() // соединение с локальной б
                 CreatedAt TEXT NOT NULL,
                 UpdatedAt TEXT NOT NULL
             )");    // Счета
+
+        Exec(conn, @"
+            CREATE TABLE IF NOT EXISTS AccountGroups (
+                Id TEXT PRIMARY KEY,
+                Name TEXT NOT NULL,
+                SortOrder INTEGER NOT NULL DEFAULT 0
+            )");    // Группы счетов
 
         Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Categories (
@@ -163,6 +173,26 @@ private SqliteConnection Open() // соединение с локальной б
         if (!hasIsDeleted)
         {
             Exec(conn, "ALTER TABLE Accounts ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
+        }
+
+        bool hasGroupId = false;
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "PRAGMA table_info(Accounts)";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader.GetString(reader.GetOrdinal("name")).Equals("GroupId", StringComparison.OrdinalIgnoreCase))
+                {
+                    hasGroupId = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasGroupId)
+        {
+            Exec(conn, "ALTER TABLE Accounts ADD COLUMN GroupId TEXT");
         }
     }
 
@@ -274,6 +304,7 @@ private SqliteConnection Open() // соединение с локальной б
         _transactions.Clear();
         _obligations.Clear();
         _templates.Clear();
+        _accountGroups.Clear();
         _currencyRates.Clear();
         _expenseAccountByCategoryId.Clear();
         _incomeAccountByCategoryId.Clear();
@@ -290,6 +321,7 @@ private SqliteConnection Open() // соединение с локальной б
                 {
                     Id = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
                     Name = r.GetString(r.GetOrdinal("Name")),
+                    GroupId = r.IsDBNull(r.GetOrdinal("GroupId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("GroupId"))),
                     CurrencyCode = r.GetString(r.GetOrdinal("CurrencyCode")),
                     InitialBalance = (decimal)r.GetDouble(r.GetOrdinal("InitialBalance")),
                     Balance = (decimal)r.GetDouble(r.GetOrdinal("Balance")),
@@ -427,6 +459,21 @@ private SqliteConnection Open() // соединение с локальной б
                 });
             }
         }
+
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "SELECT * FROM AccountGroups ORDER BY SortOrder, Name";
+            using var r = cmd.ExecuteReader();
+            while (r.Read())
+            {
+                _accountGroups.Add(new AccountGroup
+                {
+                    Id = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
+                    Name = r.GetString(r.GetOrdinal("Name")),
+                    SortOrder = r.GetInt32(r.GetOrdinal("SortOrder"))
+                });
+            }
+        }
     }
 
     private Guid? FindCategoryIdByTechnicalAccountName(string accName, string prefix)   // Поиск категории
@@ -452,10 +499,11 @@ private SqliteConnection Open() // соединение с локальной б
     {
         using var conn = Open();
         
-        Exec(conn, @"INSERT INTO Accounts (Id, Name, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType, SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, IsDeleted, CreatedAt, UpdatedAt)
-                     VALUES (@Id, @Name, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @IsDeleted, @Created, @Updated)",
+        Exec(conn, @"INSERT INTO Accounts (Id, Name, GroupId, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType, SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, IsDeleted, CreatedAt, UpdatedAt)
+                     VALUES (@Id, @Name, @Group, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @IsDeleted, @Created, @Updated)",
             ("@Id", account.Id.ToString()),
             ("@Name", account.Name),
+            ("@Group", (object?)account.GroupId?.ToString() ?? DBNull.Value),
             ("@Cur", account.CurrencyCode),
             ("@Init", (double)account.InitialBalance),
             ("@Bal", (double)account.Balance),
@@ -783,6 +831,60 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
+    public Task AddAccountGroupAsync(AccountGroup group)
+    {
+        using var conn = Open();
+        Exec(conn, @"INSERT INTO AccountGroups (Id, Name, SortOrder) VALUES (@Id, @Name, @Sort)",
+            ("@Id", group.Id.ToString()), ("@Name", group.Name), ("@Sort", group.SortOrder));
+
+        _accountGroups.Add(group);
+        RaiseChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateAccountGroupAsync(AccountGroup group)
+    {
+        using var conn = Open();
+        Exec(conn, @"UPDATE AccountGroups SET Name=@Name, SortOrder=@Sort WHERE Id=@Id",
+            ("@Name", group.Name), ("@Sort", group.SortOrder), ("@Id", group.Id.ToString()));
+
+        var idx = _accountGroups.FindIndex(g => g.Id == group.Id);
+        if (idx >= 0) _accountGroups[idx] = group;
+        RaiseChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAccountGroupAsync(Guid id)
+    {
+        using var conn = Open();
+        Exec(conn, "DELETE FROM AccountGroups WHERE Id = @Id", ("@Id", id.ToString()));
+        
+        // Сбрасываем GroupId у всех счетов этой группы
+        Exec(conn, "UPDATE Accounts SET GroupId = NULL WHERE GroupId = @Id", ("@Id", id.ToString()));
+
+        _accountGroups.RemoveAll(g => g.Id == id);
+        foreach (var a in _accounts.Where(x => x.GroupId == id))
+            a.GroupId = null;
+
+        RaiseChanged();
+        return Task.CompletedTask;
+    }
+
+    public void SetAccountGroup(Guid accountId, Guid? groupId)
+    {
+        var acc = _accounts.FirstOrDefault(a => a.Id == accountId);
+        if (acc == null) return;
+
+        acc.GroupId = groupId;
+        using var conn = Open();
+        Exec(conn, "UPDATE Accounts SET GroupId = @GroupId, UpdatedAt = @Updated WHERE Id = @Id",
+            ("@GroupId", (object?)groupId?.ToString() ?? DBNull.Value),
+            ("@Updated", DateTimeOffset.Now.ToString("O")),
+            ("@Id", accountId.ToString()));
+
+        RaiseChanged();
+    }
+
     public decimal GetRate(string fromCurrency, string toCurrency = "RUB")  // Получение курса валют
     {
         if (fromCurrency == toCurrency) return 1m;
@@ -829,6 +931,10 @@ private SqliteConnection Open() // соединение с локальной б
         List<Obligation> obligations,
         List<Transaction> transactions)
     {
+        // Сохраняем текущие привязки счетов к группам
+        var accountGroupsMap = _accounts.Where(a => a.GroupId.HasValue)
+                                        .ToDictionary(a => a.Id, a => a.GroupId!.Value);
+
         using var conn = Open();
         using var tran = conn.BeginTransaction();
 
@@ -842,10 +948,13 @@ private SqliteConnection Open() // соединение с локальной б
         // 2. Вставить счета
         foreach (var a in accounts)
         {
-            Exec(conn, @"INSERT INTO Accounts (Id, Name, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType, SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, IsDeleted, CreatedAt, UpdatedAt)
-                         VALUES (@Id, @Name, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @Del, @Created, @Updated)",
+            var groupId = accountGroupsMap.TryGetValue(a.Id, out var gId) ? (object)gId.ToString() : DBNull.Value;
+
+            Exec(conn, @"INSERT INTO Accounts (Id, Name, GroupId, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType, SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, IsDeleted, CreatedAt, UpdatedAt)
+                         VALUES (@Id, @Name, @GroupId, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @Del, @Created, @Updated)",
                 ("@Id", a.Id.ToString()),
                 ("@Name", a.Name),
+                ("@GroupId", groupId),
                 ("@Cur", a.CurrencyCode),
                 ("@Init", (double)a.InitialBalance),
                 ("@Bal", (double)a.Balance),
@@ -945,6 +1054,7 @@ private SqliteConnection Open() // соединение с локальной б
         _transactions.Clear();
         _obligations.Clear();
         _templates.Clear();
+        _accountGroups.Clear();
         _currencyRates.Clear();
         _expenseAccountByCategoryId.Clear();
         _incomeAccountByCategoryId.Clear();

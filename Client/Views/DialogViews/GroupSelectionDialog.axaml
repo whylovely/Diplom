@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Client.ViewModels"
+        x:Class="Client.Views.DialogViews.GroupSelectionDialog"
+        x:DataType="vm:GroupSelectionDialogViewModel"
+        Width="420"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="#0B1021"
+        Title="Выбор группы">
+
+  <Border Classes="card" Margin="16">
+    <StackPanel Spacing="14">
+
+      <TextBlock Text="Выберите группу для счета:" Foreground="#E0E0E0"/>
+
+      <ListBox ItemsSource="{Binding Groups}"
+               SelectedItem="{Binding SelectedGroup}"
+               MaxHeight="250"
+               Background="#0D1120">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  Spacing="8">
+        <Button Content="✓ Выбрать" Classes="accent" Click="OnOkClick" Width="100"/>
+        <Button Content="Без группы" Click="OnNoGroupClick" Width="120"/>
+        <Button Content="Отмена" Click="OnCancelClick" Width="100"/>
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
+</Window>
