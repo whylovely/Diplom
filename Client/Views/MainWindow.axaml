@@ -4,6 +4,7 @@
         xmlns:views="using:Client.Views"
         x:Class="Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app-icon.ico"
         MinWidth="1000" MinHeight="650"
         Width="1100" Height="700"
         Title="FinanceApp">
