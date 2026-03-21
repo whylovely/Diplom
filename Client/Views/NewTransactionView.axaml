@@ -9,6 +9,43 @@
 
       <TextBlock Text="Новая операция" Classes="heading"/>
 
+      <Border Classes="cardSmall" IsVisible="{Binding Templates.Count}">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Быстрые шаблоны" Classes="dim"/>
+          <ItemsControl ItemsSource="{Binding Templates}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Command="{Binding $parent[UserControl].((vm:NewTransactionViewModel)DataContext).ApplyTemplateCommand}"
+                        CommandParameter="{Binding}"
+                        Margin="0,0,8,8"
+                        Padding="10,6">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                    <Button Command="{Binding $parent[UserControl].((vm:NewTransactionViewModel)DataContext).DeleteTemplateCommand}"
+                            CommandParameter="{Binding}"
+                            Padding="2"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Width="20" Height="20"
+                            VerticalAlignment="Center">
+                      <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                            Fill="#808080"
+                            Stretch="Uniform"
+                            Width="12" Height="12"/>
+                    </Button>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
       <Border Classes="cardSmall">
         <StackPanel Orientation="Horizontal" Spacing="20">
           <RadioButton Content="Расход"
@@ -144,11 +181,15 @@
 
           <Separator/>
 
-          <Button Content="✓ Провести"
-                  Classes="accent"
-                  Command="{Binding PostCommand}"
-                  Width="180"
-                  HorizontalAlignment="Left"/>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button Content="✓ Провести"
+                    Classes="accent"
+                    Command="{Binding PostCommand}"
+                    Width="180"/>
+            <Button Content="💾 В шаблон"
+                    Command="{Binding SaveAsTemplateCommand}"
+                    ToolTip.Tip="Сохранить текущие поля как шаблон"/>
+          </StackPanel>
 
         </StackPanel>
       </Border>

@@ -20,6 +20,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     private readonly List<Category> _categories = new();
     private readonly List<Transaction> _transactions = new();
     private readonly List<Obligation> _obligations = new();
+    private readonly List<TransactionTemplate> _templates = new();
 
     private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();
     private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId = new();
@@ -30,6 +31,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
     public IReadOnlyList<Transaction> Transactions => _transactions;
     public IReadOnlyList<Obligation> Obligations => _obligations;
     public IReadOnlyList<CurrencyRate> CurrencyRates => _currencyRates;
+    public IReadOnlyList<TransactionTemplate> Templates => _templates;
 
     public LocalDbService()
     {
@@ -122,6 +124,18 @@ private SqliteConnection Open() // соединение с локальной б
                 CurrencyCode TEXT PRIMARY KEY,
                 RateToBase REAL NOT NULL
             )");    // Курсы валют
+
+        Exec(conn, @"
+            CREATE TABLE IF NOT EXISTS Templates (
+                Id TEXT PRIMARY KEY,
+                Name TEXT NOT NULL,
+                Choice INTEGER NOT NULL,
+                FromAccountId TEXT,
+                ToAccountId TEXT,
+                CategoryId TEXT,
+                Amount REAL NOT NULL DEFAULT 0,
+                Description TEXT NOT NULL DEFAULT ''
+            )");    // Шаблоны
             
         SeedDataIfEmpty(conn);
     }
@@ -259,6 +273,7 @@ private SqliteConnection Open() // соединение с локальной б
         _categories.Clear();
         _transactions.Clear();
         _obligations.Clear();
+        _templates.Clear();
         _currencyRates.Clear();
         _expenseAccountByCategoryId.Clear();
         _incomeAccountByCategoryId.Clear();
@@ -389,6 +404,26 @@ private SqliteConnection Open() // соединение с локальной б
                 {
                     CurrencyCode = r.GetString(r.GetOrdinal("CurrencyCode")),
                     RateToBase = (decimal)r.GetDouble(r.GetOrdinal("RateToBase"))
+                });
+            }
+        }
+
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.CommandText = "SELECT * FROM Templates";
+            using var r = cmd.ExecuteReader();
+            while (r.Read())
+            {
+                _templates.Add(new TransactionTemplate
+                {
+                    Id = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
+                    Name = r.GetString(r.GetOrdinal("Name")),
+                    Choice = (TxKindChoice)r.GetInt32(r.GetOrdinal("Choice")),
+                    FromAccountId = r.IsDBNull(r.GetOrdinal("FromAccountId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("FromAccountId"))),
+                    ToAccountId = r.IsDBNull(r.GetOrdinal("ToAccountId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("ToAccountId"))),
+                    CategoryId = r.IsDBNull(r.GetOrdinal("CategoryId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("CategoryId"))),
+                    Amount = (decimal)r.GetDouble(r.GetOrdinal("Amount")),
+                    Description = r.GetString(r.GetOrdinal("Description"))
                 });
             }
         }
@@ -719,6 +754,35 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
+    public Task AddTemplateAsync(TransactionTemplate template)
+    {
+        using var conn = Open();
+        Exec(conn, @"INSERT INTO Templates (Id, Name, Choice, FromAccountId, ToAccountId, CategoryId, Amount, Description)
+                     VALUES (@Id, @Name, @Choice, @From, @To, @Cat, @Amt, @Desc)",
+            ("@Id", template.Id.ToString()),
+            ("@Name", template.Name),
+            ("@Choice", (int)template.Choice),
+            ("@From", (object?)template.FromAccountId?.ToString() ?? DBNull.Value),
+            ("@To", (object?)template.ToAccountId?.ToString() ?? DBNull.Value),
+            ("@Cat", (object?)template.CategoryId?.ToString() ?? DBNull.Value),
+            ("@Amt", (double)template.Amount),
+            ("@Desc", template.Description));
+
+        _templates.Add(template);
+        RaiseChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteTemplateAsync(Guid id)
+    {
+        using var conn = Open();
+        Exec(conn, "DELETE FROM Templates WHERE Id = @Id", ("@Id", id.ToString()));
+
+        _templates.RemoveAll(t => t.Id == id);
+        RaiseChanged();
+        return Task.CompletedTask;
+    }
+
     public decimal GetRate(string fromCurrency, string toCurrency = "RUB")  // Получение курса валют
     {
         if (fromCurrency == toCurrency) return 1m;
@@ -880,6 +944,7 @@ private SqliteConnection Open() // соединение с локальной б
         _categories.Clear();
         _transactions.Clear();
         _obligations.Clear();
+        _templates.Clear();
         _currencyRates.Clear();
         _expenseAccountByCategoryId.Clear();
         _incomeAccountByCategoryId.Clear();

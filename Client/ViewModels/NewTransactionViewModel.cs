@@ -14,12 +14,14 @@ namespace Client.ViewModels
     {
         private readonly IDataService dataServ;
         private readonly INotificationService _notify;
+        private readonly IInputDialogService _input;
         private readonly Action _onPosted;
 
         public ObservableCollection<Account> Accounts { get; }
         public ObservableCollection<Category> Categories { get; }
         public ObservableCollection<Category> FilteredCategories { get; } = new();
         public ObservableCollection<Obligation> ActiveObligations { get; } = new();
+        public ObservableCollection<TransactionTemplate> Templates { get; } = new();
 
         public DateTimeOffset Date { get; set; } = DateTimeOffset.Now;
         public string Description { get; set; } = "";
@@ -43,10 +45,11 @@ namespace Client.ViewModels
         public bool IsCategoryRequire => IsExpense || IsIncome;
         public bool IsObligationRequire => IsDebtRepayment || IsDebtReceive;
 
-        public NewTransactionViewModel(IDataService data, INotificationService notify, Action onPosted)
+        public NewTransactionViewModel(IDataService data, INotificationService notify, IInputDialogService input, Action onPosted)
         {
             dataServ = data;
             _notify = notify;
+            _input = input;
             _onPosted = onPosted;
 
             Accounts = new ObservableCollection<Account>(dataServ.Accounts.Where(a => a.Type == AccountType.Assets));
@@ -57,7 +60,7 @@ namespace Client.ViewModels
             _category = Categories.FirstOrDefault();
 
             dataServ.DataChanged += OnDataChanged;
-
+            ReloadTemplates();
         }
 
         partial void OnChoiceChanged(TxKindChoice value)
@@ -81,6 +84,64 @@ namespace Client.ViewModels
             ReloadCategories();
             ReloadAccounts();
             ReloadObligations();
+            ReloadTemplates();
+        }
+
+        public void ReloadTemplates()
+        {
+            Templates.Clear();
+            foreach (var t in dataServ.Templates.OrderBy(x => x.Name))
+                Templates.Add(t);
+        }
+
+        [RelayCommand]
+        private async Task SaveAsTemplateAsync()
+        {
+            var name = await _input.PromptAsync("Новый шаблон", "Введите название шаблона:", "Шаблон " + Choice);
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            var template = new TransactionTemplate
+            {
+                Name = name,
+                Choice = Choice,
+                FromAccountId = FromAccount?.Id,
+                ToAccountId = ToAccount?.Id,
+                CategoryId = Category?.Id,
+                Amount = Amount,
+                Description = Description
+            };
+
+            await dataServ.AddTemplateAsync(template);
+            ReloadTemplates();
+            await _notify.ShowInfoAsync("Шаблон сохранен");
+        }
+
+        [RelayCommand]
+        private void ApplyTemplate(TransactionTemplate template)
+        {
+            if (template == null) return;
+
+            Choice = template.Choice;
+            FromAccount = Accounts.FirstOrDefault(a => a.Id == template.FromAccountId) ?? Accounts.FirstOrDefault();
+            ToAccount = Accounts.FirstOrDefault(a => a.Id == template.ToAccountId) ?? Accounts.Skip(1).FirstOrDefault();
+            
+            // ReloadCategories clears and reloads based on Choice, we need to make sure it's done before setting Category
+            ReloadCategories();
+            Category = FilteredCategories.FirstOrDefault(c => c.Id == template.CategoryId) ?? FilteredCategories.FirstOrDefault();
+            
+            Amount = template.Amount;
+            Description = template.Description;
+
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(Description));
+        }
+
+        [RelayCommand]
+        private async Task DeleteTemplateAsync(TransactionTemplate template)
+        {
+            if (template == null) return;
+            await dataServ.DeleteTemplateAsync(template.Id);
+            ReloadTemplates();
         }
 
         private void ResetIrrelevantFields()

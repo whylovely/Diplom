@@ -73,14 +73,14 @@ namespace Client.ViewModels
             JournalVm = new JournalViewModel(_data, _notify);
 
             NewTxVm = new NewTransactionViewModel(
-                _data, 
-                _notify, 
+                _data,
+                _notify,
+                input,
                 onPosted: () =>
             {
                 JournalVm.Refresh();
                 NavigateJournal();
             });
-
             ReportVm = new ReportViewModel(_data, _notify, _settings);
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
             ObligationsVm = new ObligationsViewModel(_data, _notify, _settings, openDebtTx);

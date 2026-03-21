@@ -14,6 +14,7 @@ namespace Client.Services
         IReadOnlyList<Category> Categories { get; }
         IReadOnlyList<Transaction> Transactions { get; }
         IReadOnlyList<Obligation> Obligations { get; }
+        IReadOnlyList<TransactionTemplate> Templates { get; }
 
         void AddAccount(Account account);   // Добавление счета
         void RenameAccount(Guid id, string newName);    // Переименовывание счета
@@ -27,6 +28,9 @@ namespace Client.Services
         Task UpdateObligationAsync(Obligation obligation);  // Изменение обязательства
         Task DeleteObligationAsync(Guid id);    // Удаление обязательства
         Task MarkObligationPaidAsync(Guid id, bool isPaid); // Статус обязательства
+
+        Task AddTemplateAsync(TransactionTemplate template); // Добавление шаблона
+        Task DeleteTemplateAsync(Guid id);                   // Удаление шаблона
 
         Account GetExpenseAccountForCategory(Guid categoryId);  // Возвращение категории расходов
         Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов
