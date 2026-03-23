@@ -138,14 +138,14 @@ public sealed class SyncService
             }
 
             var accountsToPush = uniqueAccounts.Values.Select(a => new AccountDto(
-                a.Id, a.Name, (Shared.Accounts.AccountKind)a.Type, a.CurrencyCode,
-                (Shared.Accounts.MultiCurrencyType)a.AccountMultiType, a.SecondaryCurrencyCode, a.ExchangeRate)).ToList();
+                a.Id, a.Name, (Shared.Accounts.AccountKind)(int)a.Type, a.CurrencyCode,
+                (Shared.Accounts.MultiCurrencyType)(int)a.AccountMultiType, a.SecondaryCurrencyCode, a.ExchangeRate)).ToList();
             
             var categories = _localDb.Categories.Select(c => new CategoryDto(
                 c.Id, c.Name)).ToList();
 
             var obligations = _localDb.Obligations.Select(o => new ObligationDto(
-                o.Id, o.Counterparty, o.Amount, o.Currency, (Shared.Obligations.ObligationType)o.Type,
+                o.Id, o.Counterparty, o.Amount, o.Currency, (Shared.Obligations.ObligationType)(int)o.Type,
                 o.CreatedAt, o.DueDate, o.IsPaid, o.PaidAt, o.Note)).ToList();
 
             var transactions = _localDb.Transactions.Select(t => new TransactionDto(
@@ -154,7 +154,7 @@ public sealed class SyncService
                     e.Id, 
                     accountIdMap.TryGetValue(e.AccountId, out var mappedId) ? mappedId : e.AccountId, // Подменяем ID счета, если он был дубликатом
                     e.CategoryId, 
-                    (Shared.Transactions.EntryDirection)e.Direction,
+                    (Shared.Transactions.EntryDirection)(int)e.Direction,
                     new Shared.Transactions.MoneyDto(e.Amount.Amount, e.Amount.CurrencyCode))).ToList()
             )).ToList();
 
