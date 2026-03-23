@@ -92,6 +92,7 @@ namespace Client.ViewModels
         public bool IsCalendar => SelectedSectionItem?.Value == ReportSelection.Calendar;
 
         public CalendarViewModel CalendarVm { get; }
+        public string BaseCurrencyCode => _settings.BaseCurrency;
 
         partial void OnSelectedSectionItemChanged(SectionItem value)
         {

@@ -137,9 +137,28 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <lvc:CartesianChart Grid.Row="2" Series="{Binding MonthlySeries}"
-                                    XAxes="{Binding XAxes}"
-                                    YAxes="{Binding YAxes}" />
+                <Border Grid.Row="2" Background="#0D1120" CornerRadius="16" Padding="20" Margin="0,0,0,16">
+                    <Grid RowDefinitions="Auto, *">
+                        <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,12">
+                            <TextBlock Text="Помесячная динамика" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Ellipse Width="8" Height="8" Fill="#00E676" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Доходы" FontSize="12" Foreground="#9E9E9E"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Ellipse Width="8" Height="8" Fill="#FF5252" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Расходы" FontSize="12" Foreground="#9E9E9E"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                        <lvc:CartesianChart Grid.Row="1" Series="{Binding MonthlySeries}"
+                                            XAxes="{Binding XAxes}"
+                                            YAxes="{Binding YAxes}"
+                                            MinHeight="300"
+                                            TooltipPosition="Top" />
+                    </Grid>
+                </Border>
             </Grid> 
 
             <!-- ══ ACCOUNTS TURNOVER ══════════════════════════ -->
@@ -204,7 +223,21 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" />
+                <Border Grid.Row="2" Background="#151A2E" CornerRadius="20" Padding="20" Margin="0,0,0,16">
+                    <Grid RowDefinitions="Auto, Auto, *">
+                        <StackPanel Spacing="4" Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#9E9E9E" Width="16" Height="16" Stretch="Uniform"/>
+                                <TextBlock Text="Топ расходов" FontSize="14" Foreground="#9E9E9E"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding TopExpensesSum, StringFormat={}{0:N2}}" FontFamily="Fira Code, Consolas, monospace" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#9E9E9E" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" MinHeight="250" TooltipPosition="Center" LegendPosition="Bottom" />
+                    </Grid>
+                </Border>
             </Grid>
 
             <!-- ══ INCOME TOP ═════════════════════════════════ -->
@@ -237,7 +270,21 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" />
+                <Border Grid.Row="2" Background="#151A2E" CornerRadius="20" Padding="20" Margin="0,0,0,16">
+                    <Grid RowDefinitions="Auto, Auto, *">
+                        <StackPanel Spacing="4" Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#9E9E9E" Width="16" Height="16" Stretch="Uniform"/>
+                                <TextBlock Text="Топ доходов" FontSize="14" Foreground="#9E9E9E"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding TopIncomesSum, StringFormat={}{0:N2}}" FontFamily="Fira Code, Consolas, monospace" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#9E9E9E" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" MinHeight="250" TooltipPosition="Center" LegendPosition="Bottom" />
+                    </Grid>
+                </Border>
             </Grid>
 
             <!-- ══ EXPENSE BY CATEGORY ════════════════════════ -->

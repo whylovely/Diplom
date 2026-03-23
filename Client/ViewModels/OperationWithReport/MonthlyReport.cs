@@ -70,11 +70,54 @@ namespace Client.ViewModels
             var incomeValues = MonthlyRows.Select(r => r.Income).ToArray();
             var expenseValues = MonthlyRows.Select(r => r.Expense).ToArray();
 
-            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Доходы", Values = incomeValues });
-            MonthlySeries.Add(new ColumnSeries<decimal> { Name = "Расходы", Values = expenseValues });
+            // Income — green area line
+            var incomeGreen = SkiaSharp.SKColor.Parse("#00E676");
+            MonthlySeries.Add(new LineSeries<decimal>
+            {
+                Name = "Доходы",
+                Values = incomeValues,
+                Stroke = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen, 2),
+                Fill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen.WithAlpha(60)),
+                GeometrySize = 8,
+                GeometryStroke = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen, 2),
+                GeometryFill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen),
+                LineSmoothness = 0
+            });
 
-            XAxes = new[] { new Axis { Labels = MonthlyLabels.ToArray() } };
-            YAxes = new[] { new Axis() };
+            // Expenses — red area line
+            var expenseRed = SkiaSharp.SKColor.Parse("#FF5252");
+            MonthlySeries.Add(new LineSeries<decimal>
+            {
+                Name = "Расходы",
+                Values = expenseValues,
+                Stroke = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed, 2),
+                Fill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed.WithAlpha(60)),
+                GeometrySize = 8,
+                GeometryStroke = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed, 2),
+                GeometryFill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed),
+                LineSmoothness = 0
+            });
+
+            var gridColor = SkiaSharp.SKColor.Parse("#222845");
+            var labelColor = SkiaSharp.SKColor.Parse("#9E9E9E");
+
+            XAxes = new[]
+            {
+                new Axis
+                {
+                    Labels = MonthlyLabels.ToArray(),
+                    LabelsPaint = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(labelColor),
+                    SeparatorsPaint = null // no vertical grid lines
+                }
+            };
+            YAxes = new[]
+            {
+                new Axis
+                {
+                    LabelsPaint = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(labelColor),
+                    SeparatorsPaint = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(gridColor, 1)
+                }
+            };
         }
     }
 }

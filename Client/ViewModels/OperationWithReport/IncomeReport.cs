@@ -132,8 +132,25 @@ namespace Client.ViewModels
             TopIncomesShare = Math.Round((TopIncomesSum / TotalIncome) * 100m, 2);
 
             IncomePieSeries.Clear();
+            var colors = new[] { "#B9F6CA", "#FF9E80", "#80D8FF", "#EA80FC", "#FFD180", "#FFAB91", "#CE93D8", "#80CBC4" };
+            int i = 0;
             foreach (var r in IncomeShareRows)
-                IncomePieSeries.Add(new PieSeries<decimal> { Values = new[] { r.Total }, Name = r.CategoryName });
+            {
+                var hex = colors[i % colors.Length];
+                var skColor = SkiaSharp.SKColor.Parse(hex);
+                IncomePieSeries.Add(new PieSeries<decimal>
+                {
+                    Values = new[] { r.Total },
+                    Name = r.CategoryName,
+                    InnerRadius = 50,
+                    MaxRadialColumnWidth = 20,
+                    HoverPushout = 0,
+                    Pushout = 2,
+                    Stroke = null,
+                    Fill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(skColor)
+                });
+                i++;
+            }
         }
     }
 }
