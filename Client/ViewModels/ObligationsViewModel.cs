@@ -21,8 +21,12 @@ public partial class ObligationsViewModel : ViewModelBase
     private readonly Action<Obligation> _onPayDebt;
 
     public ObservableCollection<Obligation> Items { get; } = new();
+    public ObservableCollection<Obligation> FilteredItems { get; } = new();
 
     [ObservableProperty] private Obligation? _selectedItem;
+
+    [ObservableProperty] private bool _isDebtTab = true;
+    [ObservableProperty] private bool _isCreditTab;
 
     [ObservableProperty] private bool _showPaid;
 
@@ -47,14 +51,21 @@ public partial class ObligationsViewModel : ViewModelBase
     }
 
     partial void OnShowPaidChanged(bool value) => Refresh();
+    partial void OnIsDebtTabChanged(bool value) { if(value) Refresh(); }
+    partial void OnIsCreditTabChanged(bool value) { if(value) Refresh(); }
 
     private void Refresh()
     {
         Items.Clear();
+        FilteredItems.Clear();
         var all = _data.Obligations;
 
-        var filtered = all.Where(o => ShowPaid || !o.IsPaid).OrderBy(o => o.DueDate).ToList();
-        foreach (var item in filtered) Items.Add(item);
+        var activeOrPaidItems = all.Where(o => ShowPaid || !o.IsPaid).OrderBy(o => o.DueDate).ToList();
+        foreach (var item in activeOrPaidItems) Items.Add(item);
+
+        var currentTabType = IsDebtTab ? ObligationType.Debt : ObligationType.Credit;
+        var tabItems = activeOrPaidItems.Where(o => o.Type == currentTabType).ToList();
+        foreach (var item in tabItems) FilteredItems.Add(item);
 
         TotalDebt = all.Where(o => o.Type == ObligationType.Debt && !o.IsPaid)
         .Sum(o => o.Amount * _data.GetRate(o.Currency, _settings.BaseCurrency));
@@ -74,12 +85,13 @@ public partial class ObligationsViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task EditAsync()
+    [RelayCommand]
+    private async Task EditAsync(Obligation? ob)
     {
-        if (SelectedItem is null) return;
+        var target = ob ?? SelectedItem;
+        if (target is null) return;
         
-        var dialog = new AddObligationDialog(SelectedItem);
+        var dialog = new AddObligationDialog(target);
         var result = await dialog.ShowDialog<Obligation?>(GetWindow());
         if (result != null)
         {
@@ -97,15 +109,16 @@ public partial class ObligationsViewModel : ViewModelBase
         throw new InvalidOperationException("Desktop lifetime is null");
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task DeleteAsync()
+    [RelayCommand]
+    private async Task DeleteAsync(Obligation? ob)
     {
-        if (SelectedItem is null) return;
+        var target = ob ?? SelectedItem;
+        if (target is null) return;
 
-        var confirmed = await _notify.ShowConfirmAsync($"Удалить обязательство с {SelectedItem.Counterparty}?");
+        var confirmed = await _notify.ShowConfirmAsync($"Удалить обязательство с {target.Counterparty}?");
         if (confirmed)
         {
-            try { await _data.DeleteObligationAsync(SelectedItem.Id); }
+            try { await _data.DeleteObligationAsync(target.Id); }
             catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
         }
     }
@@ -120,11 +133,12 @@ public partial class ObligationsViewModel : ViewModelBase
         catch (Exception ex) { await _notify.ShowErrorAsync(ex.Message); }
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private void PayDebt()  // открытие окна для погашения
+    [RelayCommand]
+    private void PayDebt(Obligation? ob)  // открытие окна для погашения
     {
-        if (SelectedItem == null) return;
-        _onPayDebt(SelectedItem);
+        var target = ob ?? SelectedItem;
+        if (target == null) return;
+        _onPayDebt(target);
     }
 
     private bool HasSelection => SelectedItem is not null;

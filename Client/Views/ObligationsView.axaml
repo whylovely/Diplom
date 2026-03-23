@@ -3,112 +3,259 @@
              xmlns:vm="using:Client.ViewModels"
              x:Class="Client.Views.ObligationsView"
              x:DataType="vm:ObligationsViewModel">
-  
+             
+  <UserControl.Styles>
+    <!-- Segmented Control Button Style -->
+    <Style Selector="RadioButton.segment">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#9E9E9E" />
+      <Setter Property="Padding" Value="16,8" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}" 
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <TextBlock Text="{TemplateBinding Content}" 
+                       Foreground="{TemplateBinding Foreground}"
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       FontWeight="SemiBold" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.segment:checked">
+      <Setter Property="Background" Value="#151A2E" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="RadioButton.segment:pointerover /template/ Border">
+      <Setter Property="Background" Value="#1C223A" />
+    </Style>
+
+    <!-- Invisible toggle button style for the card header -->
+    <Style Selector="ToggleButton.cardHeader">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ToggleButton.cardHeader:pointerover /template/ Border">
+      <Setter Property="Background" Value="#1C223A" />
+    </Style>
+  </UserControl.Styles>
+
   <Grid RowDefinitions="Auto,*">
-    <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
-
-      <TextBlock Text="Обязательства" Classes="heading"/>
-
-      <Border Classes="cardSmall">
-        <StackPanel Orientation="Horizontal" Spacing="10">
+    
+    <!-- Top section -->
+    <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,8">
+      
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Text="Обязательства" Classes="heading" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+          <CheckBox IsChecked="{Binding ShowPaid}" Content="Показывать оплаченные" VerticalAlignment="Center" Margin="0,0,14,0"/>
           <Button Content="＋ Добавить" Classes="accent" Command="{Binding AddCommand}" Width="130" />
-          <CheckBox IsChecked="{Binding ShowPaid}" Content="Показывать оплаченные" VerticalAlignment="Center" Margin="14,0"/>
         </StackPanel>
-      </Border>
-
+      </Grid>
+      
+      <!-- Balances Summary -->
       <Grid ColumnDefinitions="*,*" Margin="0,0,0,4">
-        <Border Classes="cardSmall" Margin="0,0,8,0">
+        <Border Classes="cardSmall" Margin="0,0,8,0" Background="#151A2E" CornerRadius="16" BorderBrush="#222845" BorderThickness="1" Padding="20">
           <StackPanel Spacing="4">
-            <TextBlock Text="Я должен" Classes="dim"/>
+            <TextBlock Text="Мой долг" Classes="dim" FontSize="14"/>
             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-              <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Classes="moneyRed heroBalance" FontSize="36"/>
+              <TextBlock Text="{Binding TotalDebt, StringFormat={}{0:N2}}" Foreground="#FF5252" FontSize="32" FontWeight="Bold"/>
               <TextBlock Text="{Binding BaseCurrencyCode}" Classes="dim" FontSize="16" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border Grid.Column="1" Classes="cardSmall" Margin="8,0,0,0">
+        
+        <Border Grid.Column="1" Classes="cardSmall" Margin="8,0,0,0" Background="#151A2E" CornerRadius="16" BorderBrush="#222845" BorderThickness="1" Padding="20">
           <StackPanel Spacing="4">
-            <TextBlock Text="Мне должны" Classes="dim"/>
+            <TextBlock Text="Мне должны" Classes="dim" FontSize="14"/>
             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-              <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Classes="moneyGreen heroBalance" FontSize="36"/>
+              <TextBlock Text="{Binding TotalCredit, StringFormat={}{0:N2}}" Foreground="#00E676" FontSize="32" FontWeight="Bold"/>
               <TextBlock Text="{Binding BaseCurrencyCode}" Classes="dim" FontSize="16" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
             </StackPanel>
           </StackPanel>
         </Border>
       </Grid>
+      
+      <!-- Segmented Control -->
+      <Border Background="#0D1120" CornerRadius="8" Padding="4" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="0">
+          <RadioButton Content="Я должен" Classes="segment" GroupName="Tabs" Width="200"
+                       IsChecked="{Binding IsDebtTab}" />
+          <RadioButton Content="Мне должны" Classes="segment" GroupName="Tabs" Width="200"
+                       IsChecked="{Binding IsCreditTab}" />
+        </StackPanel>
+      </Border>
+      
     </StackPanel>
 
-    <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" 
-              SelectedItem="{Binding SelectedItem}"
-              AutoGenerateColumns="False" 
-              IsReadOnly="True" 
-              BorderThickness="0"
-              Background="Transparent"
-              GridLinesVisibility="Horizontal">
-              
-      <DataGrid.ContextMenu>
-        <ContextMenu>
-          <MenuItem Header="Погасить долг" Command="{Binding PayDebtCommand}"/>
-          <Separator/>
-          <MenuItem Header="Изменить" Command="{Binding EditCommand}"/>
-          <MenuItem Header="Переключить статус" Command="{Binding MarkPaidCommand}"/>
-          <Separator/>
-          <MenuItem Header="Удалить" Command="{Binding DeleteCommand}" Foreground="#FF5252"/>
-        </ContextMenu>
-      </DataGrid.ContextMenu>
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="200" />
-            
-            <DataGridTemplateColumn Header="Сумма" Width="120">
-              <DataTemplate>
-                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
-                  <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" Classes="amount" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding Currency}" Classes="amount" Foreground="#9E9E9E" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                </StackPanel>
-              </DataTemplate>
-            </DataGridTemplateColumn>
+    <!-- Cards List -->
+    <ScrollViewer Grid.Row="1" Margin="0,8,0,0">
+      <ItemsControl ItemsSource="{Binding FilteredItems}">
+        
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Background="#151A2E" CornerRadius="16" BorderBrush="#222845" BorderThickness="1" Margin="0,0,0,12" ClipToBounds="True">
+              <StackPanel>
+                
+                <!-- Toggle Header -->
+                <ToggleButton x:Name="ExpandToggle" Classes="cardHeader">
+                  <Grid ColumnDefinitions="Auto, *, Auto, Auto" Height="40">
+                    <!-- Avatar / Icon -->
+                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#222845" Margin="0,0,16,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Counterparty}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Foreground="#D8D8D8" MaxWidth="12" ClipToBounds="True"/>
+                    </Border>
+                    
+                    <!-- Info -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Counterparty}" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                      <TextBlock Text="{Binding Note}" FontSize="13" Foreground="#9E9E9E" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    
+                    <!-- Amount -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,16,0">
+                      <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding Amount, StringFormat={}{0:N2}}" 
+                                   FontFamily="Fira Code, Consolas, monospace" FontSize="16" FontWeight="Bold">
+                          <TextBlock.Styles>
+                            <Style Selector="TextBlock">
+                              <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Style>
+                            <Style Selector="TextBlock[Tag=Мне должны]">
+                              <Setter Property="Foreground" Value="#00E676" />
+                            </Style>
+                            <Style Selector="TextBlock[Tag=Я должен]">
+                              <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Style>
+                          </TextBlock.Styles>
+                          <!-- Tag hack for styling based on label -->
+                          <TextBlock.Tag>
+                            <Binding Path="TypeLabel" />
+                          </TextBlock.Tag>
+                        </TextBlock>
+                        <TextBlock Text="{Binding Currency}" FontSize="14" Foreground="#9E9E9E" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Chevron -->
+                    <Path Grid.Column="3" VerticalAlignment="Center" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" Fill="#9E9E9E" Width="20" Height="20" Stretch="Uniform"/>
+                  </Grid>
+                </ToggleButton>
+                
+                <!-- Body (Visible when Expanded) -->
+                <Border IsVisible="{Binding #ExpandToggle.IsChecked}" Background="#0D1120" Padding="16">
+                  <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto">
+                    
+                    <!-- Payment Info -->
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                      <TextBlock Text="Срок" FontSize="12" Foreground="#9E9E9E" Margin="0,0,0,4"/>
+                      <TextBlock Text="{Binding DueDate, StringFormat={}{0:dd MMM yyyy}}" FontFamily="Fira Code, monospace" Foreground="#D8D8D8" FontSize="14"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1">
+                      <TextBlock Text="Статус" FontSize="12" Foreground="#9E9E9E" Margin="0,0,0,4"/>
+                      <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <!-- Status Dot -->
+                        <Ellipse Width="8" Height="8">
+                          <Ellipse.Styles>
+                            <Style Selector="Ellipse">
+                              <Setter Property="Fill" Value="#9E9E9E"/> <!-- default active -->
+                            </Style>
+                            <Style Selector="Ellipse[Tag=Погашено]">
+                              <Setter Property="Fill" Value="#9E9E9E"/> 
+                            </Style>
+                            <Style Selector="Ellipse[Tag=Просрочено]">
+                              <Setter Property="Fill" Value="#FF5252"/>
+                            </Style>
+                            <Style Selector="Ellipse[Tag=Активно]">
+                              <Setter Property="Fill" Value="#00E676"/>
+                            </Style>
+                          </Ellipse.Styles>
+                          <Ellipse.Tag>
+                             <Binding Path="StatusLabel"/>
+                          </Ellipse.Tag>
+                        </Ellipse>
+                        
+                        <!-- Status Text -->
+                        <TextBlock Text="{Binding StatusLabel}" FontSize="14">
+                          <TextBlock.Styles>
+                            <Style Selector="TextBlock[Text=Погашено]">
+                              <Setter Property="Foreground" Value="#9E9E9E"/>
+                              <Setter Property="TextDecorations" Value="Strikethrough"/>
+                            </Style>
+                            <Style Selector="TextBlock[Text=Просрочено]">
+                              <Setter Property="Foreground" Value="#FF5252"/>
+                            </Style>
+                            <Style Selector="TextBlock[Text=Активно]">
+                              <Setter Property="Foreground" Value="#00E676"/>
+                            </Style>
+                            <Style Selector="TextBlock[Text='Подходит срок']">
+                              <Setter Property="Foreground" Value="#FFA000"/>
+                            </Style>
+                          </TextBlock.Styles>
+                        </TextBlock>
+                      </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Actions -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                      <Button Content="Погасить" 
+                              Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).PayDebtCommand}"
+                              CommandParameter="{Binding}"
+                              Background="#29B6F6" Foreground="#FFFFFF" Padding="12,6" CornerRadius="6"
+                              IsVisible="{Binding !IsPaid}"/>
+                      <Button Content="Статус" 
+                              Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).MarkPaidCommand}"
+                              CommandParameter="{Binding}"
+                              Background="#222845" Foreground="#FFFFFF" Padding="12,6" CornerRadius="6"
+                              IsVisible="{Binding !IsPaid}"/>
+                      <Button Content="Статус" 
+                              Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).MarkPaidCommand}"
+                              CommandParameter="{Binding}"
+                              Background="Transparent" Foreground="#9E9E9E" Padding="12,6" CornerRadius="6"
+                              IsVisible="{Binding IsPaid}"/>
+                      <Button Content="Изменить" 
+                              Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).EditCommand}"
+                              CommandParameter="{Binding}"
+                              Background="Transparent" Foreground="#29B6F6" Padding="12,6" CornerRadius="6"/>
+                      <Button Content="Удалить" 
+                              Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).DeleteCommand}"
+                              CommandParameter="{Binding}"
+                              Background="Transparent" Foreground="#FF5252" Padding="12,6" CornerRadius="6"/>
+                    </StackPanel>
+                    
+                  </Grid>
+                </Border>
+                
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        
+      </ItemsControl>
+    </ScrollViewer>
 
-            <DataGridTextColumn Header="Тип" Binding="{Binding TypeLabel}" Width="100" />
-            <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120" FontFamily="Fira Code, Consolas, monospace" />
-            
-            <DataGridTemplateColumn Header="Статус" Width="140">
-              <DataTemplate>
-                <StackPanel Orientation="Horizontal" Spacing="8" Background="Transparent">
-                  <CheckBox IsChecked="{Binding IsPaid, Mode=OneWay}" 
-                            Command="{Binding $parent[UserControl].((vm:ObligationsViewModel)DataContext).MarkPaidCommand}"
-                            CommandParameter="{Binding}"
-                            VerticalAlignment="Center"/>
-                  <TextBlock Text="{Binding StatusLabel}" VerticalAlignment="Center">
-                    <TextBlock.Styles>
-                      <Style Selector="TextBlock[Text=Погашено]">
-                        <Setter Property="Foreground" Value="#9E9E9E"/>
-                      </Style>
-                      <Style Selector="TextBlock[Text=Просрочено]">
-                        <Setter Property="Foreground" Value="#FF5252"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                      </Style>
-                      <Style Selector="TextBlock[Text=Активно]">
-                        <Setter Property="Foreground" Value="#00E676"/>
-                      </Style>
-                      <Style Selector="TextBlock[Text='Подходит срок']">
-                        <Setter Property="Foreground" Value="#FFA000"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                      </Style>
-                    </TextBlock.Styles>
-                  </TextBlock>
-                </StackPanel>
-              </DataTemplate>
-            </DataGridTemplateColumn>
-            
-            <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*" />
-          </DataGrid.Columns>
-    </DataGrid>
-
+    <!-- Empty State -->
     <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
-                IsVisible="{Binding !Items.Count}">
+                IsVisible="{Binding !FilteredItems.Count}">
       <Path Data="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M11,19.93C7.05,19.43 4,16.05 4,12C4,7.95 7.05,4.57 11,4.07V19.93M13,4.07C16.95,4.57 20,7.95 20,12C20,16.05 16.95,19.43 13,19.93V4.07Z" 
             Fill="#9E9E9E" Opacity="0.15" Width="120" Height="120" Stretch="Uniform" HorizontalAlignment="Center"/>
       <TextBlock Text="Список обязательств пуст..." Classes="dim" FontSize="16" HorizontalAlignment="Center"/>
     </StackPanel>
+    
   </Grid>
 </UserControl>
