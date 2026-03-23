@@ -19,6 +19,7 @@ namespace Client.ViewModels
         [ObservableProperty] private bool _isMenuOpen;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsDashboardActive))]
         [NotifyPropertyChangedFor(nameof(IsAccountsActive))]
         [NotifyPropertyChangedFor(nameof(IsCategoriesActive))]
         [NotifyPropertyChangedFor(nameof(IsJournalActive))]
@@ -27,8 +28,9 @@ namespace Client.ViewModels
         [NotifyPropertyChangedFor(nameof(IsNewTransactionActive))]
         [NotifyPropertyChangedFor(nameof(IsSettingsActive))]
         [NotifyPropertyChangedFor(nameof(IsCurrenciesActive))]
-        private string _activePage = "Accounts";
+        private string _activePage = "Dashboard";
 
+        public bool IsDashboardActive => ActivePage == "Dashboard";
         public bool IsAccountsActive => ActivePage == "Accounts";
         public bool IsCategoriesActive => ActivePage == "Categories";
         public bool IsJournalActive => ActivePage == "Journal";
@@ -38,6 +40,7 @@ namespace Client.ViewModels
         public bool IsSettingsActive => ActivePage == "Settings";
         public bool IsCurrenciesActive => ActivePage == "Currencies";
 
+        public DashboardViewModel DashboardVm { get; }
         public AccountsViewModel AccountsVm { get; }
         public JournalViewModel JournalVm { get; }
         public NewTransactionViewModel NewTxVm { get; }
@@ -59,6 +62,8 @@ namespace Client.ViewModels
             var input = new InputDialogService();
             var apiService = new ApiService(_settings);
             var syncService = new SyncService(apiService, (LocalDbService)_data);
+
+            DashboardVm = new DashboardViewModel(_data, _settings);
 
             AccountsVm = new AccountsViewModel(
                 _data, 
@@ -102,7 +107,7 @@ namespace Client.ViewModels
                 NavigateCurrencies();
             };
 
-            _current = AccountsVm;
+            _current = DashboardVm;
         }
 
         public async Task OnWindowLoaded()
@@ -189,6 +194,7 @@ namespace Client.ViewModels
 
         [RelayCommand] private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
 
+        [RelayCommand] private void NavigateDashboard() { Current = DashboardVm; ActivePage = "Dashboard"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateAccounts() { Current = AccountsVm; ActivePage = "Accounts"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateJournal() { Current = JournalVm; ActivePage = "Journal"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateNewTransaction() { Current = NewTxVm; ActivePage = "NewTransaction"; IsMenuOpen = false; }

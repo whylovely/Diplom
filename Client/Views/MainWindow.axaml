@@ -14,6 +14,9 @@
   </Window.DataContext>
 
   <Window.DataTemplates>
+    <DataTemplate DataType="vm:DashboardViewModel">
+      <views:DashboardView/>
+    </DataTemplate>
     <DataTemplate DataType="vm:AccountsViewModel">
       <views:AccountsView/>
     </DataTemplate>
@@ -106,6 +109,16 @@
             <!-- Section label -->
             <TextBlock Text="НАВИГАЦИЯ" FontSize="10" FontWeight="Bold" Foreground="#55D8D8D8"
                        Margin="14,4,0,8" LetterSpacing="2"/>
+
+            <!-- 0. Главная -->
+            <Button Command="{Binding NavigateDashboardCommand}"
+                    Classes="menuItem" Classes.menuItemActive="{Binding IsDashboardActive}">
+              <StackPanel Orientation="Horizontal" Spacing="14">
+                <Path Data="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"
+                      Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" VerticalAlignment="Center"/>
+                <TextBlock Text="Главная" FontSize="14" FontWeight="Medium" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
 
             <!-- 1. Счета -->
             <Button Command="{Binding NavigateAccountsCommand}"
