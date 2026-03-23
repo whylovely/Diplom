@@ -22,14 +22,9 @@ namespace Client.ViewModels
         {
             get
             {
-                return Accounts.Sum(a => 
-                {
-                    var primary = a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency);
-                    var secondary = a.IsMultiCurrency && !string.IsNullOrEmpty(a.SecondaryCurrencyCode)
-                        ? a.SecondaryBalance * _data.GetRate(a.SecondaryCurrencyCode, _settings.BaseCurrency)
-                        : 0;
-                    return primary + secondary;
-                });
+                // Складываем только баланс в основной валюте каждого счета, переведенный в базовую валюту.
+                // Вторичный баланс - это лишь представление для UI, он не должен прибавляться.
+                return Accounts.Sum(a => a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency));
             }
         }
 
@@ -44,6 +39,19 @@ namespace Client.ViewModels
 
         public void Refresh()
         {
+            // Обновляем вторичный баланс для всех мультивалютных счетов в группе
+            foreach (var a in Accounts)
+            {
+                if (a.IsMultiCurrency && !string.IsNullOrEmpty(a.SecondaryCurrencyCode))
+                {
+                    a.SecondaryBalance = a.Balance * _data.GetRate(a.CurrencyCode, a.SecondaryCurrencyCode);
+                }
+                else
+                {
+                    a.SecondaryBalance = 0;
+                }
+            }
+
             OnPropertyChanged(nameof(TotalBalance));
             OnPropertyChanged(nameof(Name));
         }

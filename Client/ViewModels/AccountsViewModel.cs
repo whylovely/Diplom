@@ -139,6 +139,9 @@ namespace Client.ViewModels
             if (noGroupVm.Accounts.Count == 0)
                 Groups.Remove(noGroupVm);
 
+            // Обновляем все группы, чтобы рассчитались вторичные балансы
+            foreach (var g in Groups) g.Refresh();
+
             OnPropertyChanged(nameof(TotalBalance));
             IsLoading = false;
         }
