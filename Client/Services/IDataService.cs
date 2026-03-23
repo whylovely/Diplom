@@ -38,6 +38,8 @@ namespace Client.Services
         Task UpdateAccountGroupAsync(AccountGroup group);    // Обновление группы счетов
         Task DeleteAccountGroupAsync(Guid id);              // Удаление группы счетов
 
+        void UpdateAccountsBaseCurrency(string newBaseCurrency); // Обновление типа счетов при смене базовой валюты
+
         Account GetExpenseAccountForCategory(Guid categoryId);  // Возвращение категории расходов
         Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов
 

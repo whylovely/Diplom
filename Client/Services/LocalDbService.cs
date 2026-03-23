@@ -531,9 +531,54 @@ private SqliteConnection Open() // соединение с локальной б
 
         using var conn = Open();
         Exec(conn, "UPDATE Accounts SET Name = @Name, UpdatedAt = @Updated WHERE Id = @Id",
-            ("@Name", acc.Name), ("@Updated", acc.UpdatedAt.ToString("O")), ("@Id", id.ToString()));
+            ("@Name", acc.Name), ("@Updated", acc.UpdatedAt.ToString("O")), ("@Id", acc.Id.ToString()));
 
         RaiseChanged();
+    }
+
+    public void UpdateAccountsBaseCurrency(string newBaseCurrency) // Обновление типа счетов при смене базовой валюты
+    {
+        using var conn = Open();
+        using var tran = conn.BeginTransaction();
+        bool changed = false;
+
+        foreach (var acc in _accounts)
+        {
+            if (acc.Type != AccountType.Assets) continue;
+
+            if (acc.CurrencyCode != newBaseCurrency)
+            {
+                if (!acc.IsMultiCurrency || acc.SecondaryCurrencyCode != newBaseCurrency)
+                {
+                    acc.IsMultiCurrency = true;
+                    acc.SecondaryCurrencyCode = newBaseCurrency;
+                    changed = true;
+
+                    Exec(conn, "UPDATE Accounts SET AccountMultiType = @Multi, SecondaryCurrencyCode = @Sec, UpdatedAt = @Updated WHERE Id = @Id",
+                        ("@Multi", (int)acc.AccountMultiType),
+                        ("@Sec", acc.SecondaryCurrencyCode),
+                        ("@Updated", DateTimeOffset.Now.ToString("O")),
+                        ("@Id", acc.Id.ToString()));
+                }
+            }
+            else
+            {
+                if (acc.IsMultiCurrency)
+                {
+                    acc.IsMultiCurrency = false;
+                    acc.SecondaryCurrencyCode = null;
+                    changed = true;
+
+                    Exec(conn, "UPDATE Accounts SET AccountMultiType = @Multi, SecondaryCurrencyCode = NULL, UpdatedAt = @Updated WHERE Id = @Id",
+                        ("@Multi", (int)acc.AccountMultiType),
+                        ("@Updated", DateTimeOffset.Now.ToString("O")),
+                        ("@Id", acc.Id.ToString()));
+                }
+            }
+        }
+
+        tran.Commit();
+        if (changed) RaiseChanged();
     }
 
     public void RemoveAccount(Guid id)  // soft-delete счета

@@ -84,7 +84,7 @@ namespace Client.ViewModels
             ReportVm = new ReportViewModel(_data, _notify, _settings);
             CategoriesVm = new CategoriesViewModel(_data, _notify, catDialog);
             ObligationsVm = new ObligationsViewModel(_data, _notify, _settings, openDebtTx);
-            SettingsVm = new SettingsViewModel(_settings);
+            SettingsVm = new SettingsViewModel(_data, _settings);
             CurrenciesVm = new CurrenciesViewModel(_data, _settings);
 
             SettingsVm.OnLogoutRequested += async () =>
@@ -128,6 +128,7 @@ namespace Client.ViewModels
                 vm.OnConfirmed += (currency) =>
                 {
                     _settings.BaseCurrency = currency;
+                    _data.UpdateAccountsBaseCurrency(currency);
                     _settings.CompleteFirstRun();
                     dialog.Close();
                 };

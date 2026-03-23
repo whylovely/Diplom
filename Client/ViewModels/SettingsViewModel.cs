@@ -10,6 +10,7 @@ namespace Client.ViewModels
 {
     public partial class SettingsViewModel : ViewModelBase
     {
+        private readonly IDataService _data;
         private readonly SettingsService _settingsService;
 
         public event Action? OnLogoutRequested;
@@ -28,14 +29,16 @@ namespace Client.ViewModels
                 if (SetProperty(ref _selectedCurrency, value) && value != null)
                 {
                     _settingsService.BaseCurrency = value;
+                    _data.UpdateAccountsBaseCurrency(value);
                 }
             }
         }
 
         public bool HasFavorites => FavoriteCurrencies.Count > 0;
 
-        public SettingsViewModel(SettingsService settingsService)
+        public SettingsViewModel(IDataService data, SettingsService settingsService)
         {
+            _data = data;
             _settingsService = settingsService;
             LoadFavorites();
             
