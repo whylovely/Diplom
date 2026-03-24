@@ -18,6 +18,7 @@ namespace Client.ViewModels
         private readonly IDataService _data;
         private readonly INotificationService _notify;
         private readonly SettingsService _settings;
+        private bool _isRefreshing;
 
         public ReportViewModel(IDataService data, INotificationService notify, SettingsService settings)
         {
@@ -34,15 +35,17 @@ namespace Client.ViewModels
             Refresh();
         }
 
-        partial void OnTopNChanged(int value)
+        partial void OnTopNChanged(int oldValue, int newValue)
         {
-            if (value < 1) TopN = 1;
+            if (newValue < 1) TopN = 1;
             Refresh();
         }
 
         [RelayCommand]
         public void Refresh()
         {
+            if (_isRefreshing) return;
+            _isRefreshing = true;
             try
             {
                 RefreshSummary();
@@ -57,6 +60,10 @@ namespace Client.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[ReportViewModel] Refresh error: {ex.Message}");
+            }
+            finally
+            {
+                _isRefreshing = false;
             }
         }
 
@@ -94,7 +101,7 @@ namespace Client.ViewModels
         public CalendarViewModel CalendarVm { get; }
         public string BaseCurrencyCode => _settings.BaseCurrency;
 
-        partial void OnSelectedSectionItemChanged(SectionItem value)
+        partial void OnSelectedSectionItemChanged(SectionItem? oldValue, SectionItem newValue)
         {
             OnPropertyChanged(nameof(SelectedTitle));
             OnPropertyChanged(nameof(SelectedSection));
@@ -111,8 +118,13 @@ namespace Client.ViewModels
         //
 
         // Подсчет Расходов и Доходов
-        [ObservableProperty] private DateTimeOffset _dateFrom = DateTimeOffset.Now.AddMonths(-1);
-        [ObservableProperty] private DateTimeOffset _dateTo = DateTimeOffset.Now;
+        [ObservableProperty] private DateTimeOffset? _dateFrom = DateTimeOffset.Now.AddMonths(-1);
+        partial void OnDateFromChanged(DateTimeOffset? oldValue, DateTimeOffset? newValue) => Refresh();
+
+        [ObservableProperty] private DateTimeOffset? _dateTo = DateTimeOffset.Now;
+        partial void OnDateToChanged(DateTimeOffset? oldValue, DateTimeOffset? newValue) => Refresh();
+
+
         [ObservableProperty] private decimal _totalExpense;
         [ObservableProperty] private decimal _net;
         public ObservableCollection<CategoryShareRow> ExpenseRows { get; } = new();
@@ -122,7 +134,7 @@ namespace Client.ViewModels
         [RelayCommand]
         public void RefreshSummary()
         {
-            TotalExpense = ExpenseReport.RefreshExpenseRows(_data, DateFrom, DateTo, ExpenseRows);
+            TotalExpense = ExpenseReport.RefreshExpenseRows(_data, _settings, DateFrom, DateTo, ExpenseRows);
             TotalIncome = IncomeReport.RefreshIncomeRows(_data, _settings, DateFrom, DateTo, IncomeRows);
             Net = TotalIncome - TotalExpense;
         }
@@ -132,7 +144,7 @@ namespace Client.ViewModels
         public ObservableCollection<CategoryDetailGroup> ExpenseGroups { get; } = new();
 
         [RelayCommand]
-        public void RefreshExpenseCategory() => ExpenseReport.RefreshExpenseGroups(_data, DateFrom, DateTo, ExpenseGroups);
+        public void RefreshExpenseCategory() => ExpenseReport.RefreshExpenseGroups(_data, _settings, DateFrom, DateTo, ExpenseGroups);
         //
 
         // Группировка доходов по категориям с детализацией по дням
@@ -191,7 +203,7 @@ namespace Client.ViewModels
 
         // Обновление баланса на дату
         public ObservableCollection<AccountBalanceRow> BalanceRows { get; } = new();
-        partial void OnBalanceDateChanged(DateTimeOffset value) => RefreshBalance();
+        partial void OnBalanceDateChanged(DateTimeOffset oldValue, DateTimeOffset newValue) => RefreshBalance();
         [ObservableProperty] private DateTimeOffset _balanceDate = DateTimeOffset.Now;
         [ObservableProperty] private decimal _totalAssetsAtDate;
 
@@ -209,23 +221,24 @@ namespace Client.ViewModels
         private void Export(string formatStr)
         {
             if (!Enum.TryParse<ExportFormat>(formatStr, out var format)) return;
+            if (!DateFrom.HasValue || !DateTo.HasValue) return;
 
-            var baseName = $"report_{DateFrom:yyMMdd}_{DateTo:yyMMdd}";
+            var baseName = $"report_{DateFrom.Value:yyMMdd}_{DateTo.Value:yyMMdd}";
 
             switch (format)
             {
                 case ExportFormat.CSV:
-                    var csv = DropReport.BuildCSVReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    var csv = DropReport.BuildCSVReport(DateFrom.Value, DateTo.Value, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
                     ExportRequested?.Invoke(baseName + ".csv", System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray());
                     break;
 
                 case ExportFormat.TXT:
-                    var txt = DropReport.BuildTXTReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    var txt = DropReport.BuildTXTReport(DateFrom.Value, DateTo.Value, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
                     ExportRequested?.Invoke(baseName + ".txt", System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(txt)).ToArray());
                     break;
 
                 case ExportFormat.Excel:
-                    var xlsx = DropReport.BuildExcelReport(DateFrom, DateTo, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
+                    var xlsx = DropReport.BuildExcelReport(DateFrom.Value, DateTo.Value, TotalIncome, TotalExpense, Net, ExpenseRows, IncomeRows, MonthlyRows, AccountRows, BalanceDate, BalanceRows);
                     ExportRequested?.Invoke(baseName + ".xlsx", xlsx);
                     break;
             }

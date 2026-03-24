@@ -15,24 +15,50 @@ namespace Client.ViewModels
 {
     public partial class IncomeReport   // класс-помощник для доходов
     {
+        /// <summary>
+        /// Определяет доходные записи. Приоритет: Income-entry (двойная запись).
+        /// Фолбэк: Assets+Debit (серверные транзакции без технических счетов).
+        /// </summary>
+        private static IEnumerable<Entry> GetIncomeEntries(
+            IList<Transaction> txInRange,
+            IDictionary<Guid, Account> accountById)
+        {
+            foreach (var tx in txInRange)
+            {
+                var incomeEntry = tx.Entries.FirstOrDefault(e =>
+                    accountById.TryGetValue(e.AccountId, out var acc)
+                    && acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit);
+
+                if (incomeEntry != null)
+                {
+                    yield return incomeEntry;
+                    continue;
+                }
+
+                foreach (var e in tx.Entries)
+                {
+                    if (accountById.TryGetValue(e.AccountId, out var acc)
+                        && acc.Type == AccountType.Assets && e.Direction == EntryDirection.Debit)
+                    {
+                        yield return e;
+                    }
+                }
+            }
+        }
+
         public static decimal RefreshIncomeRows(
             IDataService dataServ,
             SettingsService settings,
-            DateTimeOffset DateFrom, 
-            DateTimeOffset DateTo, 
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo, 
             ObservableCollection<CategoryShareRow> IncomeRows)  // список суммы за доходы
         {
             IncomeRows.Clear();
-            var txInRange = dataServ.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList(); 
+            if (!DateFrom.HasValue || !DateTo.HasValue) return 0;
+            var txInRange = dataServ.Transactions.Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date).ToList(); 
             var accountById = dataServ.Accounts.ToDictionary(a => a.Id);
 
-            var incomeGroups = txInRange
-                .SelectMany(t => t.Entries)
-                .Where(e =>
-                {
-                    if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
-                    return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
-                })
+            var incomeGroups = GetIncomeEntries(txInRange, accountById)
                 .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
@@ -53,21 +79,22 @@ namespace Client.ViewModels
         public static void RefreshIncomeGroups(
             IDataService dataServ,
             SettingsService settings,
-            DateTimeOffset DateFrom, 
-            DateTimeOffset DateTo, 
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo, 
             ObservableCollection<CategoryDetailGroup> IncomeGroups) // доход за день
         {
             IncomeGroups.Clear();
-            var txInRange = dataServ.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            if (!DateFrom.HasValue || !DateTo.HasValue) return;
+            var txInRange = dataServ.Transactions.Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date).ToList();
             var accountById = dataServ.Accounts.ToDictionary(a => a.Id);
 
-            var groups = txInRange
-                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
-                .Where(x =>
-                {
-                    if (!accountById.TryGetValue(x.Entry.AccountId, out var acc)) return false;
-                    return acc.Type == AccountType.Income && x.Entry.Direction == EntryDirection.Credit;
-                })
+            var entries = GetIncomeEntries(txInRange, accountById).ToList();
+            var txById = txInRange.SelectMany(t => t.Entries.Select(e => new { e.Id, Tx = t }))
+                .ToDictionary(x => x.Id, x => x.Tx);
+
+            var groups = entries
+                .Select(e => new { Entry = e, Tx = txById.GetValueOrDefault(e.Id) })
+                .Where(x => x.Tx != null)
                 .GroupBy(x => x.Entry.CategoryId)
                 .Select(g =>
                 {
@@ -97,8 +124,8 @@ namespace Client.ViewModels
 
         public static void RefreshIncomeChart(
             IDataService dataServ,
-            DateTimeOffset DateFrom,
-            DateTimeOffset DateTo,
+            DateTimeOffset? DateFrom,
+            DateTimeOffset? DateTo,
             ObservableCollection<CategoryShareRow> IncomeShareRows,
             ObservableCollection<ISeries> IncomePieSeries,
             decimal TotalIncome,

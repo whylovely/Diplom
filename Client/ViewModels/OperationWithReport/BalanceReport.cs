@@ -22,7 +22,7 @@ namespace Client.ViewModels
 
             // Транзакции до или в день даты
             var txUpToDate = _data.Transactions
-                .Where(t => t.Date <= BalanceDate)
+                .Where(t => t.Date.Date <= BalanceDate.Date)
                 .ToList();
 
             foreach (var acc in assetAccounts)

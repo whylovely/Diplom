@@ -12,14 +12,15 @@ namespace Client.ViewModels
     public partial class MonthlyReport  // класс-помощник для отчетов по месяцам
     {
         public static void RefreshMonthlyRows(
-            IDataService _data,
+            IDataService _data, 
             SettingsService _settings,
-            DateTimeOffset DateFrom,
-            DateTimeOffset DateTo,
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo,
             ObservableCollection<MonthlyTotalRow> MonthlyRows)  // сортировка категорий по месяцам
         {
             MonthlyRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            if (!DateFrom.HasValue || !DateTo.HasValue) return;
+            var txInRange = _data.Transactions.Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date).ToList();
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
 
             var mothlyGroups = txInRange
@@ -28,23 +29,43 @@ namespace Client.ViewModels
 
             foreach (var mg in mothlyGroups)
             {
-                var enteries = mg.SelectMany(t => t.Entries);
-
-                var expense = enteries
-                    .Where(e =>
+                var txList = mg.ToList();
+                
+                // Расходы: приоритет Expense-entry, фолбэк Assets+Credit
+                decimal expense = 0;
+                foreach (var tx in txList)
+                {
+                    var expEntry = tx.Entries.FirstOrDefault(e =>
+                        accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Expense && e.Direction == EntryDirection.Debit);
+                    if (expEntry != null)
                     {
-                        if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
-                        return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
-                    })
-                    .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
-
-                var income = enteries
-                    .Where(e =>
+                        expense += expEntry.Amount.Amount * _data.GetRate(expEntry.Amount.CurrencyCode, _settings.BaseCurrency);
+                    }
+                    else
                     {
-                        if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
-                        return acc.Type == AccountType.Income && e.Direction == EntryDirection.Credit;
-                    })
-                    .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
+                        expense += tx.Entries
+                            .Where(e => accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets && e.Direction == EntryDirection.Credit)
+                            .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
+                    }
+                }
+
+                // Доходы: приоритет Income-entry, фолбэк Assets+Debit
+                decimal income = 0;
+                foreach (var tx in txList)
+                {
+                    var incEntry = tx.Entries.FirstOrDefault(e =>
+                        accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Income && e.Direction == EntryDirection.Credit);
+                    if (incEntry != null)
+                    {
+                        income += incEntry.Amount.Amount * _data.GetRate(incEntry.Amount.CurrencyCode, _settings.BaseCurrency);
+                    }
+                    else
+                    {
+                        income += tx.Entries
+                            .Where(e => accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets && e.Direction == EntryDirection.Debit)
+                            .Sum(e => e.Amount.Amount * _data.GetRate(e.Amount.CurrencyCode, _settings.BaseCurrency));
+                    }
+                }
 
                 MonthlyRows.Add(new MonthlyTotalRow
                 {

@@ -15,23 +15,53 @@ namespace Client.ViewModels
 {
     public partial class ExpenseReport  // класс-помощник для отчета с расходами
     {
+        /// <summary>
+        /// Определяет расходные записи из транзакций. Для каждой транзакции берётся
+        /// либо Expense-entry (двойная запись), либо Assets+Credit (серверные данные).
+        /// Это предотвращает двойной подсчёт.
+        /// </summary>
+        private static IEnumerable<Entry> GetExpenseEntries(
+            IList<Transaction> txInRange,
+            IDictionary<Guid, Account> accountById)
+        {
+            foreach (var tx in txInRange)
+            {
+                // Приоритет: Expense-entry (классическая двойная запись)
+                var expenseEntry = tx.Entries.FirstOrDefault(e =>
+                    accountById.TryGetValue(e.AccountId, out var acc)
+                    && acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit);
+
+                if (expenseEntry != null)
+                {
+                    yield return expenseEntry;
+                    continue;
+                }
+
+                // Фолбэк: Assets + Credit (серверные транзакции без технических счетов)
+                foreach (var e in tx.Entries)
+                {
+                    if (accountById.TryGetValue(e.AccountId, out var acc)
+                        && acc.Type == AccountType.Assets && e.Direction == EntryDirection.Credit)
+                    {
+                        yield return e;
+                    }
+                }
+            }
+        }
+
         public static decimal RefreshExpenseRows(
             IDataService _data, 
-            DateTimeOffset DateFrom, 
-            DateTimeOffset DateTo, 
+            SettingsService _settings,
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo, 
             ObservableCollection<CategoryShareRow> ExpenseRows) // список суммы на категории
         {
             ExpenseRows.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            if (!DateFrom.HasValue || !DateTo.HasValue) return 0;
+            var txInRange = _data.Transactions.Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date).ToList();
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
 
-            var expenseGroups = txInRange
-                .SelectMany(t => t.Entries)
-                .Where(e =>
-                {
-                    if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
-                    return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
-                })
+            var expenseGroups = GetExpenseEntries(txInRange, accountById)
                 .GroupBy(e => e.CategoryId)
                 .Select(g =>
                 {
@@ -39,7 +69,7 @@ namespace Client.ViewModels
                     return new CategoryShareRow
                     {
                         CategoryName = catName,
-                        Total = g.Sum(x => x.Amount.Amount)
+                        Total = g.Sum(x => x.Amount.Amount * _data.GetRate(x.Amount.CurrencyCode, _settings.BaseCurrency))
                     };
                 })
                 .OrderByDescending(r => r.Total);
@@ -51,21 +81,24 @@ namespace Client.ViewModels
 
         public static void RefreshExpenseGroups(
             IDataService _data, 
-            DateTimeOffset DateFrom, 
-            DateTimeOffset DateTo, 
+            SettingsService _settings,
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo, 
                 ObservableCollection<CategoryDetailGroup> ExpenseGroups)    // за какой день
             {
             ExpenseGroups.Clear();
-            var txInRange = _data.Transactions.Where(t => t.Date >= DateFrom && t.Date <= DateTo).ToList();
+            if (!DateFrom.HasValue || !DateTo.HasValue) return;
+            var txInRange = _data.Transactions.Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date).ToList();
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
 
-            var groups = txInRange
-                .SelectMany(t => t.Entries.Select(e => new { Entry = e, Tx = t }))
-                .Where(x =>
-                {
-                    if (!accountById.TryGetValue(x.Entry.AccountId, out var acc)) return false;
-                    return acc.Type == AccountType.Expense && x.Entry.Direction == EntryDirection.Debit;
-                })
+            var entries = GetExpenseEntries(txInRange, accountById).ToList();
+            // Сопоставляем entry обратно с транзакцией для получения даты и описания
+            var txById = txInRange.SelectMany(t => t.Entries.Select(e => new { e.Id, Tx = t }))
+                .ToDictionary(x => x.Id, x => x.Tx);
+
+            var groups = entries
+                .Select(e => new { Entry = e, Tx = txById.GetValueOrDefault(e.Id) })
+                .Where(x => x.Tx != null)
                 .GroupBy(x => x.Entry.CategoryId)
                 .Select(g =>
                 {
@@ -76,7 +109,7 @@ namespace Client.ViewModels
                         .Select(d => new DailyDetailRow
                         {
                             Date = d.Key.ToString("dd.MM.yyyy"),
-                            Amount = d.Sum(x => x.Entry.Amount.Amount),
+                            Amount = d.Sum(x => x.Entry.Amount.Amount * _data.GetRate(x.Entry.Amount.CurrencyCode, _settings.BaseCurrency)),
                             Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
                         })
                         .ToList();
@@ -84,7 +117,7 @@ namespace Client.ViewModels
                     return new CategoryDetailGroup
                     {
                         CategoryName = catName,
-                        Total = g.Sum(x => x.Entry.Amount.Amount),
+                        Total = g.Sum(x => x.Entry.Amount.Amount * _data.GetRate(x.Entry.Amount.CurrencyCode, _settings.BaseCurrency)),
                         Days = days
                     };
                 })
@@ -95,8 +128,8 @@ namespace Client.ViewModels
 
         public static void RefreshExpenseChart(
             IDataService _data, 
-            DateTimeOffset DateFrom, 
-            DateTimeOffset DateTo, 
+            DateTimeOffset? DateFrom, 
+            DateTimeOffset? DateTo, 
             ObservableCollection<CategoryShareRow> ExpenseShareRows, 
             ObservableCollection<ISeries> ExpensePieSeries, 
             decimal TotalExpense,

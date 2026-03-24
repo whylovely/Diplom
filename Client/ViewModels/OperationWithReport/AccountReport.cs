@@ -11,32 +11,33 @@ namespace Client.ViewModels
     {
         public static void RefreshAccountsRows(
             IDataService _data,
-            DateTimeOffset DateFrom,
-            DateTimeOffset DateTo,
+            DateTimeOffset? DateFrom,
+            DateTimeOffset? DateTo,
             ObservableCollection<AccountTurnoverRow> AccountRows)
         {
             AccountRows.Clear();
+            if (!DateFrom.HasValue || !DateTo.HasValue) return;
 
             var assetAccounts = _data.Accounts
                 .Where(a => a.Type == AccountType.Assets)
                 .ToList();
 
-            var allTx = _data.Transactions.ToList();    
+            var allTx = _data.Transactions.ToList();
 
             foreach (var acc in assetAccounts)
-            {   
+            {
                 // рассчитываем сумму всех транзакций ДО
                 var deltaBeforeFrom = allTx
-                    .Where(t => t.Date < DateFrom)
+                    .Where(t => t.Date.Date < DateFrom.Value.Date)
                     .SelectMany(t => t.Entries)
                     .Where(e => e.AccountId == acc.Id)
                     .Sum(e => e.Direction == EntryDirection.Debit ? e.Amount.Amount : -e.Amount.Amount);
 
-                var opening = acc.InitialBalance + deltaBeforeFrom;
+                    var opening = acc.InitialBalance + deltaBeforeFrom;
 
-                var entriesInPeriod = allTx
-                    .Where(t => t.Date >= DateFrom && t.Date <= DateTo)
-                    .SelectMany(t => t.Entries)
+                    var entriesInPeriod = allTx
+                        .Where(t => t.Date.Date >= DateFrom.Value.Date && t.Date.Date <= DateTo.Value.Date)
+                        .SelectMany(t => t.Entries)
                     .Where(e => e.AccountId == acc.Id)
                     .ToList();
 
