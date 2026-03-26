@@ -36,11 +36,11 @@ namespace Client.ViewModels
         public ObservableCollection<CurrencyBalance> CurrencyBalances { get; } = new();
 
         // ── Expense Donut ──────────────────────────────────
-        public ObservableCollection<ISeries> ExpensePieSeries { get; } = new();
-        public ObservableCollection<CategoryLegendItem> ExpenseLegend { get; } = new();
+        [ObservableProperty] private ObservableCollection<ISeries> _expensePieSeries = new();
+        [ObservableProperty] private ObservableCollection<CategoryLegendItem> _expenseLegend = new();
 
         // ── Monthly Dynamics ───────────────────────────────
-        public ObservableCollection<ISeries> MonthlySeries { get; } = new();
+        [ObservableProperty] private ObservableCollection<ISeries> _monthlySeries = new();
         [ObservableProperty] private LiveChartsCore.SkiaSharpView.Axis[] _xAxes = Array.Empty<LiveChartsCore.SkiaSharpView.Axis[]>() is null ? new Axis[0] : new Axis[0];
         [ObservableProperty] private LiveChartsCore.SkiaSharpView.Axis[] _yAxes = Array.Empty<Axis>();
 
@@ -92,8 +92,8 @@ namespace Client.ViewModels
 
         private void RefreshExpenseDonut()
         {
-            ExpensePieSeries.Clear();
-            ExpenseLegend.Clear();
+            var newPieSeries = new ObservableCollection<ISeries>();
+            var newLegend = new ObservableCollection<CategoryLegendItem>();
 
             var now = DateTimeOffset.Now;
             var from = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, now.Offset);
@@ -127,7 +127,7 @@ namespace Client.ViewModels
             {
                 var hex = colors[i % colors.Length];
                 var skColor = SkiaSharp.SKColor.Parse(hex);
-                ExpensePieSeries.Add(new PieSeries<decimal>
+                newPieSeries.Add(new PieSeries<decimal>
                 {
                     Values = new[] { r.Total },
                     Name = r.Name,
@@ -140,7 +140,7 @@ namespace Client.ViewModels
                 });
 
                 var sharePercent = totalExp > 0 ? Math.Round((double)(r.Total / totalExp) * 100, 1) : 0;
-                ExpenseLegend.Add(new CategoryLegendItem
+                newLegend.Add(new CategoryLegendItem
                 {
                     Name = r.Name,
                     Color = hex,
@@ -148,11 +148,14 @@ namespace Client.ViewModels
                 });
                 i++;
             }
+
+            ExpensePieSeries = newPieSeries;
+            ExpenseLegend = newLegend;
         }
 
         private void RefreshMonthly()
         {
-            MonthlySeries.Clear();
+            var newMonthlySeries = new ObservableCollection<ISeries>();
 
             var now = DateTimeOffset.Now;
             var from = now.AddMonths(-7);
@@ -162,7 +165,7 @@ namespace Client.ViewModels
             var labels = monthlyRows.Select(r => r.Month).ToArray();
 
             var incomeGreen = SkiaSharp.SKColor.Parse("#00E676");
-            MonthlySeries.Add(new LineSeries<decimal>
+            newMonthlySeries.Add(new LineSeries<decimal>
             {
                 Name = "Доходы",
                 Values = monthlyRows.Select(r => r.Income).ToArray(),
@@ -175,7 +178,7 @@ namespace Client.ViewModels
             });
 
             var expenseRed = SkiaSharp.SKColor.Parse("#FF5252");
-            MonthlySeries.Add(new LineSeries<decimal>
+            newMonthlySeries.Add(new LineSeries<decimal>
             {
                 Name = "Расходы",
                 Values = monthlyRows.Select(r => r.Expense).ToArray(),
@@ -207,6 +210,8 @@ namespace Client.ViewModels
                     SeparatorsPaint = new SolidColorPaint(gridColor, 1)
                 }
             };
+
+            MonthlySeries = newMonthlySeries;
         }
     }
 

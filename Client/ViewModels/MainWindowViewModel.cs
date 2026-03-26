@@ -194,7 +194,7 @@ namespace Client.ViewModels
 
         [RelayCommand] private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
 
-        [RelayCommand] private void NavigateDashboard() { Current = DashboardVm; ActivePage = "Dashboard"; IsMenuOpen = false; }
+        [RelayCommand] private void NavigateDashboard() { Current = DashboardVm; ActivePage = "Dashboard"; IsMenuOpen = false; DashboardVm.Refresh(); }
         [RelayCommand] private void NavigateAccounts() { Current = AccountsVm; ActivePage = "Accounts"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateJournal() { Current = JournalVm; ActivePage = "Journal"; IsMenuOpen = false; }
         [RelayCommand] private void NavigateNewTransaction() { Current = NewTxVm; ActivePage = "NewTransaction"; IsMenuOpen = false; }
