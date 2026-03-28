@@ -104,13 +104,13 @@ namespace Client.ViewModels
                 {
                     var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
                     var days = g
-                        .GroupBy(x => x.Tx.Date.Date)
+                        .GroupBy(x => x.Tx!.Date.Date)
                         .OrderBy(d => d.Key)
                         .Select(d => new DailyDetailRow
                         {
                             Date = d.Key.ToString("dd.MM.yyyy"),
                             Amount = d.Sum(x => x.Entry.Amount.Amount * _data.GetRate(x.Entry.Amount.CurrencyCode, _settings.BaseCurrency)),
-                            Description = string.Join(", ", d.Select(x => x.Tx.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
+                            Description = string.Join(", ", d.Select(x => x.Tx!.Description).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct())
                         })
                         .ToList();
 

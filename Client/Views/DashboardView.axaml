@@ -56,19 +56,7 @@
         <!-- ═══ RIGHT CONTENT: Dashboard Widgets ══════════════ -->
         <Grid Grid.Column="1" RowDefinitions="Auto, *, *" ColumnDefinitions="*, *">
 
-            <!-- ── Header ─────────────────────────────────── -->
-            <Grid Grid.ColumnSpan="2" ColumnDefinitions="*, Auto" Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <!-- App logo -->
-                    <Path Data="M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M11,6V12.5L7,10.5V12.74L11,14.74V15H13V14.74L17,12.74V10.5L13,12.5V6H11Z"
-                          Fill="#29B6F6" Stretch="Uniform" Width="24" Height="24" VerticalAlignment="Center"/>
-                    <TextBlock Text="FinTrack Pro" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
-                </StackPanel>
-                <!-- Notification bell -->
-                <Path Grid.Column="1" VerticalAlignment="Center"
-                      Data="M12,22A2,2 0 0,0 14,20H10A2,2 0 0,0 12,22M18,16V11C18,7.93 16.36,5.36 13.5,4.68V4A1.5,1.5 0 0,0 12,2.5A1.5,1.5 0 0,0 10.5,4V4.68C7.63,5.36 6,7.92 6,11V16L4,18V19H20V18L18,16Z"
-                      Fill="#9E9E9E" Stretch="Uniform" Width="20" Height="20"/>
-            </Grid>
+
 
             <!-- ── Widget 1: Total Balance (top-left) ──── -->
             <Border Grid.Row="1" Grid.Column="0" Background="#151A2E" CornerRadius="20"
