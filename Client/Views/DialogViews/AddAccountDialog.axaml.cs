@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Client.Models;
+using Client.Services;
 using Client.ViewModels;
 using System.Threading.Tasks;
 
@@ -13,10 +14,10 @@ public partial class AddAccountDialog : Window
 
     private string _baseCurrency = "RUB";
 
-    public Task<Account?> ShowDialogAsync(Window owner, string baseCurrency)
+    public Task<Account?> ShowDialogAsync(Window owner, string baseCurrency, SettingsService? settings = null)
     {
         _baseCurrency = baseCurrency;
-        DataContext = new AddAccountDialogViewModel { SelectedCurrency = baseCurrency };
+        DataContext = new AddAccountDialogViewModel(settings) { SelectedCurrency = baseCurrency };
         return ShowDialog<Account?>(owner);
     }
 

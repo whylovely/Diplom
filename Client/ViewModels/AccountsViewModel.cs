@@ -205,7 +205,7 @@ namespace Client.ViewModels
         private async Task AddAccountAsync()
         {
             var dlg = new AddAccountDialog();
-            var acc = await dlg.ShowDialogAsync(_getWindow(), _settings.BaseCurrency);
+            var acc = await dlg.ShowDialogAsync(_getWindow(), _settings.BaseCurrency, _settings);
 
             if (acc is null) return;
 

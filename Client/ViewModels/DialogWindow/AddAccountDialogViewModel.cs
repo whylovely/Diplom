@@ -1,13 +1,19 @@
+using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Client.ViewModels;
 
 public sealed partial class AddAccountDialogViewModel : ViewModelBase   // Добавление счета
 {
-    public static string[] Currencies => Models.CurrencyHelper.AvailableCurrencies;
+    public string[] Currencies { get; }
 
-    public AddAccountDialogViewModel() {}
+    public AddAccountDialogViewModel(SettingsService? settings = null)
+    {
+        Currencies = Models.CurrencyHelper.GetFilteredCurrencies(
+            settings?.Settings.FavoriteCurrencies);
+    }
 
     [ObservableProperty] private string _name = "";
     

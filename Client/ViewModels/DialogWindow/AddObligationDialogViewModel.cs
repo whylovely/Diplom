@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Client.Models;
+using Client.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -22,7 +23,7 @@ public partial class AddObligationDialogViewModel : ViewModelBase
     [ObservableProperty] private bool _hasAmountError;
 
     [ObservableProperty] private string _currencyCode = "RUB";
-    public string[] Currencies { get; } = AddAccountDialogViewModel.Currencies;
+    public string[] Currencies { get; }
  
     private ObligationType _type = ObligationType.Debt;
     public ObligationType Type
@@ -60,9 +61,11 @@ public partial class AddObligationDialogViewModel : ViewModelBase
 
     public Obligation? Result { get; private set; }
 
-    public AddObligationDialogViewModel(Window window, Obligation? existing = null)
+    public AddObligationDialogViewModel(Window window, SettingsService? settings = null, Obligation? existing = null)
     {
         _window = window;
+        Currencies = CurrencyHelper.GetFilteredCurrencies(
+            settings?.Settings.FavoriteCurrencies);
 
         if (existing != null)
         {

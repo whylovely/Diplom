@@ -76,7 +76,7 @@ public partial class ObligationsViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddAsync()
     {
-        var dialog = new AddObligationDialog();
+        var dialog = new AddObligationDialog(_settings);
         var result = await dialog.ShowDialog<Obligation?>(GetWindow());
         if (result != null)
         {
@@ -91,7 +91,7 @@ public partial class ObligationsViewModel : ViewModelBase
         var target = ob ?? SelectedItem;
         if (target is null) return;
         
-        var dialog = new AddObligationDialog(target);
+        var dialog = new AddObligationDialog(target, _settings);
         var result = await dialog.ShowDialog<Obligation?>(GetWindow());
         if (result != null)
         {

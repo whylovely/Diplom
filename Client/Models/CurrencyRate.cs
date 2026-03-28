@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Client.Models;
 
@@ -39,6 +40,30 @@ public static class CurrencyHelper
         if (CurrencyNames.TryGetValue(code, out var name))
             return name;
         return code; // Fallback to code if name not found
+    }
+
+    /// <summary>
+    /// Возвращает валюты, отфильтрованные по списку избранных.
+    /// Если избранных нет — возвращает все доступные (fallback).
+    /// </summary>
+    public static string[] GetFilteredCurrencies(List<string>? favorites)
+    {
+        if (favorites is null || favorites.Count == 0)
+            return AvailableCurrencies;
+
+        // Сохраняем порядок из AvailableCurrencies, добавляя в конец те,
+        // которые есть в избранном, но не в AvailableCurrencies
+        var ordered = AvailableCurrencies
+            .Where(c => favorites.Contains(c))
+            .ToList();
+
+        foreach (var f in favorites)
+        {
+            if (!ordered.Contains(f))
+                ordered.Add(f);
+        }
+
+        return ordered.ToArray();
     }
 
     public static ObservableCollection<string> GetObservableCurrencies() 
