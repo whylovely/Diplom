@@ -35,9 +35,8 @@ namespace Client.ViewModels
         public string BaseCurrency => _settings.BaseCurrency;
         public ObservableCollection<CurrencyBalance> CurrencyBalances { get; } = new();
 
-        // ── Expense Donut ──────────────────────────────────
-        [ObservableProperty] private ObservableCollection<ISeries> _expensePieSeries = new();
-        [ObservableProperty] private ObservableCollection<CategoryLegendItem> _expenseLegend = new();
+        // ── Recent Transactions ────────────────────────────
+        public ObservableCollection<RecentTransactionItem> RecentTransactions { get; } = new();
 
         // ── Monthly Dynamics ───────────────────────────────
         [ObservableProperty] private ObservableCollection<ISeries> _monthlySeries = new();
@@ -51,7 +50,7 @@ namespace Client.ViewModels
             {
                 RefreshAccounts();
                 RefreshTotalBalance();
-                RefreshExpenseDonut();
+                RefreshRecentTransactions();
                 RefreshMonthly();
             }
             catch (Exception ex)
@@ -90,67 +89,60 @@ namespace Client.ViewModels
             TotalBalance = assets.Sum(a => a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency));
         }
 
-        private void RefreshExpenseDonut()
+        private void RefreshRecentTransactions()
         {
-            var newPieSeries = new ObservableCollection<ISeries>();
-            var newLegend = new ObservableCollection<CategoryLegendItem>();
-
-            var now = DateTimeOffset.Now;
-            var from = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, now.Offset);
-            var to = now;
+            RecentTransactions.Clear();
 
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
-            var txInRange = _data.Transactions.Where(t => t.Date >= from && t.Date <= to).ToList();
+            var categoryById = _data.Categories.ToDictionary(c => c.Id);
 
-            var expenseGroups = txInRange
-                .SelectMany(t => t.Entries)
-                .Where(e =>
-                {
-                    if (!accountById.TryGetValue(e.AccountId, out var acc)) return false;
-                    return acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit;
-                })
-                .GroupBy(e => e.CategoryId)
-                .Select(g =>
-                {
-                    var catName = _data.Categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
-                    return new { Name = catName, Total = g.Sum(x => x.Amount.Amount) };
-                })
-                .OrderByDescending(r => r.Total)
+            // Take 5 most recent transactions
+            var recent = _data.Transactions
+                .OrderByDescending(t => t.Date)
                 .Take(5)
                 .ToList();
 
-            var totalExp = expenseGroups.Sum(r => r.Total);
-            var colors = new[] { "#B9F6CA", "#FF9E80", "#80D8FF", "#EA80FC", "#FFD180", "#FFAB91", "#CE93D8", "#80CBC4" };
-            int i = 0;
-
-            foreach (var r in expenseGroups)
+            foreach (var tx in recent)
             {
-                var hex = colors[i % colors.Length];
-                var skColor = SkiaSharp.SKColor.Parse(hex);
-                newPieSeries.Add(new PieSeries<decimal>
-                {
-                    Values = new[] { r.Total },
-                    Name = r.Name,
-                    InnerRadius = 50,
-                    MaxRadialColumnWidth = 20,
-                    HoverPushout = 0,
-                    Pushout = 2,
-                    Stroke = null,
-                    Fill = new SolidColorPaint(skColor)
-                });
+                // Find the "main" entry — the Assets account entry
+                var assetEntry = tx.Entries.FirstOrDefault(e =>
+                    accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
 
-                var sharePercent = totalExp > 0 ? Math.Round((double)(r.Total / totalExp) * 100, 1) : 0;
-                newLegend.Add(new CategoryLegendItem
+                if (assetEntry == null) continue;
+
+                accountById.TryGetValue(assetEntry.AccountId, out var account);
+                var accountName = account?.Name ?? "—";
+                var amount = assetEntry.Amount.Amount;
+                var currency = assetEntry.Amount.CurrencyCode;
+                var isIncome = assetEntry.Direction == EntryDirection.Debit;
+
+                // Try to find category
+                var categoryName = "—";
+                var categoryEntry = tx.Entries.FirstOrDefault(e => e.CategoryId.HasValue);
+                if (categoryEntry != null && categoryEntry.CategoryId.HasValue &&
+                    categoryById.TryGetValue(categoryEntry.CategoryId.Value, out var cat))
                 {
-                    Name = r.Name,
-                    Color = hex,
-                    SharePercent = sharePercent
+                    categoryName = cat.Name;
+                }
+
+                // Check if transfer
+                var isTransfer = tx.Entries.Count >= 2 &&
+                    tx.Entries.All(e => accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
+
+                if (isTransfer) categoryName = "Перевод";
+
+                RecentTransactions.Add(new RecentTransactionItem
+                {
+                    Date = tx.Date.ToString("dd.MM.yyyy"),
+                    Amount = amount,
+                    Currency = currency,
+                    IsIncome = isIncome && !isTransfer,
+                    IsTransfer = isTransfer,
+                    CategoryName = categoryName,
+                    AccountName = accountName,
+                    Description = tx.Description
                 });
-                i++;
             }
-
-            ExpensePieSeries = newPieSeries;
-            ExpenseLegend = newLegend;
         }
 
         private void RefreshMonthly()
@@ -248,10 +240,24 @@ namespace Client.ViewModels
         public decimal Balance { get; set; }
     }
 
-    public class CategoryLegendItem
+    public class RecentTransactionItem
     {
-        public string Name { get; set; } = "";
-        public string Color { get; set; } = "#FFFFFF";
-        public double SharePercent { get; set; }
+        public string Date { get; set; } = "";
+        public decimal Amount { get; set; }
+        public string Currency { get; set; } = "";
+        public bool IsIncome { get; set; }
+        public bool IsTransfer { get; set; }
+        public string CategoryName { get; set; } = "";
+        public string AccountName { get; set; } = "";
+        public string Description { get; set; } = "";
+
+        public string FormattedAmount => IsTransfer
+            ? $"{Amount:N2} {Currency}"
+            : (IsIncome ? $"+{Amount:N2}" : $"−{Amount:N2}") + $" {Currency}";
+
+        public string AmountColor => IsTransfer ? "#29B6F6" : (IsIncome ? "#00E676" : "#FF5252");
+
+        // Arrow icon: ↗ income, ↙ expense, ↔ transfer
+        public string DirectionIcon => IsTransfer ? "↔" : (IsIncome ? "↗" : "↙");
     }
 }
