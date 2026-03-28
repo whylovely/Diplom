@@ -158,9 +158,35 @@ namespace Client.ViewModels
             var newMonthlySeries = new ObservableCollection<ISeries>();
 
             var now = DateTimeOffset.Now;
-            var from = now.AddMonths(-7);
+
+            // ── Smart date range: find months with actual data ──
+            // 1. Get all distinct months that have transactions, sorted descending
+            var allMonths = _data.Transactions
+                .Select(t => new { t.Date.Year, t.Date.Month })
+                .Distinct()
+                .OrderByDescending(m => m.Year).ThenByDescending(m => m.Month)
+                .ToList();
+
+            if (allMonths.Count == 0)
+            {
+                // No data at all — clear chart
+                MonthlySeries = newMonthlySeries;
+                XAxes = Array.Empty<LiveChartsCore.SkiaSharpView.Axis>();
+                YAxes = Array.Empty<LiveChartsCore.SkiaSharpView.Axis>();
+                return;
+            }
+
+            // 2. Take up to 6 most recent months with data
+            var selectedMonths = allMonths.Take(6).OrderBy(m => m.Year).ThenBy(m => m.Month).ToList();
+
+            // 3. Compute from/to based on selected months
+            var first = selectedMonths.First();
+            var last = selectedMonths.Last();
+            var from = new DateTimeOffset(first.Year, first.Month, 1, 0, 0, 0, now.Offset);
+            var to = new DateTimeOffset(last.Year, last.Month, 1, 0, 0, 0, now.Offset).AddMonths(1).AddTicks(-1);
+
             var monthlyRows = new ObservableCollection<MonthlyTotalRow>();
-            MonthlyReport.RefreshMonthlyRows(_data, _settings, from, now, monthlyRows);
+            MonthlyReport.RefreshMonthlyRows(_data, _settings, from, to, monthlyRows);
 
             var labels = monthlyRows.Select(r => r.Month).ToArray();
 
