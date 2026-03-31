@@ -18,6 +18,15 @@ builder.Services.AddScoped<IExchangeRateService, CbrExchangeRateService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                     ?? builder.Configuration.GetConnectionString("db");
 
+// парсинг под render.com
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+{
+    var databaseUri = new Uri(connectionString);
+    var userInfo = databaseUri.UserInfo.Split(':');
+
+    connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true;";
+}
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     opt.UseNpgsql(connectionString);
