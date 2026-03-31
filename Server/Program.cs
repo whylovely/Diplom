@@ -15,9 +15,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IExchangeRateService, CbrExchangeRateService>();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                    ?? builder.Configuration.GetConnectionString("db");
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("db"));
+    opt.UseNpgsql(connectionString);
 });
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
