@@ -31,7 +31,7 @@ public sealed class CurrencyRateService
             using var http = new HttpClient
             {
                 BaseAddress = new Uri(_settings.ServerUrl.TrimEnd('/') + "/"),
-                Timeout = TimeSpan.FromSeconds(10)
+                Timeout = TimeSpan.FromSeconds(120)
             };
 
             var token = _settings.AuthToken;

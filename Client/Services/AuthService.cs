@@ -17,7 +17,7 @@ namespace Client.Services
             _http = new HttpClient
             {
                 BaseAddress = new Uri(settings.ServerUrl.TrimEnd('/') + "/"),
-                Timeout = TimeSpan.FromSeconds(15)
+                Timeout = TimeSpan.FromSeconds(100)
             };
         }
 

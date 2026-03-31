@@ -25,7 +25,7 @@ public sealed class ApiService
         _http = new HttpClient
         {
             BaseAddress = new Uri(settings.ServerUrl.TrimEnd('/') + "/"),
-            Timeout = TimeSpan.FromSeconds(30)
+            Timeout = TimeSpan.FromSeconds(100)
         };
     }
 
