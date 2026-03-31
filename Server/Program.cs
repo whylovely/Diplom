@@ -18,12 +18,34 @@ builder.Services.AddScoped<IExchangeRateService, CbrExchangeRateService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                     ?? builder.Configuration.GetConnectionString("db");
 
-// парсим на Render
+Console.WriteLine($"[DEBUG] Original connection string length: {connectionString?.Length ?? 0}");
+if (!string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine($"[DEBUG] Starts with 'postgres://': {connectionString.StartsWith("postgres://")}");
+}
+
+// Парсинг для Render
 if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
 {
-    var databaseUri = new Uri(connectionString);
-    var userInfo = databaseUri.UserInfo.Split(':');
-    connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true;";
+    try 
+    {
+        var databaseUri = new Uri(connectionString);
+        var userInfo = databaseUri.UserInfo.Split(':');
+        
+        var host = databaseUri.Host;
+        var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
+        var dbName = databaseUri.LocalPath.TrimStart('/');
+        var user = userInfo[0];
+        var password = userInfo[1];
+
+        connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={password};SslMode=Require;Trust Server Certificate=true;";
+        
+        Console.WriteLine("[DEBUG] Successfully parsed Render connection string.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[ERROR] Failed to parse connection string: {ex.Message}");
+    }
 }
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
