@@ -76,20 +76,19 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
     try
     {
         // Замени ApplicationDbContext на название твоего DbContext
-        var db = services.GetRequiredService<ApplicationDbContext>(); 
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); 
         db.Database.Migrate();
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Ошибка при миграции базы данных.");
     }
 
-    var cfg = services.GetRequiredService<IConfiguration>();
+    var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
     // Авто-миграция в Development
     if (app.Environment.IsDevelopment())
