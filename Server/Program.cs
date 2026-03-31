@@ -76,10 +76,11 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
+    
     try
     {
-        // Замени ApplicationDbContext на название твоего DbContext
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); 
+        // 2. Применяем миграции
         db.Database.Migrate();
     }
     catch (Exception ex)
@@ -90,7 +91,8 @@ using (var scope = app.Services.CreateScope())
 
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-    // Авто-миграция в Development
+    // Авто-миграция в Development (эту часть можно оставить или убрать, 
+    // так как мы уже сделали Migrate() выше, но пусть будет)
     if (app.Environment.IsDevelopment())
     {
         await db.Database.MigrateAsync();
