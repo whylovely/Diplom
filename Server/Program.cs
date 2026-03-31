@@ -18,14 +18,17 @@ builder.Services.AddScoped<IExchangeRateService, CbrExchangeRateService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                     ?? builder.Configuration.GetConnectionString("db");
 
+// Очищаем строку от случайных невидимых пробелов и кавычек по краям
+connectionString = connectionString?.Trim(' ', '"', '\'');
+
 Console.WriteLine($"[DEBUG] Original connection string length: {connectionString?.Length ?? 0}");
 if (!string.IsNullOrEmpty(connectionString))
 {
     Console.WriteLine($"[DEBUG] Starts with 'postgres://': {connectionString.StartsWith("postgres://")}");
 }
 
-// Парсинг для Render
-if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+// Теперь проверяем просто на слово "postgres" в начале (покроет и postgres://, и postgresql://)
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres", StringComparison.OrdinalIgnoreCase))
 {
     try 
     {
