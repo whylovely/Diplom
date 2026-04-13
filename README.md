@@ -1,224 +1,162 @@
-# 💰 Finance Tracker
+# Finance Tracker
 
-> Кроссплатформенное desktop-приложение для учёта личных финансов с поддержкой двойной записи и мультивалютных счетов
+Кроссплатформенное desktop-приложение для учёта личных финансов с поддержкой двойной записи, мультивалютных счетов и синхронизации с сервером.
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Avalonia](https://img.shields.io/badge/Avalonia-11.3-8B44AC?logo=avalonia)](https://avaloniaui.net/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)](https://postgresql.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+## Технологический стек
 
----
+### Клиент (Client)
 
-## 📋 Оглавление
+| Компонент | Технология |
+|-----------|------------|
+| UI Framework | Avalonia UI 11.3 |
+| Архитектура | MVVM (CommunityToolkit.Mvvm 8.2) |
+| Графики | LiveCharts2 (SkiaSharp) |
+| Локальная БД | SQLite (Microsoft.Data.Sqlite) |
+| Экспорт | ClosedXML (Excel), CSV, TXT |
+| Платформа | .NET 8, C# 12 |
 
-- [О проекте](#-о-проекте)
-- [Технологический стек](#-технологический-стек)
-- [Функциональность](#-функциональность)
-- [Архитектура](#-архитектура)
-- [Установка и запуск](#-установка-и-запуск)
-- [Структура проекта](#-структура-проекта)
-- [Разработка](#-разработка)
+### Сервер (Server)
 
----
-
-## 🎯 О проекте
-
-**Finance Tracker** — это современное приложение для управления личными финансами, построенное на принципах **двойной бухгалтерии**. Позволяет вести учёт доходов, расходов, переводов между счетами с полной детализацией и аналитикой.
-
-### Ключевые особенности
-
-- 🌍 **Кроссплатформенность** — работает на Windows, Linux, macOS
-- 💱 **Мультивалютность** — поддержка фиатных и криптовалют с автоматической конвертацией
-- 📊 **Визуализация данных** — графики по категориям, динамика по месяцам, структура расходов
-- 🔐 **Безопасность** — JWT-аутентификация, хеширование паролей
-- 🎨 **Современный UI** — Avalonia UI
-- 📈 **Отчётность** — группировка по категориям, детализация по дням, экспорт в CSV, Excel, txt
-
----
-
-## 🛠 Технологический стек
-
-### Backend (Server)
-
-| Компонент | Технология | Версия |
-|-----------|------------|--------|
-| Framework | **ASP.NET Core** | 8.0 |
-| ORM | **Entity Framework Core** | 8.0.8 |
-| База данных | **PostgreSQL** | 16 |
-| Аутентификация | **JWT** (JwtBearer) | 8.0.23 |
-| API документация | **Swagger** (Swashbuckle) | 6.6.2 |
-
-### Frontend (Client)
-
-| Компонент | Технология | Версия |
-|-----------|------------|--------|
-| UI Framework | **Avalonia UI** | 11.3.11 |
-| Архитектура | **MVVM** (CommunityToolkit) | 8.2.1 |
-| Графики | **LiveCharts** (SkiaSharp) | 2.0.0-rc6 |
-| DataGrid | **Avalonia.Controls.DataGrid** | 11.3.11 |
+| Компонент | Технология |
+|-----------|------------|
+| Framework | ASP.NET Core 8 |
+| ORM | Entity Framework Core 8 |
+| БД | PostgreSQL 16 |
+| Аутентификация | JWT (HS256) |
+| Документация API | Swagger (Swashbuckle) |
+| Курсы валют | ЦБ РФ (XML) + CoinGecko (JSON) |
 
 ### Shared
 
-- **.NET 8.0** — общие DTO, validation models, enums
+Общая библиотека DTO и перечислений (.NET 8, без внешних зависимостей).
 
----
+## Функциональность
 
-## ✨ Функциональность
+### Клиент
+- Управление счетами (обычные и мультивалютные), категориями, обязательствами
+- Транзакции: расход, доход, перевод между счетами (двойная запись)
+- Отчёты с графиками: помесячная динамика, структура расходов, топ категорий, обороты по счетам, баланс на дату
+- Экспорт отчётов в Excel, CSV, TXT
+- Календарь операций
+- Шаблоны частых операций
+- Уведомления о просроченных долгах
+- Выбор базовой валюты с автоматическим пересчётом
+- Курсы валют (фиатные + крипто) с избранным
+- Локальная SQLite БД + двусторонняя синхронизация с сервером
+- JWT-авторизация (логин, регистрация, выход с очисткой локальных данных)
 
-### Реализовано
+### Сервер
+- REST API: счета, категории, транзакции, обязательства, отчёты, курсы валют
+- JWT-аутентификация (регистрация, вход, роли User/Admin)
+- Soft delete для счетов и категорий
+- Синхронизация (Pull/Push) с разрешением конфликтов
+- Админ-панель (веб-интерфейс): управление пользователями, блокировка
+- Автоматический seed: администратор + демо-пользователь с тестовыми данными
 
-#### Сервер
-- ✅ JWT-аутентификация (регистрация, вход)
-- ✅ CRUD операции: счета, категории, транзакции, обязательства
-- ✅ **Мультивалютные счета** (основная + дополнительная валюта, курс конвертации)
-- ✅ Двойная запись (Debit/Credit entries с балансировкой)
-- ✅ API курсы валют
-- ✅ Soft delete для счетов и категорий
-- ✅ Админ-панель для управления пользователями
-- ✅ Swagger UI (автодокументация API)
-
-#### Клиент
-- ✅ Управление счетами (создание, редактирование, удаление)
-- ✅ Управление категориями доходов и расходов
-- ✅ Создание транзакций (расход, доход, перевод между счетами)
-- ✅ Управление обязательствами
-- ✅ Отчёты с группировкой по категориям и детализацией по дням (Expander-группы)
-- ✅ Графики: помесячная динамика, структура расходов (pie chart), top-N категорий
-- ✅ Обороты по счетам: остатки на начало/конец периода
-- ✅ Баланс на дату
-- ✅ Экспорт отчётов
-- ✅ Локальная БД + синхронизация
-
-### В разработке
-
-- 🚧 Деплой на облачный сервер (Render.com / Railway)
-
----
-
-## 🏗 Архитектура
+## Архитектура
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                       Finance Tracker                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────┐         ┌──────────────┐                 │
-│  │   Client     │         │    Server    │                 │
-│  │  (Avalonia)  │◄───────►│  (ASP.NET)   │                 │
-│  │              │   REST  │              │                 │
-│  │  ViewModels  │   API   │ Controllers  │                 │
-│  │  ↕           │         │  ↕           │                 │
-│  │  Services    │         │  EF Core     │                 │
-│  │  ↕           │         │  ↕           │                 │
-│  │  Models      │         │  Entities    │                 │
-│  └──────────────┘         └───────┬──────┘                 │
-│                                   │                        │
-│                           ┌───────▼──────┐                 │
-│                           │  PostgreSQL  │                 │
-│                           │  (Docker)    │                 │
-│                           └──────────────┘                 │
-│                                                             │
-│  ┌──────────────┐                                          │
-│  │   Shared     │  (DTO, Enums, Validation)                │
-│  └──────────────┘                                          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────┐         ┌──────────────────┐
+│   Client         │         │    Server         │
+│  (Avalonia UI)   │◄──REST──►  (ASP.NET Core)  │
+│                  │   API   │                   │
+│  MVVM:           │         │  Controllers      │
+│  Views ↔ VM ↔    │         │      ↓            │
+│  Services        │         │  EF Core          │
+│      ↓           │         │      ↓            │
+│  SQLite          │         │  PostgreSQL       │
+└──────────────────┘         └──────────────────┘
+         │                            │
+         └────── Shared (DTO) ────────┘
 ```
 
-### Принципы проектирования
+## Установка и запуск
 
-- 🎯 **Clean Architecture** — разделение на слои (UI → Services → Domain)
-- 📦 **MVVM** на клиенте (CommunityToolkit.Mvvm)
-- 🔄 **RESTful API** с JWT аутентификацией
-- 💾 **Repository pattern** через EF Core
-- 🧩 **Shared DTO** между клиентом и сервером
+### Требования
+- .NET 8.0 SDK
+- Docker Desktop (для PostgreSQL)
 
----
-
-## 🚀 Установка и запуск
-
-### Предварительные требования
-
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (для PostgreSQL)
-- [PostgreSQL](https://www.postgresql.org/download/) (альтернатива Docker)
-
-### 1️⃣ Клонирование репозитория
+### 1. Запуск базы данных
 
 ```bash
-git clone https://github.com/yourusername/finance-tracker.git
-cd finance-tracker/Diplom
+docker compose up -d
 ```
 
-### 2️⃣ Запуск базы данных
+PostgreSQL будет доступна на `localhost:5432` (Database: `finance`, User: `finance_user`, Password: `finance_pass`).
 
-```bash
-docker-compose up -d
-```
-
-База данных будет доступна на `localhost:5432`:
-- **Database:** finance
-- **User:** finance_user
-- **Password:** finance_pass
-
-### 3️⃣ Запуск сервера
+### 2. Запуск сервера
 
 ```bash
 cd Server
-dotnet restore
-dotnet ef database update  # применить миграции
 dotnet run
 ```
 
-Сервер запустится на `https://localhost:5432` (или порт из launchSettings).  
-Swagger UI доступен на: `https://localhost:5432/swagger`. 
-Админ панель доступна на: `https://localhost:5432/admin`. 
+При первом запуске сервер автоматически применит миграции и создаст начальные данные.
 
-### 4️⃣ Запуск клиента
+- Swagger UI: http://localhost:5273/swagger
+- Админ-панель: http://localhost:5273/admin
 
-В отдельном терминале:
+### 3. Запуск клиента
 
 ```bash
-cd ../Client
-dotnet restore
+cd Client
 dotnet run
 ```
 
-Avalonia-приложение откроется автоматически.
+### Учётные данные
 
----
+| Роль | Email | Пароль |
+|------|-------|--------|
+| Admin | admin@finance.local | Admin123 |
+| Demo | demo@finance.local | Demo123 |
 
-## 📁 Структура проекта
+Demo-пользователь содержит 3 счёта, 5 категорий, 10 транзакций и 2 обязательства.
+
+## Структура проекта
 
 ```
-Diplom/
-├── Client/                      # Avalonia UI клиент
-│   ├── Models/                  # Модели данных
-│   ├── ViewModels/              # MVVM ViewModels
-│   ├── Views/                   # AXAML разметка
-│   ├── Services/                # DataService, NotificationService
+/
+├── Client/                     # Avalonia UI клиент
+│   ├── Models/                 # Модели данных (Account, Transaction, Category, ...)
+│   ├── ViewModels/             # MVVM ViewModels
+│   │   ├── DialogWindow/       # ViewModels диалоговых окон
+│   │   └── OperationWithReport/# Логика экспорта отчётов
+│   ├── Views/                  # AXAML-разметка интерфейса
+│   │   └── DialogViews/        # Всплывающие диалоговые окна
+│   ├── Services/               # LocalDbService, ApiService, SyncService, AuthService, ...
+│   ├── Assets/                 # Иконки, шрифты
+│   ├── Program.cs              # Точка входа
+│   └── App.axaml / App.axaml.cs# Инициализация, глобальные стили
 │
-├── Server/                      # ASP.NET Core API
-│   ├── Controllers/             # API контроллеры
-│   ├── Entities/                # EF Core entities
-│   ├── Data/                    # DbContext
-│   ├── Auth/                    # JWT, UserContext
-│   ├── Migrations/              # EF миграции
+├── Server/                     # ASP.NET Core Web API
+│   ├── Controllers/            # Auth, Accounts, Categories, Transactions,
+│   │                           # Obligations, Report, Exchange, Sync, Admin
+│   ├── Entities/               # EF Core сущности (User, Account, Category, ...)
+│   ├── Data/                   # AppDbContext
+│   ├── Services/               # CbrExchangeRateService (курсы ЦБ + CoinGecko)
+│   ├── Auth/                   # UserContext (извлечение userId из JWT)
+│   ├── Migrations/             # EF Core миграции
+│   ├── wwwroot/admin/          # Веб-интерфейс админ-панели
+│   ├── Program.cs              # Настройка и запуск сервера
+│   └── appsettings.json        # JWT, подключение к БД, seed-данные
 │
-├── Shared/                      # Общие DTO между клиентом/сервером
-│   ├── Accounts/                # AccountDto, CreateAccountRequest
-│   ├── Categories/              # CategoryDto
-│   ├── Transactions/            # TransactionDto, EntryDto
-│   └── Auth/                    # LoginRequest, RegisterRequest
+├── Shared/                     # Общие DTO между клиентом и сервером
+│   ├── Accounts/               # AccountDto, CreateAccountRequest, enums
+│   ├── Auth/                   # LoginRequest, RegisterRequest, AuthResponse
+│   ├── Categories/             # CategoryDto
+│   ├── Transactions/           # TransactionDto, EntryDto, MoneyDto
+│   ├── Obligations/            # ObligationDto, enums
+│   ├── Reports/                # SummaryDto, MonthlyTotalDto, ...
+│   ├── Sync/                   # SyncPushRequest
+│   └── Exchange/               # ExchangeRateDto
 │
-├── db/                          # SQL-скрипты для инициализации
-├── docker-compose.yml           # PostgreSQL контейнер
-└── README.md                    # Этот файл
+├── db/                         # Docker-скрипты для PostgreSQL
+├── docker-compose.yml          # PostgreSQL-контейнер (dev)
+├── dockerfile                  # Сборка серверного Docker-образа
+└── Diplom.slnx                 # Корневой solution (Client + Server + Shared)
 ```
 
----
-
-## 👨‍💻 Разработка
+## Разработка
 
 ### Создание миграции
 
@@ -226,4 +164,19 @@ Diplom/
 cd Server
 dotnet ef migrations add MigrationName
 dotnet ef database update
+```
+
+### Сброс БД
+
+```bash
+docker compose down -v
+docker compose up -d
+dotnet run --project Server
+```
+
+### Резервная копия / восстановление БД
+
+```powershell
+.\db\scripts\db-backup.ps1    # → db/backup/seed.dump
+.\db\scripts\db-restore.ps1   # ← db/backup/seed.dump
 ```
