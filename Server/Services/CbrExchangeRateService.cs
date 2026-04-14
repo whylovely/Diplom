@@ -30,7 +30,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
 
     public async Task<List<ExchangeRateDto>> GetRatesAsync(CancellationToken ct)
     {
-        // Отдаём из кэша
         if (_cache.TryGetValue(CacheKey, out List<ExchangeRateDto>? cached) && cached is not null)
         {
             return cached;
@@ -49,7 +48,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
             return GetLastKnownOrEmpty();
         }
 
-        // Крипто — добавляем, при ошибке используем хардкод
         try
         {
             var cryptoUsdPrices = await FetchCryptoUsdPricesAsync(ct);

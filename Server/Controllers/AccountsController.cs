@@ -183,7 +183,6 @@ public sealed class AccountsController : ControllerBase
 
         if (entity is null) return NotFound();
 
-        // Подсчитать текущий баланс счёта по проводкам
         var entries = await _db.Entries
             .Where(e => e.AccountId == id)
             .Select(e => new { e.Direction, e.Amount })
@@ -192,7 +191,6 @@ public sealed class AccountsController : ControllerBase
         decimal balance = 0m;
         foreach (var e in entries)
         {
-            // Direction: 0 = Debit (приход), 1 = Credit (расход)
             balance += e.Direction == 0 ? e.Amount : -e.Amount;
         }
 

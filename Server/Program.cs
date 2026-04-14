@@ -15,10 +15,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IExchangeRateService, CbrExchangeRateService>();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-                    ?? builder.Configuration.GetConnectionString("db");
-
-// Очищаем строку от случайных невидимых пробелов и кавычек по краям
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? builder.Configuration.GetConnectionString("db");
 connectionString = connectionString?.Trim(' ', '"', '\'');
 
 Console.WriteLine($"[DEBUG] Original connection string length: {connectionString?.Length ?? 0}");
@@ -27,7 +24,6 @@ if (!string.IsNullOrEmpty(connectionString))
     Console.WriteLine($"[DEBUG] Starts with 'postgres://': {connectionString.StartsWith("postgres://")}");
 }
 
-// Теперь проверяем просто на слово "postgres" в начале (покроет и postgres://, и postgresql://)
 if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres", StringComparison.OrdinalIgnoreCase))
 {
     try 
@@ -116,7 +112,6 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        // 2. Применяем миграции
         db.Database.Migrate();
     }
     catch (Exception ex)
@@ -127,15 +122,13 @@ using (var scope = app.Services.CreateScope())
 
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-    // Авто-миграция в Development (эту часть можно оставить или убрать, 
-    // так как мы уже сделали Migrate() выше, но пусть будет)
     if (app.Environment.IsDevelopment())
     {
         await db.Database.MigrateAsync();
         Console.WriteLine("[DB] Migrations applied.");
     }
 
-    // --- Seed: Admin ---
+    // Seed: Admin
     var adminSection = cfg.GetSection("Admin");
     var adminEmail = adminSection["Email"];
     var adminPassword = adminSection["Password"];
@@ -165,7 +158,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // --- Seed: Demo-пользователь ---
+    // Seed: Demo-пользователь
     const string demoEmail = "demo@finance.local";
     const string demoPassword = "Demo123";
 
@@ -184,22 +177,19 @@ using (var scope = app.Services.CreateScope())
         var uid = demoUser.Id;
         var now = DateTimeOffset.UtcNow;
 
-        // Счета
         var accCard = new AccountEntity { UserId = uid, Name = "Карта", Kind = 0, Currency = "RUB" };
         var accCash = new AccountEntity { UserId = uid, Name = "Наличные", Kind = 0, Currency = "RUB" };
         var accCrypto = new AccountEntity { UserId = uid, Name = "USDT Wallet", Kind = 0, Currency = "USD", AccountType = 1, SecondaryCurrency = "RUB", ExchangeRate = 92.0m };
         db.Accounts.AddRange(accCard, accCash, accCrypto);
 
-        // Категории
         var catSalary = new CategoryEntity { UserId = uid, Name = "Зарплата" };
         var catFood = new CategoryEntity { UserId = uid, Name = "Продукты" };
         var catTransport = new CategoryEntity { UserId = uid, Name = "Транспорт" };
         var catFun = new CategoryEntity { UserId = uid, Name = "Развлечения" };
         var catCafe = new CategoryEntity { UserId = uid, Name = "Кафе" };
         db.Categories.AddRange(catSalary, catFood, catTransport, catFun, catCafe);
-        await db.SaveChangesAsync(); // сохраняем чтобы получить Id
+        await db.SaveChangesAsync();
 
-        // Транзакции (10 штук за последний месяц)
         void AddTx(DateTimeOffset date, string desc, Guid accId, Guid? catId, decimal amount, string cur, int dirFrom, int dirTo, Guid? accToId = null)
         {
             var tx = new TransactionEntity { UserId = uid, Date = date, Description = desc };
@@ -211,11 +201,9 @@ using (var scope = app.Services.CreateScope())
                 db.Entries.Add(new EntryEntity { UserId = uid, TransactionId = tx.Id, AccountId = accToId.Value, CategoryId = catId, Direction = dirTo, Amount = amount, Currency = cur });
         }
 
-        // Доходы: Debit (0) = деньги ПРИХОДЯТ на счёт
         AddTx(now.AddDays(-25), "Зарплата (аванс)", accCard.Id, catSalary.Id, 85000, "RUB", 0, 0);
         AddTx(now.AddDays(-10), "Зарплата (остаток)", accCard.Id, catSalary.Id, 70000, "RUB", 0, 0);
 
-        // Расходы: Credit (1) = деньги УХОДЯТ со счёта
         AddTx(now.AddDays(-28), "Ашан", accCard.Id, catFood.Id, 3500, "RUB", 1, 0);
         AddTx(now.AddDays(-21), "Фрукты на рынке", accCash.Id, catFood.Id, 500, "RUB", 1, 0);
         AddTx(now.AddDays(-18), "Лента", accCard.Id, catFood.Id, 4100, "RUB", 1, 0);
@@ -227,7 +215,6 @@ using (var scope = app.Services.CreateScope())
 
         await db.SaveChangesAsync();
 
-        // Обязательства
         db.Obligations.AddRange(
             new ObligationEntity { UserId = uid, Counterparty = "Максим", Amount = 5000, Currency = "RUB", Type = 0, DueDate = now.AddDays(7), Note = "Одолжил до зарплаты" },
             new ObligationEntity { UserId = uid, Counterparty = "Альфа-Банк", Amount = 12400, Currency = "RUB", Type = 1, DueDate = now.AddDays(15), Note = "Льготный период кредитки" }
@@ -251,3 +238,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Позволяет WebApplicationFactory в тестах ссылаться на Program
+public partial class Program { }

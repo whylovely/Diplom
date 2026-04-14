@@ -15,18 +15,12 @@ namespace Client.ViewModels
 {
     public partial class ExpenseReport  // класс-помощник для отчета с расходами
     {
-        /// <summary>
-        /// Определяет расходные записи из транзакций. Для каждой транзакции берётся
-        /// либо Expense-entry (двойная запись), либо Assets+Credit (серверные данные).
-        /// Это предотвращает двойной подсчёт.
-        /// </summary>
         private static IEnumerable<Entry> GetExpenseEntries(
             IList<Transaction> txInRange,
             IDictionary<Guid, Account> accountById)
         {
             foreach (var tx in txInRange)
             {
-                // Приоритет: Expense-entry (классическая двойная запись)
                 var expenseEntry = tx.Entries.FirstOrDefault(e =>
                     accountById.TryGetValue(e.AccountId, out var acc)
                     && acc.Type == AccountType.Expense && e.Direction == EntryDirection.Debit);
@@ -37,7 +31,6 @@ namespace Client.ViewModels
                     continue;
                 }
 
-                // Фолбэк: Assets + Credit (серверные транзакции без технических счетов)
                 foreach (var e in tx.Entries)
                 {
                     if (accountById.TryGetValue(e.AccountId, out var acc)
@@ -92,7 +85,6 @@ namespace Client.ViewModels
             var accountById = _data.Accounts.ToDictionary(a => a.Id);
 
             var entries = GetExpenseEntries(txInRange, accountById).ToList();
-            // Сопоставляем entry обратно с транзакцией для получения даты и описания
             var txById = txInRange.SelectMany(t => t.Entries.Select(e => new { e.Id, Tx = t }))
                 .ToDictionary(x => x.Id, x => x.Tx);
 
@@ -183,7 +175,5 @@ namespace Client.ViewModels
                 i++;
             }
         }
-
-        
     }
 }

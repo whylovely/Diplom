@@ -15,10 +15,6 @@ namespace Client.ViewModels
 {
     public partial class IncomeReport   // класс-помощник для доходов
     {
-        /// <summary>
-        /// Определяет доходные записи. Приоритет: Income-entry (двойная запись).
-        /// Фолбэк: Assets+Debit (серверные транзакции без технических счетов).
-        /// </summary>
         private static IEnumerable<Entry> GetIncomeEntries(
             IList<Transaction> txInRange,
             IDictionary<Guid, Account> accountById)

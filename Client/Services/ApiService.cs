@@ -11,9 +11,6 @@ using Shared.Transactions;
 
 namespace Client.Services;
 
-/// <summary>
-/// HTTP-клиент для REST API сервера с JWT-авторизацией.
-/// </summary>
 public sealed class ApiService
 {
     private readonly HttpClient _http;
@@ -36,8 +33,6 @@ public sealed class ApiService
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
-    // ─── Ping ────────────────────────────────────────────
-
     public async Task<bool> PingAsync()
     {
         try
@@ -51,8 +46,6 @@ public sealed class ApiService
             return false;
         }
     }
-
-    // ─── Accounts ────────────────────────────────────────
 
     public async Task<List<AccountDto>?> GetAccountsAsync()
     {
@@ -70,8 +63,6 @@ public sealed class ApiService
         return await resp.Content.ReadFromJsonAsync<AccountDto>();
     }
 
-    // ─── Categories ──────────────────────────────────────
-
     public async Task<List<CategoryDto>?> GetCategoriesAsync()
     {
         SetAuth();
@@ -87,8 +78,6 @@ public sealed class ApiService
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<CategoryDto>();
     }
-
-    // ─── Transactions ────────────────────────────────────
 
     public async Task<List<TransactionDto>?> GetTransactionsAsync()
     {
@@ -106,8 +95,6 @@ public sealed class ApiService
         return await resp.Content.ReadFromJsonAsync<TransactionDto>();
     }
 
-    // ─── Obligations ─────────────────────────────────────
-
     public async Task<List<ObligationDto>?> GetObligationsAsync()
     {
         SetAuth();
@@ -123,8 +110,6 @@ public sealed class ApiService
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<ObligationDto>();
     }
-
-    // ─── Sync ────────────────────────────────────────────
 
     public async Task PushAllDataAsync(Shared.Sync.SyncPushRequest req)
     {

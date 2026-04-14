@@ -28,14 +28,12 @@ public sealed class SyncController : ControllerBase
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
-        // Delete existing data for the user
         await _db.Entries.Where(e => e.UserId == userId).ExecuteDeleteAsync(ct);
         await _db.Transactions.Where(t => t.UserId == userId).ExecuteDeleteAsync(ct);
         await _db.Obligations.Where(o => o.UserId == userId).ExecuteDeleteAsync(ct);
         await _db.Categories.Where(c => c.UserId == userId).ExecuteDeleteAsync(ct);
         await _db.Accounts.Where(a => a.UserId == userId).ExecuteDeleteAsync(ct);
 
-        // Insert Accounts
         if (req.Accounts != null && req.Accounts.Count > 0)
         {
             var accEntities = req.Accounts.Select(a => new AccountEntity
@@ -53,7 +51,6 @@ public sealed class SyncController : ControllerBase
             await _db.Accounts.AddRangeAsync(accEntities, ct);
         }
 
-        // Insert Categories
         if (req.Categories != null && req.Categories.Count > 0)
         {
             var catEntities = req.Categories.Select(c => new CategoryEntity
@@ -66,7 +63,6 @@ public sealed class SyncController : ControllerBase
             await _db.Categories.AddRangeAsync(catEntities, ct);
         }
 
-        // Insert Obligations
         if (req.Obligations != null && req.Obligations.Count > 0)
         {
             var oblEntities = req.Obligations.Select(o => new ObligationEntity
@@ -87,7 +83,6 @@ public sealed class SyncController : ControllerBase
             await _db.Obligations.AddRangeAsync(oblEntities, ct);
         }
 
-        // Insert Transactions
         if (req.Transactions != null && req.Transactions.Count > 0)
         {
             var trEntities = req.Transactions.Select(t => new TransactionEntity

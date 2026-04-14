@@ -16,7 +16,7 @@ public sealed class ReportController : ControllerBase
     private readonly AppDbContext _db;
     public ReportController(AppDbContext db) => _db = db;
 
-    // Сводный отчёт: общий доход, расход, нетто + группировка по категориям.
+    // Сводный отчёт
     [HttpGet("summary")]
     public async Task<ActionResult<SummaryDto>> GetSummary(
         [FromQuery] DateTimeOffset from,
@@ -35,7 +35,7 @@ public sealed class ReportController : ControllerBase
             expenseByCategory, incomeByCategory));
     }
 
-    // Группировка по категориям для указанного вида счёта (1 = доход, 2 = расход).
+    // Группировка по категориям для указанного вида счёта
     [HttpGet("by-category")]
     public async Task<ActionResult<IReadOnlyList<CategoryTotalDto>>> GetByCategory(
         [FromQuery] DateTimeOffset from,
@@ -52,7 +52,7 @@ public sealed class ReportController : ControllerBase
         return Ok(result);
     }
 
-    // Помесячная динамика доходов и расходов.
+    // Помесячная динамика
     [HttpGet("monthly")]
     public async Task<ActionResult<IReadOnlyList<MonthlyTotalDto>>> GetMonthly(
         [FromQuery] DateTimeOffset from,
@@ -87,7 +87,7 @@ public sealed class ReportController : ControllerBase
         return Ok(monthly);
     }
 
-    // Обороты по счетам: дебет и кредит за период.
+    // Обороты по счетам
     [HttpGet("turnover")]
     public async Task<ActionResult<IReadOnlyList<AccountTurnoverDto>>> GetTurnover(
         [FromQuery] DateTimeOffset from,

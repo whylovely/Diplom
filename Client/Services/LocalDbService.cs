@@ -49,7 +49,7 @@ public sealed class LocalDbService : IDataService   // Основа - SQLite
         LoadAll();
     }
 
-private SqliteConnection Open() // соединение с локальной бд
+private SqliteConnection Open()
     {
         var conn = new SqliteConnection(_connectionString);
         conn.Open();
@@ -154,7 +154,6 @@ private SqliteConnection Open() // соединение с локальной б
     {
         using var conn = Open();
         
-        // Проверка наличия колонки IsDeleted в Accounts
         bool hasIsDeleted = false;
         using (var cmd = conn.CreateCommand())
         {
@@ -208,7 +207,7 @@ private SqliteConnection Open() // соединение с локальной б
             {
                 { "RUB", 1.0 }, { "USD", 72.0 }, { "EUR", 91.0 }, { "KZT", 0.16 },
                 { "GBP", 104.0 }, { "CNY", 12.0 }, { "TRY", 1.8 }
-            };  // курсы валют (пока фиксированный для рубля)
+            };  // курсы валют (фиксированный для рубля)
 
             foreach (var kvp in defaultRates)
             {
@@ -296,9 +295,8 @@ private SqliteConnection Open() // соединение с локальной б
         }
     }
 
-    private void LoadAll()  // Сохранение из БД в ОЗУ
+    private void LoadAll()
     {
-        // Очистка текущих кэшей 
         _accounts.Clear();
         _categories.Clear();
         _transactions.Clear();
@@ -495,7 +493,7 @@ private SqliteConnection Open() // соединение с локальной б
         }
     }
 
-    public void AddAccount(Account account) // Добавление счета
+    public void AddAccount(Account account)
     {
         using var conn = Open();
         
@@ -520,7 +518,7 @@ private SqliteConnection Open() // соединение с локальной б
         RaiseChanged();
     }
 
-    public void RenameAccount(Guid id, string newName)  // Переименовывание счета
+    public void RenameAccount(Guid id, string newName)
     {
         if (string.IsNullOrWhiteSpace(newName)) return;
         var acc = _accounts.FirstOrDefault(a => a.Id == id);
@@ -536,7 +534,7 @@ private SqliteConnection Open() // соединение с локальной б
         RaiseChanged();
     }
 
-    public void UpdateAccountsBaseCurrency(string newBaseCurrency) // Обновление типа счетов при смене базовой валюты
+    public void UpdateAccountsBaseCurrency(string newBaseCurrency) 
     {
         using var conn = Open();
         using var tran = conn.BeginTransaction();
@@ -581,7 +579,7 @@ private SqliteConnection Open() // соединение с локальной б
         if (changed) RaiseChanged();
     }
 
-    public void RemoveAccount(Guid id)  // soft-delete счета
+    public void RemoveAccount(Guid id)
     {
         var acc = _accounts.FirstOrDefault(a => a.Id == id);
         if (acc is null) return;
@@ -609,21 +607,21 @@ private SqliteConnection Open() // соединение с локальной б
 
     public int GetLocalTransactionCount() => _transactions.Count;
 
-    public Account GetExpenseAccountForCategory(Guid categoryId)    // Категория - расход
+    public Account GetExpenseAccountForCategory(Guid categoryId)
     {
         if (!_expenseAccountByCategoryId.TryGetValue(categoryId, out var accId))
             throw new InvalidOperationException($"Expense account not found for category {categoryId}");
         return _accounts.Single(a => a.Id == accId);
     }
 
-    public Account GetIncomeAccountForCategory(Guid categoryId) // Категория - доход
+    public Account GetIncomeAccountForCategory(Guid categoryId)
     {
         if (!_incomeAccountByCategoryId.TryGetValue(categoryId, out var accId))
             throw new InvalidOperationException($"Income account not found for category {categoryId}");
         return _accounts.Single(a => a.Id == accId);
     }
 
-    public void AddCategory(Category category)  // Добавление категории
+    public void AddCategory(Category category)
     {
         var now = DateTimeOffset.Now;
         using var conn = Open();
@@ -642,7 +640,7 @@ private SqliteConnection Open() // соединение с локальной б
         RaiseChanged();
     }
 
-    public void RemoveCategory(Category category)   // Удаление категории
+    public void RemoveCategory(Category category)
     {
         using var conn = Open();
         Exec(conn, "DELETE FROM Categories WHERE Id = @Id", ("@Id", category.Id.ToString()));
@@ -691,7 +689,7 @@ private SqliteConnection Open() // соединение с локальной б
         _incomeAccountByCategoryId[cat.Id] = incAcc.Id;
     }
 
-    public Task PostTransactionAsync(Transaction tx)    // Запись транзакции
+    public Task PostTransactionAsync(Transaction tx)
     {
         if (tx.Entries.Count < 2)
             throw new InvalidOperationException("Транзакция не содержит двух проводок");
@@ -718,7 +716,6 @@ private SqliteConnection Open() // соединение с локальной б
                 ("@Amt", (double)e.Amount.Amount),
                 ("@Cur", e.Amount.CurrencyCode));
 
-            // Обновление баланса счета, затронутого проводкой
             var acc = _accounts.Single(a => a.Id == e.AccountId);
             if (acc.Type == AccountType.Assets && acc.CurrencyCode != e.Amount.CurrencyCode)
                 throw new InvalidOperationException("Валюта проводки не совпадает с валютой счета");
@@ -732,14 +729,14 @@ private SqliteConnection Open() // соединение с локальной б
             }
         }
 
-        tran.Commit();  // Отправление изменений в бд
+        tran.Commit();
         
         _transactions.Insert(0, tx);
         RaiseChanged();
         return Task.CompletedTask;
     }
 
-    public Task StornoTransactionAsync(Guid transactionId)  // Сторнирование транзакции
+    public Task StornoTransactionAsync(Guid transactionId)
     {
         var tx = _transactions.FirstOrDefault(t => t.Id == transactionId);
         if (tx == null) return Task.CompletedTask;
@@ -776,7 +773,7 @@ private SqliteConnection Open() // соединение с локальной б
         return PostTransactionAsync(stornoTx);
     }
 
-    public Task AddObligationAsync(Obligation obligation)   // Добавление обязательтсва
+    public Task AddObligationAsync(Obligation obligation)
     {
         using var conn = Open();
         
@@ -798,7 +795,7 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
-    public Task UpdateObligationAsync(Obligation obligation)    // Изменение обязательства
+    public Task UpdateObligationAsync(Obligation obligation)
     {
         using var conn = Open();
         Exec(conn, @"UPDATE Obligations SET Counterparty=@Cp, Amount=@Amt, Currency=@Cur, Type=@Type,
@@ -819,7 +816,7 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
-    public Task DeleteObligationAsync(Guid id)  // Удаление обязатлеьства
+    public Task DeleteObligationAsync(Guid id)
     {
         using var conn = Open();
         Exec(conn, "DELETE FROM Obligations WHERE Id = @Id", ("@Id", id.ToString()));
@@ -829,7 +826,7 @@ private SqliteConnection Open() // соединение с локальной б
         return Task.CompletedTask;
     }
 
-    public Task MarkObligationPaidAsync(Guid id, bool isPaid)   // Пометка обязательства
+    public Task MarkObligationPaidAsync(Guid id, bool isPaid)
     {
         var existing = _obligations.FirstOrDefault(o => o.Id == id);
         if (existing == null) return Task.CompletedTask;
@@ -904,7 +901,6 @@ private SqliteConnection Open() // соединение с локальной б
         using var conn = Open();
         Exec(conn, "DELETE FROM AccountGroups WHERE Id = @Id", ("@Id", id.ToString()));
         
-        // Сбрасываем GroupId у всех счетов этой группы
         Exec(conn, "UPDATE Accounts SET GroupId = NULL WHERE GroupId = @Id", ("@Id", id.ToString()));
 
         _accountGroups.RemoveAll(g => g.Id == id);
@@ -930,11 +926,10 @@ private SqliteConnection Open() // соединение с локальной б
         RaiseChanged();
     }
 
-    public decimal GetRate(string fromCurrency, string toCurrency = "RUB")  // Получение курса валют
+    public decimal GetRate(string fromCurrency, string toCurrency = "RUB")
     {
         if (fromCurrency == toCurrency) return 1m;
         
-        // Для простоты пока считаем, что все кросскурсы идут через базовую валюту
         var fromRate = fromCurrency == "RUB" ? 1m : _currencyRates.FirstOrDefault(r => r.CurrencyCode == fromCurrency)?.RateToBase ?? 1m;
         var toRate = toCurrency == "RUB" ? 1m : _currencyRates.FirstOrDefault(r => r.CurrencyCode == toCurrency)?.RateToBase ?? 1m;
 
@@ -942,7 +937,7 @@ private SqliteConnection Open() // соединение с локальной б
         return fromRate / toRate;
     }
 
-    public void SetCurrencyRate(string code, decimal rate)  // Обновление курса валют
+    public void SetCurrencyRate(string code, decimal rate)
     {
         if (code == "RUB") return;
 
@@ -966,31 +961,24 @@ private SqliteConnection Open() // соединение с локальной б
         RaiseChanged();
     }
 
-    /// <summary>
-    /// Полная замена локальных данных (после синхронизации с сервером).
-    /// Удаляет все существующие записи и вставляет новые.
-    /// </summary>
     public void ReplaceAllData(
         List<Account> accounts,
         List<Category> categories,
         List<Obligation> obligations,
         List<Transaction> transactions)
     {
-        // Сохраняем текущие привязки счетов к группам
         var accountGroupsMap = _accounts.Where(a => a.GroupId.HasValue)
                                         .ToDictionary(a => a.Id, a => a.GroupId!.Value);
 
         using var conn = Open();
         using var tran = conn.BeginTransaction();
 
-        // 1. Очистить все таблицы
         Exec(conn, "DELETE FROM Entries");
         Exec(conn, "DELETE FROM Transactions");
         Exec(conn, "DELETE FROM Obligations");
         Exec(conn, "DELETE FROM Categories");
         Exec(conn, "DELETE FROM Accounts");
 
-        // 2. Вставить счета
         foreach (var a in accounts)
         {
             var groupId = accountGroupsMap.TryGetValue(a.Id, out var gId) ? (object)gId.ToString() : DBNull.Value;
@@ -1013,7 +1001,6 @@ private SqliteConnection Open() // соединение с локальной б
                 ("@Updated", a.UpdatedAt.ToString("O")));
         }
 
-        // 3. Вставить категории
         var now = DateTimeOffset.Now.ToString("O");
         foreach (var c in categories)
         {
@@ -1025,7 +1012,6 @@ private SqliteConnection Open() // соединение с локальной б
                 ("@Now", now));
         }
 
-        // 4. Вставить обязательства
         foreach (var o in obligations)
         {
             Exec(conn, @"INSERT INTO Obligations (Id, Counterparty, Amount, Currency, Type, CreatedAt, DueDate, IsPaid, PaidAt, Note)
@@ -1042,7 +1028,6 @@ private SqliteConnection Open() // соединение с локальной б
                 ("@Note", (object?)o.Note ?? DBNull.Value));
         }
 
-        // 5. Вставить транзакции и проводки
         foreach (var tx in transactions)
         {
             Exec(conn, @"INSERT INTO Transactions (Id, Date, Description, CreatedAt)
@@ -1068,14 +1053,10 @@ private SqliteConnection Open() // соединение с локальной б
 
         tran.Commit();
 
-        // 6. Перезагрузить кэш из БД
         LoadAll();
         RaiseChanged();
     }
 
-    /// <param name="conn">Соединение с БД.</param>
-    /// <param name="sql">SQL-строка запроса.</param>
-    /// <param name="parameters">Параметры для защиты от SQL-инъекций.</param>
     private static void Exec(SqliteConnection conn, string sql, params (string name, object value)[] parameters)
     {
         using var cmd = conn.CreateCommand();

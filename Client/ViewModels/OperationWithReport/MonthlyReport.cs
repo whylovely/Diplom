@@ -30,8 +30,6 @@ namespace Client.ViewModels
             foreach (var mg in mothlyGroups)
             {
                 var txList = mg.ToList();
-                
-                // Расходы: приоритет Expense-entry, фолбэк Assets+Credit
                 decimal expense = 0;
                 foreach (var tx in txList)
                 {
@@ -49,7 +47,6 @@ namespace Client.ViewModels
                     }
                 }
 
-                // Доходы: приоритет Income-entry, фолбэк Assets+Debit
                 decimal income = 0;
                 foreach (var tx in txList)
                 {
@@ -91,7 +88,6 @@ namespace Client.ViewModels
             var incomeValues = MonthlyRows.Select(r => r.Income).ToArray();
             var expenseValues = MonthlyRows.Select(r => r.Expense).ToArray();
 
-            // Income — green area line
             var incomeGreen = SkiaSharp.SKColor.Parse("#00E676");
             MonthlySeries.Add(new LineSeries<decimal>
             {
@@ -105,7 +101,6 @@ namespace Client.ViewModels
                 LineSmoothness = 0
             });
 
-            // Expenses — red area line
             var expenseRed = SkiaSharp.SKColor.Parse("#FF5252");
             MonthlySeries.Add(new LineSeries<decimal>
             {
@@ -128,7 +123,7 @@ namespace Client.ViewModels
                 {
                     Labels = MonthlyLabels.ToArray(),
                     LabelsPaint = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(labelColor),
-                    SeparatorsPaint = null // no vertical grid lines
+                    SeparatorsPaint = null
                 }
             };
             YAxes = new[]
