@@ -103,9 +103,20 @@ namespace Client.Services
             }
         }
 
+        public DateTimeOffset? LastSyncedAt
+        {
+            get => Settings.LastSyncedAt;
+            set
+            {
+                Settings.LastSyncedAt = value;
+                Save();
+            }
+        }
+
         public void Logout()
         {
             Settings.AuthToken = null;
+            Settings.LastSyncedAt = null;
             Save();
         }
     }

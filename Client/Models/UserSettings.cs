@@ -10,5 +10,6 @@ namespace Client.Models
         public string? AuthToken { get; set; }
         public string ServerUrl { get; set; } = "https://diplom-odbj.onrender.com/";
         public List<string> FavoriteCurrencies { get; set; } = new();
+        public DateTimeOffset? LastSyncedAt { get; set; }
     }
 }

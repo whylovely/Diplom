@@ -1,15 +1,12 @@
-## .NET Build Artifacts
 bin/
 obj/
 out/
 
-## NuGet Packages
 *.nupkg
 *.snupkg
 .nuget/
 packages/
 
-## Visual Studio / Rider
 .vs/
 .vscode/
 .idea/
@@ -22,18 +19,15 @@ packages/
 *.vsidx
 *.dotCover
 
-## Avalonia Compiled XAML
 *.axaml.cache
 *.axaml.g.cs
 
-## Build / Test Results
 publish/
 artifacts/
 TestResults/
 coverage/
 coverage.xml
 
-## Temporary Files
 *.log
 *.tmp
 *.temp
@@ -41,23 +35,19 @@ coverage.xml
 *.swp
 *~
 
-## Local Configuration (secrets)
 appsettings.Local.json
 *.secrets.json
 
-## Local Databases
 *.db
 *.sqlite
 *.sqlite3
 
-## OS Files
-# Windows
 Thumbs.db
 Desktop.ini
 ehthumbs.db
-# Linux
 .nfs*
-# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
+
+/Server.Tests

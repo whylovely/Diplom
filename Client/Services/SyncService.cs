@@ -10,29 +10,38 @@ using Shared.Transactions;
 
 namespace Client.Services;
 
-/// <summary>
-/// Сервис синхронизации: pull данных с сервера → замена локальной SQLite.
-/// Стратегия: сервер главный.
-/// </summary>
 public sealed class SyncService
 {
     private readonly ApiService _api;
     private readonly LocalDbService _localDb;
+    private readonly SettingsService _settings;
 
-    public SyncService(ApiService api, LocalDbService localDb)
+    public SyncService(ApiService api, LocalDbService localDb, SettingsService settings)
     {
         _api = api;
         _localDb = localDb;
+        _settings = settings;
     }
 
-    /// <summary>
-    /// Проверить доступность сервера.
-    /// </summary>
+    public async Task<SyncResult> SmartSyncAsync()
+    {
+        var lastSync      = _settings.LastSyncedAt ?? DateTimeOffset.MinValue;
+        var lastLocalChange = _localDb.GetLocalLastChangeDate();
+
+        bool hasLocalChanges = lastLocalChange.HasValue && lastLocalChange.Value > lastSync;
+
+        if (hasLocalChanges)
+            await PushAllDataToServerAsync();
+
+        var result = await SyncAsync();
+
+        if (result.Success)
+            _settings.LastSyncedAt = DateTimeOffset.UtcNow;
+
+        return result;
+    }
     public Task<bool> IsServerAvailableAsync() => _api.PingAsync();
 
-    /// <summary>
-    /// Получить количество транзакций на сервере (для сравнения с локальными).
-    /// </summary>
     public async Task<int> GetServerTransactionCountAsync()
     {
         try
@@ -43,19 +52,14 @@ public sealed class SyncService
         catch { return -1; }
     }
 
-    /// <summary>
-    /// Полная синхронизация: загрузить данные с сервера и записать в локальную БД.
-    /// </summary>
     public async Task<SyncResult> SyncAsync()
     {
         try
         {
-            // 1. Скачать основные данные
             var serverAccounts = await _api.GetAccountsAsync() ?? new();
             var serverCategories = await _api.GetCategoriesAsync() ?? new();
             var serverObligations = await _api.GetObligationsAsync() ?? new();
 
-            // 2. Попробовать скачать транзакции (endpoint может не существовать)
             List<TransactionDto> serverTransactions = new();
             try
             {
@@ -63,16 +67,13 @@ public sealed class SyncService
             }
             catch
             {
-                // Если endpoint отсутствует — продолжаем без транзакций
             }
 
-            // 3. Маппинг DTO → клиентские модели
             var accounts = serverAccounts.Select(MapAccount).ToList();
             var categories = serverCategories.Select(MapCategory).ToList();
             var obligations = serverObligations.Select(MapObligation).ToList();
             var transactions = serverTransactions.Select(MapTransaction).ToList();
 
-            // 5. Пересчитать балансы из транзакций
             var accountMap = accounts.ToDictionary(a => a.Id);
             foreach (var tx in transactions)
             {
@@ -81,7 +82,6 @@ public sealed class SyncService
                     if (!accountMap.TryGetValue(entry.AccountId, out var acc)) continue;
                     if (acc.Type == AccountType.Assets)
                     {
-                        // Debit (0) → +, Credit (1) → -, любое другое → -
                         var delta = entry.Direction == Models.EntryDirection.Debit
                             ? entry.Amount.Amount
                             : -entry.Amount.Amount;
@@ -90,7 +90,6 @@ public sealed class SyncService
                 }
             }
 
-            // 6. Заменить локальные данные
             _localDb.ReplaceAllData(accounts, categories, obligations, transactions);
 
             return new SyncResult
@@ -112,14 +111,10 @@ public sealed class SyncService
         }
     }
 
-    /// <summary>
-    /// Полная синхронизация: отправить локальные данные на сервер с перезаписью.
-    /// </summary>
     public async Task<SyncResult> PushAllDataToServerAsync()
     {
         try
         {
-            // 1. Устраняем дубликаты счетов по имени (оставляем тот, у которого есть транзакции, или первый попавшийся)
             var uniqueAccounts = new Dictionary<string, Account>(StringComparer.OrdinalIgnoreCase);
             var accountIdMap = new Dictionary<Guid, Guid>(); // oldId -> newId
 
@@ -127,7 +122,6 @@ public sealed class SyncService
             {
                 if (uniqueAccounts.TryGetValue(acc.Name, out var existing))
                 {
-                    // Дубликат найден. Запоминаем, что старый ID теперь ссылается на сохраненный ID
                     accountIdMap[acc.Id] = existing.Id;
                 }
                 else
@@ -180,7 +174,6 @@ public sealed class SyncService
         }
     }
 
-    // ─── Маппинг DTO → Client Models ─────────────────────
 
     private static Account MapAccount(AccountDto dto) => new()
     {
@@ -191,7 +184,7 @@ public sealed class SyncService
         AccountMultiType = (Models.MultiCurrencyType)(int)dto.AccountType,
         SecondaryCurrencyCode = dto.SecondaryCurrency,
         ExchangeRate = dto.ExchangeRate,
-        Balance = 0, // будет пересчитан из транзакций
+        Balance = 0,
         CreatedAt = DateTimeOffset.Now,
         UpdatedAt = DateTimeOffset.Now
     };
