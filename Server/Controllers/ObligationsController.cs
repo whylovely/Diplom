@@ -64,6 +64,9 @@ public sealed class ObligationsController : ControllerBase
         if (!Enum.IsDefined(typeof(ObligationType), req.Type))
             return BadRequest("Invalid obligation type.");
 
+        if (req.Amount <= 0)
+            return BadRequest("Amount must be greater than 0.");
+
         var entity = new ObligationEntity
         {
             UserId = userId,
@@ -141,6 +144,9 @@ public sealed class ObligationsController : ControllerBase
             x => x.UserId == userId && !x.IsDeleted && x.Id == id, ct);
 
         if (entity is null) return NotFound();
+
+        if (entity.IsPaid)
+            return BadRequest("Obligation is already paid.");
 
         if (!entity.IsPaid)
         {
