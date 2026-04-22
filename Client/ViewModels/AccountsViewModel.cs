@@ -20,7 +20,7 @@ namespace Client.ViewModels
         private readonly Action<Account, TxKindChoice> _onQuickTx;  // Быстрые действия
         private readonly Func<Avalonia.Controls.Window> _getWindow;
         private readonly SettingsService _settings;
-        private readonly SyncService? _syncService;
+        private readonly SyncOrchestrator? _orchestrator;
 
         public ObservableCollection<Account> Accounts { get; }
         public ObservableCollection<AccountGroupViewModel> Groups { get; } = new();
@@ -69,8 +69,7 @@ namespace Client.ViewModels
             SettingsService settings,
             Action<Account, TxKindChoice> onQuickTx,
             Func<Avalonia.Controls.Window> getWindow,
-            SyncService? syncService = null
-            )
+            SyncOrchestrator? orchestrator = null)
         {
             _data = data;
             _notify = notify;
@@ -79,7 +78,7 @@ namespace Client.ViewModels
             _settings = settings;
             _onQuickTx = onQuickTx;
             _getWindow = getWindow;
-            _syncService = syncService;
+            _orchestrator = orchestrator;
 
             Accounts = new ObservableCollection<Account>();
             _data.DataChanged += OnDataChanged;
@@ -303,102 +302,72 @@ namespace Client.ViewModels
             _onQuickTx(acc, TxKindChoice.Income);
         }
 
-        // Если разница между локальными и серверными данными больше этого порога —
-        // показываем диалог вместо автоматического выбора.
-        private const int SyncConflictThreshold = 10;
-
         [RelayCommand]
         private async Task SyncAsync()
         {
-            if (_syncService is null || IsSyncing) return;
+            if (_orchestrator is null || IsSyncing) return;
 
             IsSyncing = true;
-            SyncStatusText = "Проверка...";
-            SyncIconColor = "#29B6F6";
+            SetSyncStatus("Проверка...", "#29B6F6");
 
-            var localCount  = _data.GetLocalTransactionCount();
-            var serverCount = await Task.Run(() => _syncService.GetServerTransactionCountAsync());
-            var diff        = Math.Abs(localCount - serverCount);
+            // Фаза 1: анализ
+            var analysis = await _orchestrator.AnalyzeAsync();
 
-            if (serverCount >= 0 && diff > SyncConflictThreshold)
+            // Фаза 2: выбор действия
+            SyncAction action;
+            if (analysis.NeedsConflictDialog)
             {
-                var localDate = _data.GetLocalLastChangeDate();
-                var dialog    = new SyncConflictDialog(localDate, localCount, serverCount);
-                var choice    = await dialog.ShowDialog<string?>(_getWindow());
+                var dialog = new SyncConflictDialog(
+                    analysis.LocalLastChange, analysis.LocalCount, analysis.ServerCount);
+                var choice = await dialog.ShowDialog<string?>(_getWindow());
 
-                if (choice == "client")
+                action = choice switch
                 {
-                    SyncStatusText = "Отменено пользователем";
-                    SyncIconColor  = "#FF8C00";
-                    IsSyncing      = false;
-                    return;
-                }
-
-                if (choice == "push")
-                {
-                    SyncStatusText = "Отправка на сервер...";
-                    var pushResult = await Task.Run(() => _syncService.PushAllDataToServerAsync());
-                    if (pushResult.Success)
-                    {
-                        SyncStatusText = "Синхронизировано";
-                        SyncIconColor  = "#00E676";
-                    }
-                    else
-                    {
-                        var e2 = pushResult.ErrorMessage ?? "Неизвестная ошибка";
-                        if (e2.Length > 60) e2 = e2[..60] + "…";
-                        SyncStatusText = $"Ошибка: {e2}";
-                        SyncIconColor  = "#FF5252";
-                    }
-                    IsSyncing = false;
-                    return;
-                }
-
-                if (choice is null)
-                {
-                    SyncStatusText = "Синхронизировано";
-                    SyncIconColor  = "#00E676";
-                    IsSyncing      = false;
-                    return;
-                }
-
-                SyncStatusText = "Синхронизация...";
-                var pullResult = await Task.Run(() => _syncService.SyncAsync());
-                if (pullResult.Success)
-                {
-                    await LoadDataAsync();
-                    SyncStatusText = "Синхронизировано";
-                    SyncIconColor  = "#00E676";
-                }
-                else
-                {
-                    var e2 = pullResult.ErrorMessage ?? "Неизвестная ошибка";
-                    if (e2.Length > 60) e2 = e2[..60] + "…";
-                    SyncStatusText = $"Ошибка: {e2}";
-                    SyncIconColor  = "#FF5252";
-                }
-                IsSyncing = false;
-                return;
-            }
-
-            SyncStatusText = "Синхронизация...";
-            var result = await Task.Run(() => _syncService.SmartSyncAsync());
-
-            if (result.Success)
-            {
-                await LoadDataAsync();
-                SyncStatusText = "Синхронизировано";
-                SyncIconColor  = "#00E676";
+                    "push"   => SyncAction.PushOnly,
+                    "server" => SyncAction.PullOnly,
+                    "client" => SyncAction.Cancel,
+                    _        => SyncAction.Dismiss   // null = закрыл без выбора
+                };
             }
             else
             {
-                var err = result.ErrorMessage ?? "Неизвестная ошибка";
+                action = SyncAction.SmartSync;
+            }
+
+            SetSyncStatus(
+                action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...",
+                "#29B6F6");
+
+            // Фаза 3: выполнение
+            var outcome = await _orchestrator.ExecuteAsync(action);
+
+            if (outcome.Success)
+            {
+                if (outcome.DataReplaced) await LoadDataAsync();
+                SetSyncStatus("Синхронизировано", "#00E676");
+            }
+            else if (outcome.WasCancelled)
+            {
+                SetSyncStatus("Отменено пользователем", "#FF8C00");
+            }
+            else if (outcome.WasDismissed)
+            {
+                SetSyncStatus("Синхронизировано", "#00E676");
+            }
+            else
+            {
+                var err = outcome.ErrorMessage ?? "Неизвестная ошибка";
                 if (err.Length > 60) err = err[..60] + "…";
-                SyncStatusText = $"Ошибка: {err}";
-                SyncIconColor  = "#FF5252";
+                SetSyncStatus($"Ошибка: {err}", "#FF5252");
             }
 
             IsSyncing = false;
+        }
+
+        private void SetSyncStatus(string text, string color)
+        {
+            SyncStatusText = text;
+            SyncIconColor  = color;
         }
     }
 }

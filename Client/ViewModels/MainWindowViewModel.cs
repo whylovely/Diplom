@@ -61,19 +61,20 @@ namespace Client.ViewModels
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
             var apiService = new ApiService(_settings);
-            var syncService = new SyncService(apiService, (LocalDbService)_data, _settings);
+            var syncService   = new SyncService(apiService, (LocalDbService)_data, _settings);
+            var syncOrchestrator = new SyncOrchestrator(syncService, _data);
 
             DashboardVm = new DashboardViewModel(_data, _settings);
 
             AccountsVm = new AccountsViewModel(
-                _data, 
-                _notify, 
+                _data,
+                _notify,
                 catDialog,
-                input, 
+                input,
                 _settings,
                 onQuickTx: openQuickTx,
                 getWindow: () => App.MainWindow!,
-                syncService: syncService);
+                orchestrator: syncOrchestrator);
 
             JournalVm = new JournalViewModel(_data, _notify);
 
