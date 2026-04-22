@@ -51,3 +51,4 @@ ehthumbs.db
 .LSOverride
 
 /Server.Tests
+/Client.Tests
