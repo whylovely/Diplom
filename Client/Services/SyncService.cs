@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Client.Models;
-using Shared.Accounts;
-using Shared.Categories;
-using Shared.Obligations;
 using Shared.Transactions;
 
 namespace Client.Services;
@@ -69,10 +66,10 @@ public sealed class SyncService
             {
             }
 
-            var accounts = serverAccounts.Select(MapAccount).ToList();
-            var categories = serverCategories.Select(MapCategory).ToList();
-            var obligations = serverObligations.Select(MapObligation).ToList();
-            var transactions = serverTransactions.Select(MapTransaction).ToList();
+            var accounts    = serverAccounts.Select(DtoMapper.FromDto).ToList();
+            var categories  = serverCategories.Select(DtoMapper.FromDto).ToList();
+            var obligations = serverObligations.Select(DtoMapper.FromDto).ToList();
+            var transactions = serverTransactions.Select(DtoMapper.FromDto).ToList();
 
             var accountMap = accounts.ToDictionary(a => a.Id);
             foreach (var tx in transactions)
@@ -131,26 +128,11 @@ public sealed class SyncService
                 }
             }
 
-            var accountsToPush = uniqueAccounts.Values.Select(a => new AccountDto(
-                a.Id, a.Name, (Shared.Accounts.AccountKind)(int)a.Type, a.CurrencyCode,
-                (Shared.Accounts.MultiCurrencyType)(int)a.AccountMultiType, a.SecondaryCurrencyCode, a.ExchangeRate)).ToList();
-            
-            var categories = _localDb.Categories.Select(c => new CategoryDto(
-                c.Id, c.Name)).ToList();
-
-            var obligations = _localDb.Obligations.Select(o => new ObligationDto(
-                o.Id, o.Counterparty, o.Amount, o.Currency, (Shared.Obligations.ObligationType)(int)o.Type,
-                o.CreatedAt, o.DueDate, o.IsPaid, o.PaidAt, o.Note)).ToList();
-
-            var transactions = _localDb.Transactions.Select(t => new TransactionDto(
-                t.Id, t.Date, t.Description,
-                t.Entries.Select(e => new EntryDto(
-                    e.Id, 
-                    accountIdMap.TryGetValue(e.AccountId, out var mappedId) ? mappedId : e.AccountId, // Подменяем ID счета, если он был дубликатом
-                    e.CategoryId, 
-                    (Shared.Transactions.EntryDirection)(int)e.Direction,
-                    new Shared.Transactions.MoneyDto(e.Amount.Amount, e.Amount.CurrencyCode))).ToList()
-            )).ToList();
+            var accountsToPush = uniqueAccounts.Values.Select(DtoMapper.ToDto).ToList();
+            var categories     = _localDb.Categories.Select(DtoMapper.ToDto).ToList();
+            var obligations    = _localDb.Obligations.Select(DtoMapper.ToDto).ToList();
+            var transactions   = _localDb.Transactions
+                .Select(t => DtoMapper.ToDto(t, accountIdMap)).ToList();
 
             var req = new Shared.Sync.SyncPushRequest(accountsToPush, categories, obligations, transactions);
             await _api.PushAllDataAsync(req);
@@ -175,60 +157,6 @@ public sealed class SyncService
     }
 
 
-    private static Account MapAccount(AccountDto dto) => new()
-    {
-        Id = dto.Id,
-        Name = dto.Name,
-        CurrencyCode = dto.Currency,
-        Type = (AccountType)(int)dto.Kind,
-        AccountMultiType = (Models.MultiCurrencyType)(int)dto.AccountType,
-        SecondaryCurrencyCode = dto.SecondaryCurrency,
-        ExchangeRate = dto.ExchangeRate,
-        Balance = 0,
-        CreatedAt = DateTimeOffset.Now,
-        UpdatedAt = DateTimeOffset.Now
-    };
-
-    private static readonly HashSet<string> IncomeCategories = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Зарплата", "Доход", "Фриланс", "Подработка", "Стипендия", "Пенсия", "Инвестиции"
-    };
-
-    private static Category MapCategory(CategoryDto dto) => new()
-    {
-        Id = dto.Id,
-        Name = dto.Name,
-        Kind = IncomeCategories.Contains(dto.Name) ? CategoryKind.Income : CategoryKind.Expense
-    };
-
-    private static Obligation MapObligation(ObligationDto dto) => new()
-    {
-        Id = dto.Id,
-        Counterparty = dto.Counterparty,
-        Amount = dto.Amount,
-        Currency = dto.Currency,
-        Type = (Models.ObligationType)(int)dto.Type,
-        CreatedAt = dto.CreatedAt,
-        DueDate = dto.DueDate,
-        IsPaid = dto.IsPaid,
-        PaidAt = dto.PaidAt,
-        Note = dto.Note
-    };
-
-    private static Transaction MapTransaction(TransactionDto dto) => new()
-    {
-        Id = dto.Id,
-        Date = dto.Date,
-        Description = dto.Description ?? string.Empty,
-        Entries = dto.Entries.Select(e => new Entry
-        {
-            Id = e.Id,
-            AccountId = e.AccountId,
-            CategoryId = e.CategoryId,
-            Direction = (Models.EntryDirection)(int)e.Direction,
-            Amount = new Money(e.Money.Amount, e.Money.Currency)
-        }).ToList()
-    };
 }
 
 public sealed class SyncResult
