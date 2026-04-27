@@ -76,7 +76,7 @@
                     <!-- Per-currency breakdown -->
                     <ItemsControl ItemsSource="{Binding CurrencyBalances}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:CurrencyBalance">
+                            <DataTemplate x:DataType="m:CurrencyBalance">
                                 <TextBlock FontSize="14" Foreground="#9E9E9E" Margin="0,2">
                                     <Run Text="{Binding Balance, StringFormat={}{0:N2}}"/>
                                     <Run Text=" "/>
@@ -96,7 +96,7 @@
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding RecentTransactions}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:RecentTransactionItem">
+                                <DataTemplate x:DataType="m:RecentTransactionItem">
                                     <Border Padding="8,6" Margin="0,0,0,4"
                                             Background="#1A2038" CornerRadius="10">
                                         <Grid ColumnDefinitions="Auto, *, Auto">

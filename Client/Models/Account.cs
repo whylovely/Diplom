@@ -45,6 +45,31 @@ namespace Client.Models
         MultiCurrency = 1
     }
 
+    public sealed class CurrencyBalance
+    {
+        public string CurrencyCode { get; set; } = "";
+        public decimal Balance { get; set; }
+    }
+
+    public sealed class RecentTransactionItem
+    {
+        public string Date         { get; set; } = "";
+        public decimal Amount      { get; set; }
+        public string Currency     { get; set; } = "";
+        public bool IsIncome       { get; set; }
+        public bool IsTransfer     { get; set; }
+        public string CategoryName { get; set; } = "";
+        public string AccountName  { get; set; } = "";
+        public string Description  { get; set; } = "";
+
+        public string FormattedAmount => IsTransfer
+            ? $"{Amount:N2} {Currency}"
+            : (IsIncome ? $"+{Amount:N2}" : $"−{Amount:N2}") + $" {Currency}";
+
+        public string AmountColor    => IsTransfer ? "#29B6F6" : (IsIncome ? "#00E676" : "#FF5252");
+        public string DirectionIcon  => IsTransfer ? "↔" : (IsIncome ? "↗" : "↙");
+    }
+
     public sealed class AccountBalanceRow
     {
         public string AccountName { get; set; } = "";
