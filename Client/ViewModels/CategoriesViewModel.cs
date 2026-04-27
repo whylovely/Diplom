@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels;
 
-public sealed partial class CategoriesViewModel : ViewModelBase // управление Категориями
+/// <summary>
+/// Страница «Категории»: добавление, переименование и удаление.
+/// При создании категории <see cref="LocalDbService.AddCategory"/> попутно
+/// создаст пару технических счетов («Расходы: X» и «Доходы: X»).
+/// </summary>
+public sealed partial class CategoriesViewModel : ViewModelBase
 {
     private readonly IDataService _data;
     private readonly INotificationService _notify;

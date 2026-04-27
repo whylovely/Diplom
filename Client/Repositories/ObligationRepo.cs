@@ -8,6 +8,11 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
+/// <summary>
+/// Хранилище обязательств — долгов перед кем-то и займов от кого-то.
+/// Не связан с транзакциями напрямую: при погашении долга <c>NewTransactionViewModel</c>
+/// строит транзакцию через <c>TransactionBuilder</c>, а потом помечает долг как оплаченный.
+/// </summary>
 public sealed class ObligationRepository
 {
     private readonly SqliteConFactory _factory;
@@ -102,6 +107,10 @@ public sealed class ObligationRepository
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Помечает обязательство как оплаченное (или возвращает в неоплаченные).
+    /// Если <paramref name="isPaid"/>=true — выставляется <c>PaidAt = Now</c>, иначе обнуляется.
+    /// </summary>
     public Task Mark(Guid id, bool isPaid)
     {
         var existing = _obligations.FirstOrDefault(o => o.Id == id);

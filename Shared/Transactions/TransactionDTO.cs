@@ -1,7 +1,13 @@
-﻿namespace Shared.Transactions;
+﻿// DTO транзакций и проводок. Используются и в HTTP-API, и в SyncPushRequest.
+namespace Shared.Transactions;
 
+/// <summary>Серверный аналог клиентского Money. Currency — ISO 4217 (3 буквы).</summary>
 public sealed record MoneyDto(decimal Amount, string Currency);
 
+/// <summary>
+/// Направление проводки в DTO: Debit=0, Credit=1.
+/// На сервере (EntryEntity.EntryDirection) Debit=1, Credit=2 — маппинг через cast в контроллерах.
+/// </summary>
 public enum EntryDirection
 {
     Debit = 0,

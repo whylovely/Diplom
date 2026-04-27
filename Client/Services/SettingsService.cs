@@ -5,6 +5,12 @@ using System.Text.Json;
 
 namespace Client.Services
 {
+    /// <summary>
+    /// Хранит настройки приложения в JSON-файле <c>%AppData%/Diplom/user_settings.json</c>.
+    /// Настройки сохраняются автоматически после каждой записи в свойство.
+    /// Событие <see cref="SettingsChanged"/> срабатывает на любое изменение —
+    /// ViewModel переподписываются на нём, чтобы UI обновился (например, при смене базовой валюты).
+    /// </summary>
     public class SettingsService
     {
         private const string AppName = "Diplom";
@@ -25,6 +31,8 @@ namespace Client.Services
             Load();
         }
 
+        // Пробуем прочитать файл; если он битый или его нет — стартуем с дефолтных настроек.
+        // Битый файл не критичен: пользователь просто увидит экран первого запуска заново.
         private void Load()
         {
             if (File.Exists(_filePath))
@@ -113,6 +121,10 @@ namespace Client.Services
             }
         }
 
+        /// <summary>
+        /// Сбрасывает данные сессии: токен и время последней синхронизации.
+        /// Базовая валюта и URL сервера остаются — это пользовательские предпочтения.
+        /// </summary>
         public void Logout()
         {
             Settings.AuthToken = null;

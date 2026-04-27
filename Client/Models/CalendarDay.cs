@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
+    /// <summary>
+    /// Одна клетка календарной сетки в <c>CalendarViewModel</c>.
+    /// Содержит агрегированные итоги дня и список транзакций для тултипа/детализации.
+    /// IsCurrentMonth=false для дней предыдущего/следующего месяца, отображаемых в той же сетке.
+    /// </summary>
     public sealed class CalendarDay
     {
         public DateTime Date { get; set; }

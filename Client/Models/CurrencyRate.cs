@@ -5,12 +5,20 @@ using System.Linq;
 
 namespace Client.Models;
 
-public sealed class CurrencyRate    // Курсы валют
+/// <summary>
+/// Курс валюты к рублю. RateToBase = сколько рублей за 1 единицу валюты.
+/// Хранится в таблице CurrencyRates, обновляется <c>CurrencyRateService</c> с сервера.
+/// </summary>
+public sealed class CurrencyRate
 {
     public string CurrencyCode { get; set; } = string.Empty;
     public decimal RateToBase { get; set; }
 }
 
+/// <summary>
+/// Справочник доступных валют (фиат + крипто) и их человекочитаемых названий.
+/// Используется в выпадающих списках выбора валюты.
+/// </summary>
 public static class CurrencyHelper
 {
     public static readonly string[] AvailableCurrencies = 

@@ -2,6 +2,11 @@ using System;
 
 namespace Client.Models
 {
+    /// <summary>
+    /// Строка журнала операций — уже «расплющенная» транзакция с полями для UI.
+    /// IsExpense / IsIncome / IsTransfer определяют цвет и знак суммы.
+    /// IsDuplicate выставляется эвристикой в JournalViewModel для подсветки возможных дублей.
+    /// </summary>
     public sealed class JournalRow
     {
         public Guid TransactionId { get; set; }

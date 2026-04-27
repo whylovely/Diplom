@@ -3,7 +3,17 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.Models
 {
-    public sealed partial class Account : ObservableObject  // счет
+    /// <summary>
+    /// Счёт пользователя. Делится на три типа (см. <see cref="AccountType"/>):
+    /// <list type="bullet">
+    ///   <item>Assets — реальные активы (наличные, карты, депозиты)</item>
+    ///   <item>Income — технические счета доходов (по одному на категорию)</item>
+    ///   <item>Expense — технические счета расходов (по одному на категорию)</item>
+    /// </list>
+    /// Технические счета нужны как противоположная сторона проводки в двойной записи.
+    /// Пользователь их в UI не видит — они скрыты в <c>AccountsViewModel</c> через фильтр.
+    /// </summary>
+    public sealed partial class Account : ObservableObject
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         [ObservableProperty] private string _name = "";
@@ -45,12 +55,17 @@ namespace Client.Models
         MultiCurrency = 1
     }
 
+    /// <summary>Сумма в одной валюте — для виджета «Балансы по валютам» на дашборде.</summary>
     public sealed class CurrencyBalance
     {
         public string CurrencyCode { get; set; } = "";
         public decimal Balance { get; set; }
     }
 
+    /// <summary>
+    /// Элемент списка «Последние операции» на главном экране.
+    /// Уже отформатирован для отображения: знак суммы, иконка направления, цвет.
+    /// </summary>
     public sealed class RecentTransactionItem
     {
         public string Date         { get; set; } = "";
@@ -70,6 +85,7 @@ namespace Client.Models
         public string DirectionIcon  => IsTransfer ? "↔" : (IsIncome ? "↗" : "↙");
     }
 
+    /// <summary>Строка отчёта «Баланс на дату» — снимок остатка по одному счёту.</summary>
     public sealed class AccountBalanceRow
     {
         public string AccountName { get; set; } = "";
@@ -77,6 +93,10 @@ namespace Client.Models
         public decimal Balance { get; set; }
     }
 
+    /// <summary>
+    /// Строка отчёта «Обороты по счетам»: остатки на начало/конец периода
+    /// и суммарные дебетовые/кредитовые обороты внутри периода.
+    /// </summary>
     public sealed class AccountTurnoverRow
     {
         public string AccountName { get; set; } = "";

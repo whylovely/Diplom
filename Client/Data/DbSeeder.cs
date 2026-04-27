@@ -5,11 +5,22 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
+/// <summary>
+/// Наполняет пустую БД демо-данными при первом запуске:
+/// курсы валют, категории, технические счета, пара активов, пример долга и
+/// несколько транзакций за последние дни. На уже заполненную БД не влияет.
+/// </summary>
 public sealed class DbSeeder
 {
     private readonly SqliteConFactory _factory;
     public DbSeeder(SqliteConFactory f) => _factory = f;
 
+    /// <summary>
+    /// Если в БД нет курсов валют — добавляет дефолтный набор.
+    /// Если нет ни одного счёта — создаёт демо-данные (категории, счета, транзакции, долг).
+    /// Две независимые проверки, чтобы при ручном удалении частей данных
+    /// можно было дозаполнить только нужное.
+    /// </summary>
     public void SeedIfEmpty()
     {
         using var conn = _factory.Open();
@@ -51,6 +62,9 @@ public sealed class DbSeeder
             var accIncomeTransportId  = Guid.NewGuid().ToString();
             var accExpenseTransportId = Guid.NewGuid().ToString();
 
+            // Создаёт категорию и пару технических счетов «Доходы: X» / «Расходы: X».
+            // Технические счета используются как противоположная сторона проводки
+            // при записи доходов и расходов — без этого нарушится двойная запись.
             void AddCategory(string id, string name, int kind, string incomeId, string expenseId)
             {
                 SqliteConFactory.Exec(conn, @"INSERT INTO Categories (Id, Name, Kind, CreatedAt, UpdatedAt) VALUES (@Id, @Name, @Kind, @Now, @Now)",
@@ -83,6 +97,9 @@ public sealed class DbSeeder
                          VALUES (@Id, 'Иван', 5000, 'RUB', 0, @Now, 0)",
                          ("@Id", Guid.NewGuid().ToString()), ("@Now", now));
 
+            // Создаёт транзакцию из двух проводок: основной счёт и противоположный технический.
+            // mainAccDir — направление по основному счёту (Debit для дохода, Credit для расхода);
+            // у технического направление автоматически инвертируется, чтобы баланс сошёлся.
             void AddTx(string dateDelta, string desc, string accId, string catId, string techAccId, EntryDirection mainAccDir, double amount, string currency)
             {
                 var txId   = Guid.NewGuid().ToString();

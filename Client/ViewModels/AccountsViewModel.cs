@@ -10,7 +10,14 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
-    public sealed partial class AccountsViewModel : ViewModelBase   // упраление страницей "Счета"
+    /// <summary>
+    /// Страница «Счета»: CRUD счетов, группировка по <see cref="AccountGroupViewModel"/>,
+    /// быстрые операции (расход / доход / перевод) и кнопка синхронизации с сервером.
+    ///
+    /// Логика синхронизации делегирована <see cref="SyncOrchestrator"/> — здесь только
+    /// показ диалога конфликта и обновление статуса в UI после ответа оркестратора.
+    /// </summary>
+    public sealed partial class AccountsViewModel : ViewModelBase
     {
         private readonly IDataService _data;
         private readonly INotificationService _notify;

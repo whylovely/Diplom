@@ -1,5 +1,9 @@
 ﻿namespace Server.Entities;
 
+/// <summary>
+/// Заголовок транзакции. Сами проводки лежат в Entries — кардинальность 1-ко-многим
+/// настроена в AppDbContext с каскадным удалением (удалили транзакцию → удалились проводки).
+/// </summary>
 public sealed class TransactionEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

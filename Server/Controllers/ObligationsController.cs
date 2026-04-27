@@ -8,6 +8,11 @@ using Shared.Obligations;
 
 namespace Server.Controllers;
 
+/// <summary>
+/// CRUD обязательств — долгов перед кем-то и займов от кого-то.
+/// Отдельный endpoint <c>POST /{id}/mark-paid</c> отмечает обязательство как погашенное —
+/// фронт после этого создаёт обычную транзакцию погашения через TransactionsController.
+/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/obligations")]

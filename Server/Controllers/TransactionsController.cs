@@ -9,6 +9,12 @@ using EntryDirection = Shared.Transactions.EntryDirection;
 
 namespace Server.Controllers;
 
+/// <summary>
+/// CRUD транзакций с валидацией двойной записи. Каждая транзакция должна содержать
+/// от 2 до 50 проводок, все по счетам одной валюты, и суммарно сбалансированной
+/// (сумма Debit = сумме Credit). Принадлежность счетов и категорий пользователю
+/// проверяется до сохранения, чтобы нельзя было сослаться на чужой ресурс.
+/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/transactions")]
@@ -43,11 +49,17 @@ public sealed class TransactionsController : ControllerBase
         return Ok(items);
     }
 
+    /// <summary>
+    /// Создаёт транзакцию двойной записи. Валидация в порядке стоимости проверки
+    /// (от дешёвых in-memory к запросам к БД и в самом конце — баланс сумм).
+    /// Запись делается в SQL-транзакции, чтобы либо сохранилась вся, либо ничего.
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult<TransactionDto>> Create(CreateTransactionRequest req, CancellationToken ct)
     {
         var userId = UserContext.GetUserId(User);
 
+        // Двойная запись требует минимум 2 проводки; верхний лимит — защита от случайного DoS
         if (req.Entries is null || req.Entries.Count < 2)
             return BadRequest("Transaction must contain at least 2 entries.");
 
@@ -75,6 +87,8 @@ public sealed class TransactionsController : ControllerBase
                 return BadRequest("One or more categories are invalid or not owned by the user.");
         }
 
+        // Сейчас сервер не поддерживает мультивалютные транзакции — все проводки в одной валюте.
+        // Конвертация валют делается через отдельный счёт-конвертер на клиенте.
         var distinctAccCurrencies = accounts.Select(a => a.Currency).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         if (distinctAccCurrencies.Count != 1)
             return BadRequest("All accounts in a transaction must have the same currency.");
@@ -93,6 +107,8 @@ public sealed class TransactionsController : ControllerBase
                 return BadRequest("Invalid entry direction.");
         }
 
+        // Главная инвариантность двойной записи: Debit − Credit = 0.
+        // Без этой проверки можно «нарисовать» деньги из ниоткуда.
         decimal signedSum = 0m;
         foreach (var e in req.Entries)
         {

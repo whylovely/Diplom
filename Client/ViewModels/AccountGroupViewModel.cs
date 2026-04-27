@@ -7,6 +7,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Обёртка над <see cref="AccountGroup"/> для отображения в боковой панели на странице «Счета».
+    /// Содержит коллекцию счетов, входящих в группу, и пересчитывает суммарный баланс
+    /// в базовой валюте при изменении данных или настроек.
+    /// </summary>
     public sealed partial class AccountGroupViewModel : ObservableObject
     {
         private readonly IDataService _data;

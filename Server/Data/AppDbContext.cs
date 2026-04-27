@@ -3,6 +3,17 @@ using Server.Entities;
 
 namespace Server.Data;
 
+/// <summary>
+/// EF Core контекст приложения. Все сущности привязаны к UserId — изоляция данных
+/// обеспечивается фильтрами в контроллерах (<c>.Where(x =&gt; x.UserId == userId)</c>).
+///
+/// Уникальные индексы (UserId, Name) с фильтром <c>IsDeleted = false</c> позволяют
+/// одному пользователю иметь несколько счетов с одинаковыми именами после soft-delete.
+///
+/// Для Obligation действует глобальный QueryFilter — удалённые автоматически отфильтровываются.
+/// Для Account и Category аналогичный фильтр стоит локально в запросах, чтобы не мешать
+/// навигационным свойствам в Sync push (где нужны и удалённые тоже).
+/// </summary>
 public sealed class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }

@@ -8,6 +8,14 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
+/// <summary>
+/// Репозиторий транзакций. В отличие от других репозиториев сам не сохраняет новые
+/// транзакции — это делает <c>LocalDbService.PostTransactionAsync</c> (там нужна
+/// SQL-транзакция по таблицам Transactions/Entries/Accounts одновременно).
+///
+/// Этот класс отвечает только за загрузку из БД, кеш в памяти и построение сторно.
+/// Свежесозданные транзакции добавляются в кеш через <see cref="AddToCache"/>.
+/// </summary>
 public sealed class TransactionsRepository
 {
     private readonly SqliteConFactory _factory;
@@ -20,6 +28,11 @@ public sealed class TransactionsRepository
 
     public TransactionsRepository(SqliteConFactory f) => _factory = f;
 
+    /// <summary>
+    /// Перечитывает все транзакции и проводки из БД. Делается двумя запросами
+    /// (один по Transactions, второй по Entries) и сборкой в памяти —
+    /// проще, чем JOIN с разворачиванием в иерархию.
+    /// </summary>
     public void Load()
     {
         _transactions.Clear();
@@ -71,14 +84,26 @@ public sealed class TransactionsRepository
 
     public int GetLocalCount() => _transactions.Count;
 
-    // Добавляет транзакцию в кэш после успешного сохранения в БД
+    /// <summary>
+    /// Добавляет уже сохранённую в БД транзакцию в начало кеша.
+    /// Вызывается из LocalDbService после успешной записи — чтобы UI получил событие
+    /// и список обновился без полного Load.
+    /// </summary>
     public void AddToCache(Transaction tx)
     {
         _transactions.Insert(0, tx);
         RaiseChanged();
     }
 
-    // Строит сторно-транзакцию (не сохраняет — это делает LocalDbService)
+    /// <summary>
+    /// Строит сторно (обратную транзакцию) на основе существующей: те же проводки,
+    /// но с инвертированными направлениями Debit↔Credit. Используется для отмены операции.
+    /// Возвращает объект <see cref="Transaction"/>, не сохраняет его — это делает
+    /// LocalDbService.StornoTransactionAsync через PostTransactionAsync.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Если транзакция не найдена или один из её Asset-счетов уже удалён.
+    /// </exception>
     public Transaction BuildStorno(Guid transactionId, IReadOnlyList<Account> accounts)
     {
         var tx = _transactions.FirstOrDefault(t => t.Id == transactionId)

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Client.Services
 {
-
+    /// <summary>
+    /// Контракт для показа стандартных диалогов из ViewModel — без прямой ссылки на View.
+    /// ViewModel вызывают эти методы вместо MessageBox, что позволяет тестировать их с моком.
+    /// </summary>
     public interface INotificationService
     {
         Task ShowErrorAsync(string message, string title = "Ошибка");
@@ -15,6 +18,10 @@ namespace Client.Services
         Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение");
     }
 
+    /// <summary>
+    /// Реальная реализация: показывает диалоги <c>MessageDialog</c> и <c>ConfirmDialog</c>
+    /// в качестве модальных окон поверх <c>MainWindow</c>. В юнит-тестах подменяется на заглушку.
+    /// </summary>
     public sealed class NotificationService : INotificationService
     {
         public Task ShowErrorAsync(string message, string title = "Ошибка")

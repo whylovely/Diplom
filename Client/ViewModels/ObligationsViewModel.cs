@@ -13,6 +13,11 @@ using Client.Views;
 
 namespace Client.ViewModels;
 
+/// <summary>
+/// Страница «Обязательства»: список долгов и займов в виде карточек.
+/// При нажатии «Погасить» вызывает callback в MainWindowViewModel, который
+/// переключает на NewTransactionViewModel с предзаполненной формой долга.
+/// </summary>
 public partial class ObligationsViewModel : ViewModelBase
 {
     private readonly IDataService _data;

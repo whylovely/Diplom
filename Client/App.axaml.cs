@@ -13,6 +13,12 @@ using Client.Views;
 
 namespace Client
 {
+    /// <summary>
+    /// Корневой Application-объект Avalonia. Инициализирует XAML-ресурсы (App.axaml),
+    /// создаёт <see cref="MainWindow"/> и <see cref="MainWindowViewModel"/>,
+    /// и регистрирует глобальные обработчики необработанных исключений —
+    /// чтобы вместо падения приложения пользователь увидел диалог с ошибкой.
+    /// </summary>
     public partial class App : Application
     {
         public static Avalonia.Controls.Window? MainWindow { get; private set; }

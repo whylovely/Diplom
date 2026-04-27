@@ -10,6 +10,14 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Страница «Новая транзакция». Содержит форму с переключателем вида
+    /// (расход/доход/перевод/долг) и набор сохранённых шаблонов.
+    ///
+    /// Логика разделена: <see cref="TransactionValidator"/> проверяет поля,
+    /// <see cref="TransactionBuilder"/> строит проводки, <see cref="TemplateService"/>
+    /// собирает шаблон. ViewModel занимается только UI и оркестрацией.
+    /// </summary>
     public sealed partial class NewTransactionViewModel : ViewModelBase
     {
         private readonly IDataService _data;

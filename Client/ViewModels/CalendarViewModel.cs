@@ -10,6 +10,11 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Страница «Календарь операций»: 7×6 сетка дней месяца с агрегатами доходов/расходов.
+    /// При клике на день открывается модалка со списком всех операций этого дня.
+    /// Используется внутри ReportViewModel как одна из вкладок отчётов.
+    /// </summary>
     public sealed partial class CalendarViewModel : ViewModelBase
     {
         private readonly IDataService _data;

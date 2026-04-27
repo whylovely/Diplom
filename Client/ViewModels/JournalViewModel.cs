@@ -10,7 +10,12 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public sealed partial class JournalViewModel : ViewModelBase    // управление Журналом
+    /// <summary>
+    /// Страница «Журнал»: таблица всех транзакций с поиском, фильтром по типу и
+    /// подсветкой возможных дублей (эвристика — одинаковая дата, сумма и счёт).
+    /// Поддерживает сторнирование выбранной транзакции через <c>StornoTransactionCommand</c>.
+    /// </summary>
+    public sealed partial class JournalViewModel : ViewModelBase
     {
         private readonly IDataService _data;
         private readonly INotificationService _notify;

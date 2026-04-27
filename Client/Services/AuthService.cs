@@ -6,6 +6,12 @@ using Shared.Auth;
 
 namespace Client.Services
 {
+    /// <summary>
+    /// Обёртка над endpoint'ами <c>/api/auth/login</c> и <c>/api/auth/register</c>.
+    /// Методы возвращают tuple <c>(Ok, Error)</c> — UI показывает Error в красном поле формы.
+    /// При успехе сохраняет JWT в <see cref="SettingsService"/>, после чего <c>ApiService</c>
+    /// автоматически подставит его во все последующие запросы.
+    /// </summary>
     public class AuthService
     {
         private readonly SettingsService _settings;

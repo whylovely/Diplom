@@ -8,6 +8,12 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
+/// <summary>
+/// Хранилище категорий доходов и расходов. Технические счета (нужные для двойной записи)
+/// сюда не входят — за них отвечает <c>AccountRepository</c>.
+/// При добавлении категории через <c>LocalDbService.AddCategory</c> сразу создаётся
+/// пара технических счетов.
+/// </summary>
 public sealed class CategoriesRepository
 {
     private readonly SqliteConFactory _factory;

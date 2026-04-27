@@ -8,6 +8,11 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Страница «Настройки»: смена базовой валюты, управление избранными валютами,
+    /// выход из аккаунта. Смена базовой валюты затрагивает мультивалютные счета —
+    /// см. <see cref="LocalDbService.UpdateAccountsBaseCurrency"/>.
+    /// </summary>
     public partial class SettingsViewModel : ViewModelBase
     {
         private readonly IDataService _data;

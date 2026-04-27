@@ -11,6 +11,11 @@ using Shared.Auth;
 
 namespace Server.Controllers;
 
+/// <summary>
+/// Регистрация и вход пользователей. Выдаёт JWT с claim'ами Sub/Email/NameIdentifier/Role,
+/// срок жизни 7 дней. Пароли хешируются <see cref="PasswordHasher{T}"/> (PBKDF2).
+/// Email нормализуется в lower-case до записи и поиска — чтобы Bob@x.com и bob@x.com были одним юзером.
+/// </summary>
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController : ControllerBase
@@ -58,6 +63,11 @@ public sealed class AuthController : ControllerBase
         return Ok(new AuthResponse(CreateToken(user)));
     }
 
+    /// <summary>
+    /// Отдельный endpoint для входа в админ-панель: проверяет роль "Admin",
+    /// иначе возвращает 403, даже если пароль правильный. Это защищает от случайного
+    /// открытия админки обычным пользователем.
+    /// </summary>
     [HttpPost("admin/login")]
     public async Task<ActionResult<AuthResponse>> AdminLogin(LoginRequest req, CancellationToken ct)
     {
@@ -72,6 +82,8 @@ public sealed class AuthController : ControllerBase
         return Ok(new AuthResponse(CreateToken(user)));
     }
 
+    // Формирует подписанный JWT (HS256). Settings вынесены в appsettings.json (Jwt:Issuer/Audience/Key),
+    // в тестах ключ переопределяется через PostConfigure<JwtBearerOptions>.
     private string CreateToken(UserEntity user)
     {
         var jwt = _cfg.GetSection("Jwt");

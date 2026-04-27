@@ -13,7 +13,15 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    public sealed partial class ReportViewModel : ViewModelBase 
+    /// <summary>
+    /// Страница «Отчёты». Через переключатель <see cref="SelectedSection"/> показывает 9 разделов:
+    /// сводный, баланс на дату, помесячная динамика, обороты по счетам, топ расходов/доходов,
+    /// расходы/доходы по категориям с детализацией, календарь.
+    /// Тяжёлая логика вынесена в статические классы <c>OperationWithReport/*</c>,
+    /// которые делегируют чистую агрегацию <see cref="TransactionAggregator"/>.
+    /// Поддерживает экспорт в CSV, TXT и Excel через <see cref="ExportRequested"/>.
+    /// </summary>
+    public sealed partial class ReportViewModel : ViewModelBase
     {
         private readonly IDataService _data;
         private readonly INotificationService _notify;

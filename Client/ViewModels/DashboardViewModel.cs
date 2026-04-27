@@ -10,6 +10,12 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Главный экран приложения — дашборд. Показывает четыре виджета:
+    /// карточки активных счетов, общий баланс по валютам, последние операции и
+    /// график доходов/расходов за последние 6 месяцев.
+    /// Чистая агрегация делегируется <see cref="TransactionAggregator"/>.
+    /// </summary>
     public sealed partial class DashboardViewModel : ViewModelBase
     {
         private readonly IDataService _data;

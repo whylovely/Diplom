@@ -5,6 +5,12 @@ using Client.Models;
 
 namespace Client.Services
 {
+    /// <summary>
+    /// Единый контракт доступа к данным для всех ViewModel.
+    /// Реализуется <see cref="LocalDbService"/>, который под капотом делегирует работу
+    /// репозиториям. Любая работа с данными во ViewModel идёт только через этот интерфейс —
+    /// напрямую к репозиториям обращаться нельзя.
+    /// </summary>
     public interface IDataService
     {
         event Action? DataChanged;

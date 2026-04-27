@@ -11,6 +11,15 @@ using Shared.Transactions;
 
 namespace Client.Services;
 
+/// <summary>
+/// Тонкая обёртка над <see cref="HttpClient"/> к серверному REST API.
+/// Подставляет JWT-токен из <see cref="SettingsService"/> в заголовок <c>Authorization</c>
+/// перед каждым запросом. Не реализует политику повторов и не кеширует —
+/// этим занимаются вызывающие сервисы (<c>SyncService</c>, <c>AuthService</c>).
+///
+/// Таймаут 100 секунд завышен для бесплатного хостинга на Render —
+/// первый запрос «будит» инстанс из cold-старта, иногда занимает до 30 сек.
+/// </summary>
 public sealed class ApiService
 {
     private readonly HttpClient _http;
@@ -26,6 +35,8 @@ public sealed class ApiService
         };
     }
 
+    // Перед каждым запросом — обновляем токен. SettingsService может его поменять
+    // (например, после перелогина), поэтому нельзя выставлять один раз в конструкторе.
     private void SetAuth()
     {
         var token = _settings.AuthToken;
@@ -33,6 +44,10 @@ public sealed class ApiService
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
+    /// <summary>
+    /// Простой ping сервера: сходит по защищённому endpoint и проверит, что вернулось 2xx.
+    /// Используется для определения «онлайн ли сервер» перед попыткой синхронизации.
+    /// </summary>
     public async Task<bool> PingAsync()
     {
         try

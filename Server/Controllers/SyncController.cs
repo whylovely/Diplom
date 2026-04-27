@@ -12,6 +12,12 @@ using System.Threading.Tasks;
 
 namespace Server.Controllers;
 
+/// <summary>
+/// Endpoint полной замены данных пользователя на сервере (Push from client).
+/// Принимает весь снапшот: счета, категории, обязательства, транзакции с проводками.
+/// Старые данные удаляются через ExecuteDeleteAsync, новые создаются в одной SQL-транзакции —
+/// если что-то упадёт, на сервере останутся прежние данные.
+/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/sync")]

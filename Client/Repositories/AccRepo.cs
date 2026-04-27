@@ -8,6 +8,15 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
+/// <summary>
+/// Хранилище счетов и групп счетов. Кеширует все активные (не удалённые) счета в памяти,
+/// перечитывает их при <see cref="Load"/>. Уведомляет подписчиков через <see cref="Changed"/>
+/// после любой модификации, чтобы фасад LocalDbService мог пробросить событие в UI.
+///
+/// Помимо обычных счетов (Assets) хранит технические счета доходов/расходов: для каждой
+/// категории создаётся пара «Доходы: X» / «Расходы: X» — они нужны как противоположная
+/// сторона проводки при записи дохода/расхода (двойная запись).
+/// </summary>
 public sealed class AccountRepository
 {
     private readonly SqliteConFactory _factory;
@@ -16,6 +25,7 @@ public sealed class AccountRepository
     private readonly List<Account> _accounts = new();
     private readonly List<AccountGroup> _accountGroups = new();
 
+    // Быстрый поиск технического счёта по Id категории — заполняется в RebuildTechnicalAccountMappings
     private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();
     private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId  = new();
 
@@ -80,7 +90,12 @@ public sealed class AccountRepository
         }
     }
 
-    // Вызывается из LocalDbService после загрузки категорий
+    /// <summary>
+    /// Восстанавливает словари связей «категория → технический счёт» по именам.
+    /// Связь не хранится в БД явно, поэтому ищем по конвенции имени:
+    /// «Расходы: {имя категории}» / «Доходы: {имя категории}».
+    /// Вызывается из LocalDbService после загрузки счетов И категорий.
+    /// </summary>
     public void RebuildTechnicalAccountMappings(IReadOnlyList<Category> categories)
     {
         _expenseAccountByCategoryId.Clear();
@@ -156,6 +171,11 @@ public sealed class AccountRepository
         RaiseChanged();
     }
 
+    /// <summary>
+    /// При смене базовой валюты пользователем переключает Asset-счета:
+    /// если валюта счёта совпадает с новой базовой — снимаем мультивалютность,
+    /// иначе — включаем мультивалютность с базовой как secondary, чтобы конвертация работала.
+    /// </summary>
     public void UpdateBaseCurrency(string newBaseCurrency)
     {
         using var conn = _factory.Open();
@@ -240,7 +260,11 @@ public sealed class AccountRepository
         return _accounts.Max(a => a.UpdatedAt);
     }
 
-    // Создаёт технические счета «Расходы» и «Доходы» при добавлении категории
+    /// <summary>
+    /// Создаёт пару технических счетов («Расходы: X» / «Доходы: X») и регистрирует их в словарях.
+    /// Вызывается из LocalDbService.AddCategory сразу после добавления категории —
+    /// без них нельзя будет провести расход или доход по этой категории.
+    /// </summary>
     public void CreateTechnicalAccountsForCategory(Category category)
     {
         var now = DateTimeOffset.Now;

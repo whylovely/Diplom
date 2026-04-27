@@ -7,6 +7,15 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Корневая ViewModel приложения. В конструкторе создаёт все сервисы и страницы,
+    /// управляет навигацией через свойство <see cref="Current"/> (привязано к
+    /// ContentControl в MainWindow.axaml).
+    ///
+    /// При старте окна выполняет цепочку инициализации в <see cref="OnWindowLoadedAsync"/>:
+    /// проверка авторизации → диалог первого запуска → обновление курсов →
+    /// проверка просроченных обязательств.
+    /// </summary>
     public sealed partial class MainWindowViewModel : ViewModelBase
     {
         private readonly IDataService _data;

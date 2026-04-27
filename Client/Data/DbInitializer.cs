@@ -3,21 +3,31 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
+/// <summary>
+/// Создаёт схему БД при первом запуске и доливает недостающие колонки
+/// при обновлении приложения. Вызывается один раз из конструктора <c>LocalDbService</c>.
+/// </summary>
 public sealed class DbInitializer
 {
     private readonly SqliteConFactory _factory;
     public DbInitializer(SqliteConFactory f) => _factory = f;
 
+    /// <summary>Полная инициализация: схема + миграции.</summary>
     public void Initialize()
     {
         EnsureCreated();
         MigrateSchema();
     }
 
-    private void EnsureCreated()    // инициализация бд
+    /// <summary>
+    /// Создаёт все таблицы через CREATE TABLE IF NOT EXISTS — повторный вызов безопасен.
+    /// Здесь хранится «эталонная» схема БД на момент текущей версии клиента.
+    /// </summary>
+    private void EnsureCreated()
     {
         using var conn = _factory.Open();
 
+        // Счета пользователя: активы, технические доходы и расходы
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Accounts (
                 Id TEXT PRIMARY KEY,
@@ -34,15 +44,17 @@ public sealed class DbInitializer
                 IsDeleted INTEGER NOT NULL DEFAULT 0,
                 CreatedAt TEXT NOT NULL,
                 UpdatedAt TEXT NOT NULL
-            )");    // Счета
+            )");
 
+        // Группы счетов — для отображения в боковой панели
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS AccountGroups (
                 Id TEXT PRIMARY KEY,
                 Name TEXT NOT NULL,
                 SortOrder INTEGER NOT NULL DEFAULT 0
-            )");    // Группы счетов
+            )");
 
+        // Категории расходов и доходов
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Categories (
                 Id TEXT PRIMARY KEY,
@@ -50,16 +62,18 @@ public sealed class DbInitializer
                 Kind INTEGER NOT NULL DEFAULT 0,
                 CreatedAt TEXT NOT NULL,
                 UpdatedAt TEXT NOT NULL
-            )");    // Категории
+            )");
 
+        // Транзакции — заголовки операций
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Transactions (
                 Id TEXT PRIMARY KEY,
                 Date TEXT NOT NULL,
                 Description TEXT NOT NULL DEFAULT '',
                 CreatedAt TEXT NOT NULL
-            )");    // Транзакции
+            )");
 
+        // Проводки двойной записи — Debit/Credit, привязка к счёту и категории
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Entries (
                 Id TEXT PRIMARY KEY,
@@ -71,8 +85,9 @@ public sealed class DbInitializer
                 CurrencyCode TEXT NOT NULL DEFAULT 'RUB',
                 FOREIGN KEY (TransactionId) REFERENCES Transactions(Id),
                 FOREIGN KEY (AccountId) REFERENCES Accounts(Id)
-            )");    // Проводки
+            )");
 
+        // Долги и займы — кому я должен или мне должны
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Obligations (
                 Id TEXT PRIMARY KEY,
@@ -85,14 +100,16 @@ public sealed class DbInitializer
                 IsPaid INTEGER NOT NULL DEFAULT 0,
                 PaidAt TEXT,
                 Note TEXT
-            )");    // Обязательства
+            )");
 
+        // Курсы валют к базовой (по умолчанию RUB = 1.0)
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS CurrencyRates (
                 CurrencyCode TEXT PRIMARY KEY,
                 RateToBase REAL NOT NULL
-            )");    // Курсы валют
+            )");
 
+        // Сохранённые шаблоны частых операций
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Templates (
                 Id TEXT PRIMARY KEY,
@@ -103,52 +120,39 @@ public sealed class DbInitializer
                 CategoryId TEXT,
                 Amount REAL NOT NULL DEFAULT 0,
                 Description TEXT NOT NULL DEFAULT ''
-            )");    // Шаблоны
-            
+            )");
     }
 
+    /// <summary>
+    /// Доливает колонки, которые появились в более поздних версиях схемы.
+    /// SQLite не поддерживает «IF NOT EXISTS» для ALTER TABLE, поэтому сначала
+    /// проверяем PRAGMA table_info, и только потом добавляем колонку.
+    /// </summary>
     private void MigrateSchema()
     {
         using var conn = _factory.Open();
-        
-        bool hasIsDeleted = false;
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "PRAGMA table_info(Accounts)";
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                if (reader.GetString(reader.GetOrdinal("name")).Equals("IsDeleted", StringComparison.OrdinalIgnoreCase))
-                {
-                    hasIsDeleted = true;
-                    break;
-                }
-            }
-        }
 
-        if (!hasIsDeleted)
-        {
+        // Колонка IsDeleted появилась после введения мягкого удаления счетов
+        if (!ColumnExists(conn, "Accounts", "IsDeleted"))
             SqliteConFactory.Exec(conn, "ALTER TABLE Accounts ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
-        }
 
-        bool hasGroupId = false;
-        using (var cmd = conn.CreateCommand())
-        {
-            cmd.CommandText = "PRAGMA table_info(Accounts)";
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                if (reader.GetString(reader.GetOrdinal("name")).Equals("GroupId", StringComparison.OrdinalIgnoreCase))
-                {
-                    hasGroupId = true;
-                    break;
-                }
-            }
-        }
-
-        if (!hasGroupId)
-        {
+        // Колонка GroupId — для группировки счетов в боковой панели
+        if (!ColumnExists(conn, "Accounts", "GroupId"))
             SqliteConFactory.Exec(conn, "ALTER TABLE Accounts ADD COLUMN GroupId TEXT");
+    }
+
+    /// <summary>Проверяет наличие колонки через PRAGMA table_info.</summary>
+    private static bool ColumnExists(SqliteConnection conn, string table, string column)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"PRAGMA table_info({table})";
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (reader.GetString(reader.GetOrdinal("name"))
+                .Equals(column, StringComparison.OrdinalIgnoreCase))
+                return true;
         }
+        return false;
     }
 }

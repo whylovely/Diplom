@@ -1,11 +1,20 @@
 ﻿namespace Server.Entities;
 
+/// <summary>
+/// ВНИМАНИЕ: тут Debit=1, Credit=2 (а на клиенте Debit=0, Credit=1) — так сложилось исторически,
+/// маппинг идёт через явный (int)cast в DtoMapper и контроллерах. При добавлении нового
+/// направления нужно править оба места.
+/// </summary>
 public enum EntryDirection
 {
     Debit = 1,
     Credit = 2
 }
 
+/// <summary>
+/// Одна проводка двойной записи. UserId дублируется на проводке (а не только на транзакции)
+/// для эффективной фильтрации и индексов (UserId, AccountId) / (UserId, CategoryId).
+/// </summary>
 public sealed class EntryEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

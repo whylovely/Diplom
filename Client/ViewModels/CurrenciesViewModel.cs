@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
+    /// <summary>
+    /// Страница «Курсы валют»: просмотр актуальных курсов и управление списком избранного.
+    /// Курсы пуш-обновляются <see cref="CurrencyRateService"/> при старте приложения.
+    /// </summary>
     public partial class CurrenciesViewModel : ViewModelBase
     {
         private readonly IDataService _data;

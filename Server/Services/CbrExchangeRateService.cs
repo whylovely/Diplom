@@ -6,6 +6,15 @@ using Shared.Exchange;
 
 namespace Server.Services;
 
+/// <summary>
+/// Боевая реализация сервиса курсов валют. Тянет фиатные курсы из XML-фида ЦБ РФ
+/// и крипто-курсы из CoinGecko. Двухуровневое кеширование:
+/// <list type="bullet">
+///   <item>CacheKey — свежий снепшот, живёт 1 час (свежие данные)</item>
+///   <item>LastKnownKey — последний удачный, живёт 7 дней (fallback при недоступности API)</item>
+/// </list>
+/// При сетевой ошибке возвращаем последний известный — это лучше, чем валить весь endpoint.
+/// </summary>
 public sealed class CbrExchangeRateService : IExchangeRateService
 {
     private readonly IHttpClientFactory _httpClientFactory;

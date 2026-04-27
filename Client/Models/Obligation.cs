@@ -4,7 +4,14 @@ using System;
 
 namespace Client.Models;
 
-public partial class Obligation : ObservableObject  // Долги
+/// <summary>
+/// Долговое обязательство: либо я кому-то должен (Debt), либо мне должны (Credit).
+/// При погашении формируется обычная транзакция через <c>TransactionBuilder</c>,
+/// затем долг помечается как оплаченный.
+/// Свойство <see cref="StatusLabel"/> вычисляется на лету: показывает «Просрочено» /
+/// «Подходит срок» (≤ 3 дней до даты) / «Активно» / «Погашено».
+/// </summary>
+public partial class Obligation : ObservableObject
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
