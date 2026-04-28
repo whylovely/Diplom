@@ -112,7 +112,7 @@ namespace Client.ViewModels
             Accounts.Clear();
             Groups.Clear();
 
-            var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets).ToList();
+            var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets && !a.IsDeleted).ToList();
             var loadedGroups = _data.AccountGroups.OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList();
 
             foreach (var g in loadedGroups)

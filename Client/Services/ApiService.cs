@@ -12,35 +12,42 @@ using Shared.Transactions;
 
 namespace Client.Services;
 
-// Тонкая обёртка над HttpClient к серверному REST API
+// Тонкая обёртка над HttpClient к серверному REST API.
+// HttpClient создаётся заново при каждом вызове Build() — это гарантирует,
+// что смена ServerUrl в настройках сразу подхватывается без перезапуска.
 public sealed class ApiService
 {
-    private readonly HttpClient _http;
     private readonly SettingsService _settings;
 
     public ApiService(SettingsService settings)
     {
         _settings = settings;
-        _http = new HttpClient
-        {
-            BaseAddress = new Uri(settings.ServerUrl.TrimEnd('/') + "/"),
-            Timeout = TimeSpan.FromSeconds(100)
-        };
     }
 
-    private void SetAuth()
+    // Создаёт HttpClient с актуальным BaseAddress и Bearer-токеном.
+    // Таймаут 100 сек — запас для cold-старта на Render (бесплатный хостинг
+    // «засыпает» и первый запрос может занять до 30 сек).
+    private HttpClient Build()
     {
+        var http = new HttpClient
+        {
+            BaseAddress = new Uri(_settings.ServerUrl.TrimEnd('/') + "/"),
+            Timeout = TimeSpan.FromSeconds(100)
+        };
+
         var token = _settings.AuthToken;
         if (!string.IsNullOrEmpty(token))
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        return http;
     }
 
     public async Task<bool> PingAsync()
     {
         try
         {
-            SetAuth();
-            var resp = await _http.GetAsync("api/accounts");
+            using var http = Build();
+            var resp = await http.GetAsync("api/accounts");
             return resp.IsSuccessStatusCode;
         }
         catch
@@ -51,40 +58,40 @@ public sealed class ApiService
 
     public async Task<List<AccountDto>?> GetAccountsAsync()
     {
-        SetAuth();
-        var resp = await _http.GetAsync("api/accounts");
+        using var http = Build();
+        var resp = await http.GetAsync("api/accounts");
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<AccountDto>>();
     }
 
     public async Task<List<CategoryDto>?> GetCategoriesAsync()
     {
-        SetAuth();
-        var resp = await _http.GetAsync("api/categories");
+        using var http = Build();
+        var resp = await http.GetAsync("api/categories");
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<CategoryDto>>();
     }
 
     public async Task<List<TransactionDto>?> GetTransactionsAsync()
     {
-        SetAuth();
-        var resp = await _http.GetAsync("api/transactions");
+        using var http = Build();
+        var resp = await http.GetAsync("api/transactions");
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<TransactionDto>>();
     }
 
     public async Task<List<ObligationDto>?> GetObligationsAsync()
     {
-        SetAuth();
-        var resp = await _http.GetAsync("api/obligations");
+        using var http = Build();
+        var resp = await http.GetAsync("api/obligations");
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<ObligationDto>>();
     }
 
     public async Task PushAllDataAsync(SyncPushRequest req)
     {
-        SetAuth();
-        var resp = await _http.PostAsJsonAsync("api/sync/push", req);
+        using var http = Build();
+        var resp = await http.PostAsJsonAsync("api/sync/push", req);
         resp.EnsureSuccessStatusCode();
     }
 }
