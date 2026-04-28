@@ -266,7 +266,7 @@
       <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
-    <!-- ══ BOTTOM NAV BAR (MAC-OS DOCK) ITEMS ═════════════════════════════ -->
+    <!-- ══ BOTTOM NAV BAR ITEMS ═════════════════════════════ -->
     <Style Selector="Button.dockItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -325,7 +325,7 @@
       <Setter Property="BorderThickness" Value="0,0,0,1"/>
     </Style>
 
-    <!-- ══ HAMBURGER BUTTON (with cyan glow on hover) ═══════════ -->
+    <!-- ══ HAMBURGER BUTTON ═══════════ -->
     <Style Selector="Button.hamburgerBtn">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>

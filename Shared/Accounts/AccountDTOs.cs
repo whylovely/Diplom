@@ -1,7 +1,7 @@
 ﻿// DTO счетов для синхронизации клиент↔сервер. Клиентская модель Account мапится в DtoMapper.
 namespace Shared.Accounts;
 
-/// <summary>Тип счёта. На клиенте — AccountType, тут переименовано для DTO-семантики.</summary>
+// Тип счёта
 public enum AccountKind
 {
     Assets = 0,

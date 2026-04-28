@@ -43,7 +43,6 @@
     </DataTemplate>
   </Window.DataTemplates>
 
-  <!-- Panel allows overlay layers on top of content -->
   <Panel>
 
     <!-- ═══ BASE LAYOUT: HEADER + CONTENT ══════════════════════ -->

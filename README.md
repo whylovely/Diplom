@@ -93,8 +93,8 @@ dotnet run
 
 При первом запуске сервер автоматически применит миграции и создаст начальные данные.
 
-- Swagger UI: http://localhost:5273/swagger
-- Админ-панель: http://localhost:5273/admin
+- Swagger UI: https://diplom-odbj.onrender.com/swagger
+- Админ-панель: https://diplom-odbj.onrender.com/admin
 
 ### 3. Запуск клиента
 

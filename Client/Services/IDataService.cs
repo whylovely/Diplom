@@ -5,12 +5,7 @@ using Client.Models;
 
 namespace Client.Services
 {
-    /// <summary>
-    /// Единый контракт доступа к данным для всех ViewModel.
-    /// Реализуется <see cref="LocalDbService"/>, который под капотом делегирует работу
-    /// репозиториям. Любая работа с данными во ViewModel идёт только через этот интерфейс —
-    /// напрямую к репозиториям обращаться нельзя.
-    /// </summary>
+    // Единый контракт доступа к данным для всех ViewModel
     public interface IDataService
     {
         event Action? DataChanged;
@@ -23,41 +18,41 @@ namespace Client.Services
         IReadOnlyList<TransactionTemplate> Templates { get; }
         IReadOnlyList<AccountGroup> AccountGroups { get; }
 
-        void AddAccount(Account account);   // Добавление счета
-        void RenameAccount(Guid id, string newName);    // Переименовывание счета
-        void RemoveAccount(Guid id);    // soft-delete счета
-        bool IsAccountUsed(Guid id);    // Использовался ли аккаунт
-        void SetAccountGroup(Guid accountId, Guid? groupId); // Привязка счета к группе
+        void AddAccount(Account account);
+        void RenameAccount(Guid id, string newName);
+        void RemoveAccount(Guid id);
+        bool IsAccountUsed(Guid id);
+        void SetAccountGroup(Guid accountId, Guid? groupId);
 
-        void AddCategory(Category category);    // Добавление категории
-        void RemoveCategory(Category category); // Удаление категории
+        void AddCategory(Category category);
+        void RemoveCategory(Category category);
 
-        Task AddObligationAsync(Obligation obligation); // Добавление обязательства
-        Task UpdateObligationAsync(Obligation obligation);  // Изменение обязательства
-        Task DeleteObligationAsync(Guid id);    // Удаление обязательства
-        Task MarkObligationPaidAsync(Guid id, bool isPaid); // Статус обязательства
+        Task AddObligationAsync(Obligation obligation);
+        Task UpdateObligationAsync(Obligation obligation);
+        Task DeleteObligationAsync(Guid id);
+        Task MarkObligationPaidAsync(Guid id, bool isPaid);
 
-        Task AddTemplateAsync(TransactionTemplate template); // Добавление шаблона
-        Task DeleteTemplateAsync(Guid id);                   // Удаление шаблона
+        Task AddTemplateAsync(TransactionTemplate template);
+        Task DeleteTemplateAsync(Guid id);
 
-        Task AddAccountGroupAsync(AccountGroup group);       // Добавление группы счетов
-        Task UpdateAccountGroupAsync(AccountGroup group);    // Обновление группы счетов
-        Task DeleteAccountGroupAsync(Guid id);              // Удаление группы счетов
+        Task AddAccountGroupAsync(AccountGroup group);
+        Task UpdateAccountGroupAsync(AccountGroup group);
+        Task DeleteAccountGroupAsync(Guid id);
 
-        void UpdateAccountsBaseCurrency(string newBaseCurrency); // Обновление типа счетов при смене базовой валюты
+        void UpdateAccountsBaseCurrency(string newBaseCurrency);
 
-        Account GetExpenseAccountForCategory(Guid categoryId);  // Возвращение категории расходов
-        Account GetIncomeAccountForCategory(Guid categoryId);   // Возвращение категории доходов
+        Account GetExpenseAccountForCategory(Guid categoryId);
+        Account GetIncomeAccountForCategory(Guid categoryId);
 
-        Task PostTransactionAsync(Transaction tx);  // Проводка транзакции
-        Task StornoTransactionAsync(Guid transactionId);    // Сторнирование транзакции
+        Task PostTransactionAsync(Transaction tx);
+        Task StornoTransactionAsync(Guid transactionId);
 
-        decimal GetRate(string fromCurrency, string toCurrency = "RUB");    // Получение курса валют
-        void SetCurrencyRate(string code, decimal rate);    // Обновление курса валют
+        decimal GetRate(string fromCurrency, string toCurrency = "RUB");
+        void SetCurrencyRate(string code, decimal rate);
 
-        DateTimeOffset? GetLocalLastChangeDate();   // Дата последнего изменения
-        int GetLocalTransactionCount();             // Количество транзакций
+        DateTimeOffset? GetLocalLastChangeDate();
+        int GetLocalTransactionCount();
 
-        void ClearDatabase();                       // Очистка БД (выход из аккаунта)
+        void ClearDatabase();
     }
 }

@@ -62,7 +62,6 @@ namespace Client.ViewModels.DialogWindow
                 Currencies.Clear();
                 IsSearching = true;
 
-                // Debounce (400ms)
                 await Task.Delay(400, token);
 
                 token.ThrowIfCancellationRequested();
@@ -91,9 +90,7 @@ namespace Client.ViewModels.DialogWindow
                 }
             }
             catch (OperationCanceledException)
-            {
-                // Ignored
-            }
+            { }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Search error: {ex.Message}");
@@ -112,7 +109,6 @@ namespace Client.ViewModels.DialogWindow
             Currencies.Clear();
             var favorites = _settings.Settings.FavoriteCurrencies ?? new List<string>();
             
-            // Если избранных нет, покажем дефолтные популярные
             var defaultList = favorites.Count > 0 ? favorites : new List<string> { "RUB", "USD", "EUR", "BTC" };
 
             foreach (var code in defaultList)

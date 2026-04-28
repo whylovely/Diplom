@@ -3,12 +3,7 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
-    /// <summary>
-    /// Настройки приложения. Сериализуются в JSON-файл <c>user_settings.json</c>
-    /// через <see cref="Client.Services.SettingsService"/>.
-    /// IsFirstRun сбрасывается в false после прохождения мастера выбора базовой валюты.
-    /// LastSyncedAt используется SyncOrchestrator чтобы решить «нужен ли push».
-    /// </summary>
+    // Настройки приложения
     public class UserSettings
     {
         public string BaseCurrency { get; set; } = "RUB";

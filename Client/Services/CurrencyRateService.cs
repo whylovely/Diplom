@@ -20,10 +20,6 @@ public sealed class CurrencyRateService
         _settings = settings;
     }
 
-    /// <summary>
-    /// Загружает актуальные курсы с сервера и сохраняет в локальную БД.
-    /// Ошибки сети игнорируются (останутся старые курсы).
-    /// </summary>
     public async Task UpdateRatesAsync(IDataService data)
     {
         try

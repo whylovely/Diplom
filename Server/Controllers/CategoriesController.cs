@@ -10,11 +10,7 @@ using Shared.Auth;
 
 namespace Server.Controllers;
 
-/// <summary>
-/// CRUD категорий пользователя. Имя уникально в рамках одного пользователя
-/// среди не удалённых (см. фильтр индекса в AppDbContext).
-/// При удалении проверяется использование в транзакциях — если есть, нужен <c>?force=true</c>.
-/// </summary>
+// CRUD категорий пользователя
 [ApiController]
 [Authorize]
 [Route("api/categories")]

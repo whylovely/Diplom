@@ -13,12 +13,6 @@ using Client.Views;
 
 namespace Client
 {
-    /// <summary>
-    /// Корневой Application-объект Avalonia. Инициализирует XAML-ресурсы (App.axaml),
-    /// создаёт <see cref="MainWindow"/> и <see cref="MainWindowViewModel"/>,
-    /// и регистрирует глобальные обработчики необработанных исключений —
-    /// чтобы вместо падения приложения пользователь увидел диалог с ошибкой.
-    /// </summary>
     public partial class App : Application
     {
         public static Avalonia.Controls.Window? MainWindow { get; private set; }
@@ -27,7 +21,6 @@ namespace Client
         {
             AvaloniaXamlLoader.Load(this);
 
-            // Глобальные обработчики необработанных исключений
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         }
@@ -56,7 +49,7 @@ namespace Client
 
         private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
-            e.SetObserved(); // предотвращаем завершение процесса
+            e.SetObserved();
             var msg = e.Exception.InnerException?.Message ?? e.Exception.Message;
             ShowGlobalError($"Ошибка фоновой задачи:\n{msg}");
         }
@@ -72,19 +65,15 @@ namespace Client
                     await dialog.ShowDialog(MainWindow);
                 }
                 catch
-                {
-                    // Если не удалось показать диалог — молча игнорируем
-                }
+                { }
             });
         }
 
         private void DisableAvaloniaDataAnnotationValidation()
         {
-            // Get an array of plugins to remove
             var dataValidationPluginsToRemove =
                 BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
 
-            // remove each entry found
             foreach (var plugin in dataValidationPluginsToRemove)
             {
                 BindingPlugins.DataValidators.Remove(plugin);

@@ -23,9 +23,6 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// Click on the dimming overlay closes the floating menu.
-    /// </summary>
     private void OnOverlayPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (DataContext is MainWindowViewModel vm && vm.IsMenuOpen)

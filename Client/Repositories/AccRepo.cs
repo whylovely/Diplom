@@ -8,35 +8,23 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-/// <summary>
-/// Хранилище счетов и групп счетов. Кеширует все активные (не удалённые) счета в памяти,
-/// перечитывает их при <see cref="Load"/>. Уведомляет подписчиков через <see cref="Changed"/>
-/// после любой модификации, чтобы фасад LocalDbService мог пробросить событие в UI.
-///
-/// Помимо обычных счетов (Assets) хранит технические счета доходов/расходов: для каждой
-/// категории создаётся пара «Доходы: X» / «Расходы: X» — они нужны как противоположная
-/// сторона проводки при записи дохода/расхода (двойная запись).
-/// </summary>
+// Хранилище счетов и групп счетов
 public sealed class AccountRepository
 {
     private readonly SqliteConFactory _factory;
+    public event Action? Changed;
     private void RaiseChanged() => Changed?.Invoke();
 
     private readonly List<Account> _accounts = new();
     private readonly List<AccountGroup> _accountGroups = new();
 
-    // Быстрый поиск технического счёта по Id категории — заполняется в RebuildTechnicalAccountMappings
     private readonly Dictionary<Guid, Guid> _expenseAccountByCategoryId = new();
     private readonly Dictionary<Guid, Guid> _incomeAccountByCategoryId  = new();
 
     public IReadOnlyList<Account> All => _accounts;
     public IReadOnlyList<AccountGroup> Groups => _accountGroups;
 
-    public event Action? Changed;
-
     public AccountRepository(SqliteConFactory f) => _factory = f;
-
-    // ── Загрузка ──────────────────────────────────────────────────────────────
 
     public void Load()
     {
@@ -55,20 +43,20 @@ public sealed class AccountRepository
             {
                 var acc = new Account
                 {
-                    Id                    = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
-                    Name                  = r.GetString(r.GetOrdinal("Name")),
-                    GroupId               = r.IsDBNull(r.GetOrdinal("GroupId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("GroupId"))),
-                    CurrencyCode          = r.GetString(r.GetOrdinal("CurrencyCode")),
-                    InitialBalance        = (decimal)r.GetDouble(r.GetOrdinal("InitialBalance")),
-                    Balance               = (decimal)r.GetDouble(r.GetOrdinal("Balance")),
-                    Type                  = (AccountType)r.GetInt32(r.GetOrdinal("Type")),
-                    AccountMultiType      = (MultiCurrencyType)r.GetInt32(r.GetOrdinal("AccountMultiType")),
+                    Id = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
+                    Name = r.GetString(r.GetOrdinal("Name")),
+                    GroupId = r.IsDBNull(r.GetOrdinal("GroupId")) ? null : Guid.Parse(r.GetString(r.GetOrdinal("GroupId"))),
+                    CurrencyCode = r.GetString(r.GetOrdinal("CurrencyCode")),
+                    InitialBalance = (decimal)r.GetDouble(r.GetOrdinal("InitialBalance")),
+                    Balance = (decimal)r.GetDouble(r.GetOrdinal("Balance")),
+                    Type = (AccountType)r.GetInt32(r.GetOrdinal("Type")),
+                    AccountMultiType = (MultiCurrencyType)r.GetInt32(r.GetOrdinal("AccountMultiType")),
                     SecondaryCurrencyCode = r.IsDBNull(r.GetOrdinal("SecondaryCurrencyCode")) ? null : r.GetString(r.GetOrdinal("SecondaryCurrencyCode")),
-                    ExchangeRate          = r.IsDBNull(r.GetOrdinal("ExchangeRate")) ? null : (decimal?)r.GetDouble(r.GetOrdinal("ExchangeRate")),
-                    SecondaryBalance      = (decimal)r.GetDouble(r.GetOrdinal("SecondaryBalance")),
-                    IsDeleted             = r.GetInt32(r.GetOrdinal("IsDeleted")) == 1,
-                    CreatedAt             = DateTimeOffset.Parse(r.GetString(r.GetOrdinal("CreatedAt"))),
-                    UpdatedAt             = DateTimeOffset.Parse(r.GetString(r.GetOrdinal("UpdatedAt")))
+                    ExchangeRate = r.IsDBNull(r.GetOrdinal("ExchangeRate")) ? null : (decimal?)r.GetDouble(r.GetOrdinal("ExchangeRate")),
+                    SecondaryBalance = (decimal)r.GetDouble(r.GetOrdinal("SecondaryBalance")),
+                    IsDeleted = r.GetInt32(r.GetOrdinal("IsDeleted")) == 1,
+                    CreatedAt = DateTimeOffset.Parse(r.GetString(r.GetOrdinal("CreatedAt"))),
+                    UpdatedAt = DateTimeOffset.Parse(r.GetString(r.GetOrdinal("UpdatedAt")))
                 };
                 _accounts.Add(acc);
             }
@@ -82,20 +70,15 @@ public sealed class AccountRepository
             {
                 _accountGroups.Add(new AccountGroup
                 {
-                    Id        = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
-                    Name      = r.GetString(r.GetOrdinal("Name")),
+                    Id = Guid.Parse(r.GetString(r.GetOrdinal("Id"))),
+                    Name = r.GetString(r.GetOrdinal("Name")),
                     SortOrder = r.GetInt32(r.GetOrdinal("SortOrder"))
                 });
             }
         }
     }
 
-    /// <summary>
-    /// Восстанавливает словари связей «категория → технический счёт» по именам.
-    /// Связь не хранится в БД явно, поэтому ищем по конвенции имени:
-    /// «Расходы: {имя категории}» / «Доходы: {имя категории}».
-    /// Вызывается из LocalDbService после загрузки счетов И категорий.
-    /// </summary>
+    // Восстанавливает словари связей «категория → технический счёт» 
     public void RebuildTechnicalAccountMappings(IReadOnlyList<Category> categories)
     {
         _expenseAccountByCategoryId.Clear();
@@ -111,8 +94,6 @@ public sealed class AccountRepository
         }
     }
 
-    // ── CRUD счетов ───────────────────────────────────────────────────────────
-
     public void Add(Account account)
     {
         using var conn = _factory.Open();
@@ -121,20 +102,20 @@ public sealed class AccountRepository
             (Id, Name, GroupId, CurrencyCode, InitialBalance, Balance, Type, AccountMultiType,
              SecondaryCurrencyCode, ExchangeRate, SecondaryBalance, IsDeleted, CreatedAt, UpdatedAt)
             VALUES (@Id, @Name, @Group, @Cur, @Init, @Bal, @Type, @Multi, @Sec, @Rate, @SecBal, @IsDeleted, @Created, @Updated)",
-            ("@Id",        account.Id.ToString()),
-            ("@Name",      account.Name),
-            ("@Group",     (object?)account.GroupId?.ToString() ?? DBNull.Value),
-            ("@Cur",       account.CurrencyCode),
-            ("@Init",      (double)account.InitialBalance),
-            ("@Bal",       (double)account.Balance),
-            ("@Type",      (int)account.Type),
-            ("@Multi",     (int)account.AccountMultiType),
-            ("@Sec",       (object?)account.SecondaryCurrencyCode ?? DBNull.Value),
-            ("@Rate",      account.ExchangeRate.HasValue ? (object)(double)account.ExchangeRate.Value : DBNull.Value),
-            ("@SecBal",    (double)account.SecondaryBalance),
+            ("@Id", account.Id.ToString()),
+            ("@Name", account.Name),
+            ("@Group", (object?)account.GroupId?.ToString() ?? DBNull.Value),
+            ("@Cur", account.CurrencyCode),
+            ("@Init", (double)account.InitialBalance),
+            ("@Bal", (double)account.Balance),
+            ("@Type", (int)account.Type),
+            ("@Multi", (int)account.AccountMultiType),
+            ("@Sec", (object?)account.SecondaryCurrencyCode ?? DBNull.Value),
+            ("@Rate", account.ExchangeRate.HasValue ? (object)(double)account.ExchangeRate.Value : DBNull.Value),
+            ("@SecBal", (double)account.SecondaryBalance),
             ("@IsDeleted", account.IsDeleted ? 1 : 0),
-            ("@Created",   account.CreatedAt.ToString("O")),
-            ("@Updated",   account.UpdatedAt.ToString("O")));
+            ("@Created", account.CreatedAt.ToString("O")),
+            ("@Updated", account.UpdatedAt.ToString("O")));
 
         _accounts.Add(account);
         RaiseChanged();
@@ -146,7 +127,7 @@ public sealed class AccountRepository
         var acc = _accounts.FirstOrDefault(a => a.Id == id);
         if (acc is null) return;
 
-        acc.Name      = newName.Trim();
+        acc.Name = newName.Trim();
         acc.UpdatedAt = DateTimeOffset.Now;
 
         using var conn = _factory.Open();
@@ -171,11 +152,7 @@ public sealed class AccountRepository
         RaiseChanged();
     }
 
-    /// <summary>
-    /// При смене базовой валюты пользователем переключает Asset-счета:
-    /// если валюта счёта совпадает с новой базовой — снимаем мультивалютность,
-    /// иначе — включаем мультивалютность с базовой как secondary, чтобы конвертация работала.
-    /// </summary>
+    // При смене базовой валюты пользователем переключает Asset-счета
     public void UpdateBaseCurrency(string newBaseCurrency)
     {
         using var conn = _factory.Open();
@@ -190,29 +167,29 @@ public sealed class AccountRepository
             {
                 if (!acc.IsMultiCurrency || acc.SecondaryCurrencyCode != newBaseCurrency)
                 {
-                    acc.IsMultiCurrency        = true;
-                    acc.SecondaryCurrencyCode  = newBaseCurrency;
+                    acc.IsMultiCurrency = true;
+                    acc.SecondaryCurrencyCode = newBaseCurrency;
                     changed = true;
 
                     SqliteConFactory.Exec(conn, "UPDATE Accounts SET AccountMultiType = @Multi, SecondaryCurrencyCode = @Sec, UpdatedAt = @Updated WHERE Id = @Id",
-                        ("@Multi",   (int)acc.AccountMultiType),
-                        ("@Sec",     acc.SecondaryCurrencyCode),
+                        ("@Multi", (int)acc.AccountMultiType),
+                        ("@Sec", acc.SecondaryCurrencyCode),
                         ("@Updated", DateTimeOffset.Now.ToString("O")),
-                        ("@Id",      acc.Id.ToString()));
+                        ("@Id", acc.Id.ToString()));
                 }
             }
             else
             {
                 if (acc.IsMultiCurrency)
                 {
-                    acc.IsMultiCurrency       = false;
+                    acc.IsMultiCurrency = false;
                     acc.SecondaryCurrencyCode = null;
                     changed = true;
 
                     SqliteConFactory.Exec(conn, "UPDATE Accounts SET AccountMultiType = @Multi, SecondaryCurrencyCode = NULL, UpdatedAt = @Updated WHERE Id = @Id",
-                        ("@Multi",   (int)acc.AccountMultiType),
+                        ("@Multi", (int)acc.AccountMultiType),
                         ("@Updated", DateTimeOffset.Now.ToString("O")),
-                        ("@Id",      acc.Id.ToString()));
+                        ("@Id",  acc.Id.ToString()));
                 }
             }
         }
@@ -238,8 +215,6 @@ public sealed class AccountRepository
         RaiseChanged();
     }
 
-    // ── Вспомогательные ───────────────────────────────────────────────────────
-
     public Account GetExpenseAccountForCategory(Guid categoryId)
     {
         if (!_expenseAccountByCategoryId.TryGetValue(categoryId, out var accId))
@@ -260,43 +235,37 @@ public sealed class AccountRepository
         return _accounts.Max(a => a.UpdatedAt);
     }
 
-    /// <summary>
-    /// Создаёт пару технических счетов («Расходы: X» / «Доходы: X») и регистрирует их в словарях.
-    /// Вызывается из LocalDbService.AddCategory сразу после добавления категории —
-    /// без них нельзя будет провести расход или доход по этой категории.
-    /// </summary>
+    // Создаёт пару технических счетов («Расходы: X» / «Доходы: X»)
     public void CreateTechnicalAccountsForCategory(Category category)
     {
         var now = DateTimeOffset.Now;
 
         var expense = new Account
         {
-            Id           = Guid.NewGuid(),
-            Name         = $"Расходы: {category.Name}",
+            Id = Guid.NewGuid(),
+            Name = $"Расходы: {category.Name}",
             CurrencyCode = "RUB",
-            Type         = AccountType.Expense,
-            CreatedAt    = now,
-            UpdatedAt    = now
+            Type = AccountType.Expense,
+            CreatedAt = now,
+            UpdatedAt = now
         };
 
         var income = new Account
         {
-            Id           = Guid.NewGuid(),
-            Name         = $"Доходы: {category.Name}",
+            Id = Guid.NewGuid(),
+            Name = $"Доходы: {category.Name}",
             CurrencyCode = "RUB",
-            Type         = AccountType.Income,
-            CreatedAt    = now,
-            UpdatedAt    = now
+            Type = AccountType.Income,
+            CreatedAt = now,
+            UpdatedAt = now
         };
 
         Add(expense);
         Add(income);
 
         _expenseAccountByCategoryId[category.Id] = expense.Id;
-        _incomeAccountByCategoryId[category.Id]  = income.Id;
+        _incomeAccountByCategoryId[category.Id] = income.Id;
     }
-
-    // ── Группы счетов ─────────────────────────────────────────────────────────
 
     public Task AddGroupAsync(AccountGroup group)
     {

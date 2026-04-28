@@ -5,10 +5,7 @@ using Client.Views;
 
 namespace Client.Services;
 
-/// <summary>
-/// Показывает диалог добавления категории. Используется из NewTransactionViewModel,
-/// когда пользователь начал вводить категорию, которой ещё нет — можно создать тут же.
-/// </summary>
+// Показывает диалог добавления категории
 public interface ICategoryDialogService
 {
     Task<Category?> ShowAddCategoryDialogAsync(string? initialName = null);

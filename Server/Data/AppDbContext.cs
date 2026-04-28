@@ -102,6 +102,5 @@ public sealed class AppDbContext : DbContext
 
             e.HasQueryFilter(x => !x.IsDeleted);
         });
-
     }
 }

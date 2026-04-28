@@ -5,11 +5,7 @@ using Client.Models;
 
 namespace Client.Services;
 
-/// <summary>
-/// Строит список проводок (Entry) для транзакции по параметрам формы.
-/// Чистая бизнес-логика — не обращается к БД и не знает о UI.
-/// Бросает <see cref="InvalidOperationException"/> при невалидных бизнес-условиях.
-/// </summary>
+// Строит список проводок (Entry) для транзакции по параметрам формы
 public sealed class TransactionBuilder
 {
     private readonly IDataService _data;
@@ -33,17 +29,17 @@ public sealed class TransactionBuilder
                 var expAcc = _data.GetExpenseAccountForCategory(category!.Id);
                 entries.Add(new Entry
                 {
-                    AccountId  = fromAccount.Id,
+                    AccountId = fromAccount.Id,
                     CategoryId = category.Id,
-                    Direction  = EntryDirection.Credit,
-                    Amount     = money
+                    Direction = EntryDirection.Credit,
+                    Amount = money
                 });
                 entries.Add(new Entry
                 {
-                    AccountId  = expAcc.Id,
+                    AccountId = expAcc.Id,
                     CategoryId = category.Id,
-                    Direction  = EntryDirection.Debit,
-                    Amount     = money
+                    Direction = EntryDirection.Debit,
+                    Amount = money
                 });
                 break;
             }
@@ -53,17 +49,17 @@ public sealed class TransactionBuilder
                 var incAcc = _data.GetIncomeAccountForCategory(category!.Id);
                 entries.Add(new Entry
                 {
-                    AccountId  = fromAccount.Id,
+                    AccountId = fromAccount.Id,
                     CategoryId = category.Id,
-                    Direction  = EntryDirection.Debit,
-                    Amount     = money
+                    Direction = EntryDirection.Debit,
+                    Amount = money
                 });
                 entries.Add(new Entry
                 {
-                    AccountId  = incAcc.Id,
+                    AccountId = incAcc.Id,
                     CategoryId = category.Id,
-                    Direction  = EntryDirection.Credit,
-                    Amount     = money
+                    Direction = EntryDirection.Credit,
+                    Amount = money
                 });
                 break;
             }
@@ -77,13 +73,13 @@ public sealed class TransactionBuilder
                 {
                     AccountId = fromAccount.Id,
                     Direction = EntryDirection.Credit,
-                    Amount    = money
+                    Amount = money
                 });
                 entries.Add(new Entry
                 {
                     AccountId = toAccount.Id,
                     Direction = EntryDirection.Debit,
-                    Amount    = money
+                    Amount = money
                 });
                 break;
             }
@@ -102,13 +98,13 @@ public sealed class TransactionBuilder
                 {
                     AccountId = fromAccount.Id,
                     Direction = EntryDirection.Credit,
-                    Amount    = money
+                    Amount = money
                 });
                 entries.Add(new Entry
                 {
                     AccountId = expAcc.Id,
                     Direction = EntryDirection.Debit,
-                    Amount    = money
+                    Amount = money
                 });
                 break;
             }
@@ -116,24 +112,22 @@ public sealed class TransactionBuilder
             case TxKindChoice.DebtReceive:
             {
                 if (obligation!.Currency != fromAccount.CurrencyCode)
-                    throw new InvalidOperationException(
-                        $"Валюта долга ({obligation.Currency}) не совпадает с валютой счета ({fromAccount.CurrencyCode})");
+                    throw new InvalidOperationException($"Валюта долга ({obligation.Currency}) не совпадает с валютой счета ({fromAccount.CurrencyCode})");
 
                 var incAcc = _data.Accounts.FirstOrDefault(a => a.Type == AccountType.Income)
-                    ?? throw new InvalidOperationException(
-                        "Не найден технический счет доходов для зачисления долга.");
+                    ?? throw new InvalidOperationException("Не найден технический счет доходов для зачисления долга.");
 
                 entries.Add(new Entry
                 {
                     AccountId = fromAccount.Id,
                     Direction = EntryDirection.Debit,
-                    Amount    = money
+                    Amount = money
                 });
                 entries.Add(new Entry
                 {
                     AccountId = incAcc.Id,
                     Direction = EntryDirection.Credit,
-                    Amount    = money
+                    Amount = money
                 });
                 break;
             }

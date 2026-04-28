@@ -10,15 +10,7 @@ using Client.Repositories;
 
 namespace Client.Services;
 
-/// <summary>
-/// Фасад над репозиториями, реализует <see cref="IDataService"/> для всех ViewModel.
-/// Создаёт схему БД, наполняет демо-данными при первом запуске, инстанцирует все репозитории
-/// и подписывается на их события <c>Changed</c>, ретранслируя их через <see cref="DataChanged"/>.
-///
-/// Здесь же оркестрируются операции, затрагивающие несколько сущностей:
-/// добавление категории + создание технических счетов, проводка транзакции (двойная запись),
-/// сторнирование, полная замена данных при Pull-синхронизации.
-/// </summary>
+// Фасад над репозиториями, реализует IDataService для всех ViewModel
 public sealed class LocalDbService : IDataService
 {
     private readonly Client.Data.SqliteConFactory _factory;
@@ -48,7 +40,6 @@ public sealed class LocalDbService : IDataService
     {
         _factory = new Client.Data.SqliteConFactory();
 
-        // Порядок важен: сначала схема, затем демо-данные на пустую БД, потом загрузка в память
         new DbInitializer(_factory).Initialize();
         new DbSeeder(_factory).SeedIfEmpty();
 
@@ -59,8 +50,6 @@ public sealed class LocalDbService : IDataService
         _templatesRepo     = new TemplatesRepository(_factory);
         _currencyRatesRepo = new CurrencyRatesRepository(_factory);
 
-        // Категории должны загрузиться раньше счетов, чтобы потом построить
-        // словари технических счетов по именам категорий
         _categoriesRepo.Load();
         _accountsRepo.Load();
         _accountsRepo.RebuildTechnicalAccountMappings(_categoriesRepo.All);
@@ -69,19 +58,15 @@ public sealed class LocalDbService : IDataService
         _templatesRepo.Load();
         _currencyRatesRepo.Load();
 
-        // Любое изменение в любом репозитории → одно общее DataChanged для всех подписчиков (UI)
-        _accountsRepo.Changed      += RaiseChanged;
-        _categoriesRepo.Changed    += RaiseChanged;
-        _transactionsRepo.Changed  += RaiseChanged;
-        _obligationsRepo.Changed   += RaiseChanged;
-        _templatesRepo.Changed     += RaiseChanged;
+        _accountsRepo.Changed += RaiseChanged;
+        _categoriesRepo.Changed += RaiseChanged;
+        _transactionsRepo.Changed += RaiseChanged;
+        _obligationsRepo.Changed += RaiseChanged;
+        _templatesRepo.Changed += RaiseChanged;
         _currencyRatesRepo.Changed += RaiseChanged;
     }
 
-    /// <summary>
-    /// Возвращает дату самого свежего изменения (макс из дат транзакций и обязательств).
-    /// Используется <see cref="SyncOrchestrator"/> для решения «нужно ли пушить локальные данные».
-    /// </summary>
+    // Возвращает дату самого свежего изменения 
     public DateTimeOffset? GetLocalLastChangeDate()
     {
         var dates = new List<DateTimeOffset>();
@@ -102,10 +87,6 @@ public sealed class LocalDbService : IDataService
     public Task UpdateAccountGroupAsync(AccountGroup group) => _accountsRepo.UpdateGroupAsync(group);
     public Task DeleteAccountGroupAsync(Guid id) => _accountsRepo.DeleteGroupAsync(id);
 
-    /// <summary>
-    /// Добавление категории всегда сопровождается созданием пары технических счетов
-    /// (Расходы:X / Доходы:X), без них нельзя будет провести расход или доход.
-    /// </summary>
     public void AddCategory(Category category)
     {
         _categoriesRepo.Add(category);
@@ -117,10 +98,6 @@ public sealed class LocalDbService : IDataService
     /// <summary>
     /// Сохраняет транзакцию двойной записи: пишет заголовок в Transactions, все проводки в Entries
     /// и обновляет балансы Asset-счетов в одной SQL-транзакции (атомарно).
-    /// После успеха — добавляет транзакцию в кеш репозитория, что вызывает событие <c>DataChanged</c>.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// Если в транзакции меньше двух проводок или валюта проводки не совпадает с валютой Asset-счёта.
     /// </exception>
     public Task PostTransactionAsync(Transaction tx)
     {
@@ -164,14 +141,10 @@ public sealed class LocalDbService : IDataService
 
         tran.Commit();
 
-        _transactionsRepo.AddToCache(tx);   // fires Changed → RaiseChanged via subscription
+        _transactionsRepo.AddToCache(tx);
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Отменяет транзакцию через сторно: репозиторий строит обратные проводки,
-    /// а мы сохраняем их обычным <see cref="PostTransactionAsync"/> — балансы откатываются автоматически.
-    /// </summary>
     public Task StornoTransactionAsync(Guid transactionId)
     {
         var storno = _transactionsRepo.BuildStorno(transactionId, _accountsRepo.All);
@@ -190,18 +163,12 @@ public sealed class LocalDbService : IDataService
     public decimal GetRate(string fromCurrency, string toCurrency = "RUB") => _currencyRatesRepo.Get(fromCurrency, toCurrency);
     public void SetCurrencyRate(string code, decimal rate) => _currencyRatesRepo.Set(code, rate);
 
-    /// <summary>
-    /// Полная замена данных при Pull-синхронизации с сервера.
-    /// Удаляет всё локальное (кроме курсов валют и шаблонов — они локальные) и пишет полученное.
-    /// Привязки счетов к группам сохраняются по Id, чтобы UI-настройки не сбрасывались.
-    /// </summary>
     public void ReplaceAllData(
         List<Account> accounts,
         List<Category> categories,
         List<Obligation> obligations,
         List<Transaction> transactions)
     {
-        // Сервер не знает о группах счетов (это локальная UI-фича) — сохраним привязки до DELETE
         var accountGroupsMap = _accountsRepo.All.Where(a => a.GroupId.HasValue)
                                                .ToDictionary(a => a.Id, a => a.GroupId!.Value);
 
@@ -303,15 +270,9 @@ public sealed class LocalDbService : IDataService
         _currencyRatesRepo.Load();
     }
 
-    // Обёртка вокруг фабрики — оставлена для совместимости со всеми внутренними вызовами
     private static void Exec(SqliteConnection conn, string sql, params (string name, object value)[] parameters)
         => Client.Data.SqliteConFactory.Exec(conn, sql, parameters);
 
-    /// <summary>
-    /// Удаляет файл БД и пересоздаёт пустую схему. Вызывается при выходе из аккаунта,
-    /// чтобы данные одного пользователя не пересекались с другим.
-    /// <c>ClearAllPools</c> обязателен — иначе SQLite держит файл открытым через пул соединений.
-    /// </summary>
     public void ClearDatabase()
     {
         SqliteConnection.ClearAllPools();

@@ -2,11 +2,7 @@ using System;
 
 namespace Server.Entities;
 
-/// <summary>
-/// Обязательство на сервере. Type: 0 = я должен, 1 = мне должны.
-/// Глобальный QueryFilter в AppDbContext отфильтровывает удалённые автоматически —
-/// в SyncController фильтр обходится через IgnoreQueryFilters при полной перезаписи.
-/// </summary>
+// Обязательство на сервере
 public class ObligationEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

@@ -8,13 +8,7 @@ using Shared.Reports;
 
 namespace Server.Controllers;
 
-/// <summary>
-/// Серверные отчёты: сводный, по категориям, помесячный, оборот по счетам.
-/// Используются админ-панелью для просмотра агрегированных данных пользователей —
-/// клиентская часть строит отчёты из локальной БД через TransactionAggregator.
-/// Запросы используют навигационные JOIN'ы (Entry → Account → Kind), которые
-/// EF InMemory не транслирует — соответствующие тесты помечены [Skip].
-/// </summary>
+// Серверные отчёты
 [ApiController]
 [Authorize]
 [Route("api/reports")]

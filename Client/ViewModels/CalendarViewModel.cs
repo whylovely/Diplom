@@ -10,11 +10,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Страница «Календарь операций»: 7×6 сетка дней месяца с агрегатами доходов/расходов.
-    /// При клике на день открывается модалка со списком всех операций этого дня.
-    /// Используется внутри ReportViewModel как одна из вкладок отчётов.
-    /// </summary>
+    // Страница «Календарь операций»: 7×6 сетка дней месяца с агрегатами доходов/расходов.
     public sealed partial class CalendarViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -108,7 +104,6 @@ namespace Client.ViewModels
             BuildGrid();
             UpdateMonthTotals();
 
-            // Попробуем сохранить выбранный день
             if (SelectedDay is not null)
             {
                 var prev = SelectedDay.Date;
@@ -123,10 +118,8 @@ namespace Client.ViewModels
             var firstOfMonth = new DateTime(DisplayYear, DisplayMonth, 1);
             var daysInMonth = DateTime.DaysInMonth(DisplayYear, DisplayMonth);
 
-            // Понедельник = 0, Воскресенье = 6
             int startDayOfWeek = ((int)firstOfMonth.DayOfWeek + 6) % 7;
 
-            // Предыдущий месяц — заполнение начала
             var prevMonth = firstOfMonth.AddDays(-startDayOfWeek);
             for (int i = 0; i < startDayOfWeek; i++)
             {
@@ -139,7 +132,6 @@ namespace Client.ViewModels
                 Days.Add(BuildDay(new DateTime(DisplayYear, DisplayMonth, d), isCurrentMonth: true));
             }
 
-            // Заполнение до 42 ячеек (6 рядов)
             var nextDay = new DateTime(DisplayYear, DisplayMonth, daysInMonth).AddDays(1);
             while (Days.Count < 42)
             {
@@ -157,7 +149,6 @@ namespace Client.ViewModels
                 IsToday = date == DateTime.Today
             };
 
-            // Собираем операции через ту же логику, что в JournalViewModel
             var dayRows = new List<JournalRow>();
 
             foreach (var tx in _data.Transactions)
@@ -174,7 +165,6 @@ namespace Client.ViewModels
                         ? _data.Categories.FirstOrDefault(c => c.Id == entry.CategoryId.Value)
                         : null;
 
-                    // Проверяем: перевод — это когда 2+ asset entry
                     var assetEntries = tx.Entries
                         .Where(e => _data.Accounts.FirstOrDefault(a => a.Id == e.AccountId)?.Type == AccountType.Assets)
                         .ToList();
@@ -183,7 +173,6 @@ namespace Client.ViewModels
 
                     if (isTransfer)
                     {
-                        // Для переводов считаем только credit (расход со счёта-источника)
                         if (entry.Direction == EntryDirection.Credit)
                         {
                             var toEntry = assetEntries.FirstOrDefault(e => e.Direction == EntryDirection.Debit);
@@ -204,7 +193,6 @@ namespace Client.ViewModels
                                 IsTransfer = true
                             });
                         }
-                        // Не добавляем в income/expense — это перевод
                     }
                     else
                     {

@@ -44,27 +44,23 @@ namespace Client.ViewModels.DialogWindow
 
             var list = new List<CurrencyRateItem>();
 
-            // Always add RUB if not present in CurrencyRates
             var allCodes = _data.CurrencyRates.Select(r => r.CurrencyCode).ToList();
             if (!allCodes.Contains("RUB")) allCodes.Add("RUB");
             
-            // Add other missing well-known currencies
             foreach (var code in CurrencyHelper.AvailableCurrencies)
             {
                 if (!allCodes.Contains(code))
                     allCodes.Add(code);
             }
 
-            // Distinct
             allCodes = allCodes.Distinct().ToList();
 
             foreach (var code in allCodes)
             {
-                if (code == baseCur) continue; // Skip base currency as it's always 1
+                if (code == baseCur) continue;
 
                 var name = CurrencyHelper.GetCurrencyName(code);
                 
-                // Search filter
                 if (!string.IsNullOrEmpty(query))
                 {
                     if (!code.ToLower().Contains(query) && !name.ToLower().Contains(query))
@@ -79,7 +75,6 @@ namespace Client.ViewModels.DialogWindow
                 list.Add(new CurrencyRateItem(this, code, name, rate, isFav, baseCur));
             }
 
-            // Sort: Favorites first, then alphabetical by Code
             var sorted = list.OrderByDescending(x => x.IsFavorite).ThenBy(x => x.Code);
 
             foreach (var item in sorted)

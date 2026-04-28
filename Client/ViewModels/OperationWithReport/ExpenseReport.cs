@@ -62,8 +62,8 @@ namespace Client.ViewModels
             ObservableCollection<ISeries> expensePieSeries,
             decimal totalExpense,
             int topN,
-            decimal topExpensesSum,
-            decimal topExpensesShare,
+            out decimal topExpensesSum,
+            out decimal topExpensesShare,
             ObservableCollection<CategoryShareRow> expenseRows)
         {
             expenseShareRows.Clear();

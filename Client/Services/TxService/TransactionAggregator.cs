@@ -5,16 +5,9 @@ using Client.Models;
 
 namespace Client.Services;
 
-/// <summary>
-/// Чистые функции агрегации транзакций.
-/// Не зависит от UI, ObservableCollection или SettingsService.
-/// Используется DashboardViewModel, ReportViewModel и классами OperationWithReport.
-/// </summary>
+// Функции агрегации транзакций
 public static class TransactionAggregator
 {
-    // ── Фильтрация ───────────────────────────────────────────────────────────
-
-    /// <summary>Транзакции в диапазоне дат (включительно). Если даты null — пустой список.</summary>
     public static IReadOnlyList<Transaction> FilterByDateRange(
         IReadOnlyList<Transaction> transactions,
         DateTimeOffset? from,
@@ -26,12 +19,6 @@ public static class TransactionAggregator
             .ToList();
     }
 
-    // ── Выборка характерных проводок ─────────────────────────────────────────
-
-    /// <summary>
-    /// Для каждой транзакции возвращает «расходную» проводку:
-    /// сначала ищет Debit по Expense-счёту, иначе — Credit по Assets-счёту.
-    /// </summary>
     public static IEnumerable<Entry> GetExpenseEntries(
         IReadOnlyList<Transaction> txInRange,
         IDictionary<Guid, Account> accountById)
@@ -53,10 +40,6 @@ public static class TransactionAggregator
         }
     }
 
-    /// <summary>
-    /// Для каждой транзакции возвращает «доходную» проводку:
-    /// сначала ищет Credit по Income-счёту, иначе — Debit по Assets-счёту.
-    /// </summary>
     public static IEnumerable<Entry> GetIncomeEntries(
         IReadOnlyList<Transaction> txInRange,
         IDictionary<Guid, Account> accountById)
@@ -78,12 +61,6 @@ public static class TransactionAggregator
         }
     }
 
-    // ── Агрегация по категориям ──────────────────────────────────────────────
-
-    /// <summary>
-    /// Группирует проводки по CategoryId, переводит суммы в базовую валюту.
-    /// Возвращает строки, отсортированные по убыванию суммы.
-    /// </summary>
     public static IReadOnlyList<CategoryShareRow> AggregateByCategoryRows(
         IEnumerable<Entry> entries,
         IReadOnlyList<Category> categories,
@@ -105,12 +82,9 @@ public static class TransactionAggregator
             .ToList();
     }
 
-    /// <summary>
-    /// Группирует проводки по CategoryId + дням, с детализацией.
-    /// </summary>
     public static IReadOnlyList<CategoryDetailGroup> AggregateByCategoryGroups(
         IEnumerable<Entry> entries,
-        IReadOnlyList<Transaction> txInRange,  // нужен для обратного поиска Tx по Entry.Id
+        IReadOnlyList<Transaction> txInRange,
         IReadOnlyList<Category> categories,
         Func<string, string, decimal> getRate,
         string baseCurrency)
@@ -152,12 +126,6 @@ public static class TransactionAggregator
             .ToList();
     }
 
-    // ── Помесячные итоги ─────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Считает доходы и расходы по месяцам в заданном диапазоне.
-    /// Суммы в базовой валюте.
-    /// </summary>
     public static IReadOnlyList<MonthlyTotalRow> BuildMonthlyTotals(
         IReadOnlyList<Transaction> transactions,
         IDictionary<Guid, Account> accountById,
@@ -208,19 +176,14 @@ public static class TransactionAggregator
 
                 return new MonthlyTotalRow
                 {
-                    Month    = $"{mg.Key.Year:D4}-{mg.Key.Month:D2}",
-                    Income   = income,
-                    Expense  = expense
+                    Month = $"{mg.Key.Year:D4}-{mg.Key.Month:D2}",
+                    Income = income,
+                    Expense = expense
                 };
             })
             .ToList();
     }
 
-    // ── Dashboard-специфика ──────────────────────────────────────────────────
-
-    /// <summary>
-    /// Последние N транзакций, преобразованные в элементы для виджета.
-    /// </summary>
     public static IReadOnlyList<RecentTransactionItem> BuildRecentItems(
         IReadOnlyList<Transaction> transactions,
         IDictionary<Guid, Account> accountById,
@@ -250,23 +213,20 @@ public static class TransactionAggregator
 
             result.Add(new RecentTransactionItem
             {
-                Date         = tx.Date.ToString("dd.MM.yyyy"),
-                Amount       = assetEntry.Amount.Amount,
-                Currency     = assetEntry.Amount.CurrencyCode,
-                IsIncome     = isIncome && !isTransfer,
-                IsTransfer   = isTransfer,
+                Date = tx.Date.ToString("dd.MM.yyyy"),
+                Amount = assetEntry.Amount.Amount,
+                Currency = assetEntry.Amount.CurrencyCode,
+                IsIncome = isIncome && !isTransfer,
+                IsTransfer = isTransfer,
                 CategoryName = categoryName,
-                AccountName  = account?.Name ?? "—",
-                Description  = tx.Description
+                AccountName = account?.Name ?? "—",
+                Description = tx.Description
             });
         }
 
         return result;
     }
 
-    /// <summary>
-    /// Балансы по валютам для Asset-счетов.
-    /// </summary>
     public static IReadOnlyList<CurrencyBalance> BuildCurrencyBalances(
         IReadOnlyList<Account> assetAccounts)
     {
@@ -275,7 +235,7 @@ public static class TransactionAggregator
             .Select(g => new CurrencyBalance
             {
                 CurrencyCode = g.Key,
-                Balance      = g.Sum(a => a.Balance)
+                Balance = g.Sum(a => a.Balance)
             })
             .OrderByDescending(c => c.Balance)
             .ToList();

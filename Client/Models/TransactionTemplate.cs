@@ -2,11 +2,7 @@ using System;
 
 namespace Client.Models
 {
-    /// <summary>
-    /// Сохранённый шаблон формы транзакции (например, «оплата интернета»).
-    /// Все поля Id-ссылок (FromAccountId/ToAccountId/CategoryId) опциональны —
-    /// шаблон может быть частичным, пользователь дозаполнит на форме.
-    /// </summary>
+    ///Сохранённый шаблон формы транзакции
     public sealed class TransactionTemplate
     {
         public Guid Id { get; init; } = Guid.NewGuid();

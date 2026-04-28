@@ -7,15 +7,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-/// <summary>
-/// Хранит курсы валют относительно рубля (RateToBase = сколько RUB за 1 единицу валюты).
-/// Курсы подтягиваются <c>CurrencyRateService</c> из внешнего API при старте приложения.
-/// Используется для пересчёта мультивалютных балансов и сумм в отчётах.
-/// </summary>
+// Хранит курсы валют относительно рубля (RateToBase = сколько RUB за 1 единицу валюты)
 public sealed class CurrencyRatesRepository
 {
     private readonly SqliteConFactory _factory;
-
     public event Action? Changed;
     private void RaiseChanged() => Changed?.Invoke();
 
@@ -45,26 +40,18 @@ public sealed class CurrencyRatesRepository
         }
     }
 
-    /// <summary>
-    /// Возвращает коэффициент пересчёта <paramref name="fromCurrency"/> → <paramref name="toCurrency"/>.
-    /// Реализован через рубль как «общий знаменатель»: A→B = (A→RUB) / (B→RUB).
-    /// Если курс неизвестен — берётся 1.0 (лучше показать неточную сумму, чем уронить отчёт).
-    /// </summary>
+    // Реализован через рубль как «общий знаменатель»: A→B = (A→RUB) / (B→RUB).
     public decimal Get(string fromCurrency, string toCurrency = "RUB")
     {
         if (fromCurrency == toCurrency) return 1m;
 
-        // RateToBase у нас всегда «сколько RUB за 1 единицу валюты», поэтому RUB сам к себе = 1
         var fromRate = fromCurrency == "RUB" ? 1m : _currencyRates.FirstOrDefault(r => r.CurrencyCode == fromCurrency)?.RateToBase ?? 1m;
-        var toRate   = toCurrency   == "RUB" ? 1m : _currencyRates.FirstOrDefault(r => r.CurrencyCode == toCurrency)?.RateToBase   ?? 1m;
+        var toRate = toCurrency == "RUB" ? 1m : _currencyRates.FirstOrDefault(r => r.CurrencyCode == toCurrency)?.RateToBase ?? 1m;
 
         if (toRate == 0) return 0;
         return fromRate / toRate;
     }
 
-    /// <summary>
-    /// Сохраняет или обновляет курс валюты к рублю. RUB не сохраняется — он по определению 1.0.
-    /// </summary>
     public void Set(string code, decimal rate)
     {
         if (code == "RUB") return;

@@ -2,10 +2,7 @@ using Client.Models;
 
 namespace Client.Services;
 
-/// <summary>
-/// Проверяет корректность параметров формы перед построением транзакции.
-/// Возвращает <c>null</c> если всё ОК, или строку с описанием первой найденной ошибки.
-/// </summary>
+// Проверяет корректность параметров формы перед построением транзакции
 public sealed class TransactionValidator
 {
     public string? Validate(

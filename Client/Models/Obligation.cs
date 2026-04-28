@@ -4,13 +4,7 @@ using System;
 
 namespace Client.Models;
 
-/// <summary>
-/// Долговое обязательство: либо я кому-то должен (Debt), либо мне должны (Credit).
-/// При погашении формируется обычная транзакция через <c>TransactionBuilder</c>,
-/// затем долг помечается как оплаченный.
-/// Свойство <see cref="StatusLabel"/> вычисляется на лету: показывает «Просрочено» /
-/// «Подходит срок» (≤ 3 дней до даты) / «Активно» / «Погашено».
-/// </summary>
+// Долговое обязательство
 public partial class Obligation : ObservableObject
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -46,7 +40,7 @@ public partial class Obligation : ObservableObject
                 var now = DateTimeOffset.Now.Date;
                 var due = DueDate.Value.Date;
                 if (due < now) return "Просрочено";
-                if ((due - now).TotalDays <= 3) return "Подходит срок";
+                if ((due - now).TotalDays <= 3) return "Подходит срок"; // уведомление о платеже (3 дня)
             }
             return "Активно";
         }
@@ -55,6 +49,6 @@ public partial class Obligation : ObservableObject
 
 public enum ObligationType
 {
-    Debt = 0,
-    Credit = 1
+    Debt = 0,   // я должен
+    Credit = 1  // мне должны
 }

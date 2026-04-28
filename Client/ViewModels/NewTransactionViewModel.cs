@@ -10,14 +10,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Страница «Новая транзакция». Содержит форму с переключателем вида
-    /// (расход/доход/перевод/долг) и набор сохранённых шаблонов.
-    ///
-    /// Логика разделена: <see cref="TransactionValidator"/> проверяет поля,
-    /// <see cref="TransactionBuilder"/> строит проводки, <see cref="TemplateService"/>
-    /// собирает шаблон. ViewModel занимается только UI и оркестрацией.
-    /// </summary>
+    // Страница «Новая транзакция»
     public sealed partial class NewTransactionViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -81,8 +74,6 @@ namespace Client.ViewModels
             ReloadTemplates();
         }
 
-        // ── Обновление выбора типа операции ──────────────────────────────────
-
         partial void OnChoiceChanged(TxKindChoice value)
         {
             OnPropertyChanged(nameof(IsExpense));
@@ -105,8 +96,6 @@ namespace Client.ViewModels
             ReloadObligations();
             ReloadTemplates();
         }
-
-        // ── Быстрый пресет из внешнего кода ──────────────────────────────────
 
         public void PresetForQuickTx(Account account, TxKindChoice choice)
         {
@@ -146,12 +135,9 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(IsObligationRequire));
         }
 
-        // ── Основная команда: провести транзакцию ─────────────────────────────
-
         [RelayCommand]
         private async Task PostAsync()
         {
-            // 1. Валидация формы
             var error = _validator.Validate(Choice, FromAccount, ToAccount, Category, SelectedObligation, Amount);
             if (error != null)
             {
@@ -159,7 +145,6 @@ namespace Client.ViewModels
                 return;
             }
 
-            // 2. Построение проводок
             var money = new Money(Amount, FromAccount!.CurrencyCode);
             System.Collections.Generic.List<Entry> entries;
             try
@@ -172,7 +157,6 @@ namespace Client.ViewModels
                 return;
             }
 
-            // 3. Запись транзакции
             var tx = new Transaction
             {
                 Date        = Date,
@@ -190,7 +174,6 @@ namespace Client.ViewModels
                 return;
             }
 
-            // 4. Обновление обязательства при необходимости
             if (IsObligationRequire && SelectedObligation != null)
             {
                 try
@@ -210,13 +193,10 @@ namespace Client.ViewModels
                 }
             }
 
-            // 5. Сброс формы
             Amount      = 0;
             Description = "";
             _onPosted();
         }
-
-        // ── Шаблоны ───────────────────────────────────────────────────────────
 
         public void ReloadTemplates()
         {
@@ -267,8 +247,6 @@ namespace Client.ViewModels
             ReloadTemplates();
         }
 
-        // ── Перезагрузка коллекций ────────────────────────────────────────────
-
         public void ReloadAccounts()
         {
             Accounts.Clear();
@@ -305,8 +283,6 @@ namespace Client.ViewModels
 
             SelectedObligation ??= ActiveObligations.FirstOrDefault();
         }
-
-        // ── Вспомогательные ──────────────────────────────────────────────────
 
         private void ResetIrrelevantFields()
         {

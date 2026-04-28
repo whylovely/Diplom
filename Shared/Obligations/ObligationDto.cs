@@ -1,8 +1,8 @@
 using System;
 
-// DTO обязательств — долгов и займов. Совпадает по полям с клиентской моделью Obligation.
 namespace Shared.Obligations;
 
+// DTO обязательств — долгов и займов
 public enum ObligationType
 {
     Debt = 0,   // Я должен

@@ -22,7 +22,7 @@ public sealed class SyncService
 
     public async Task<SyncResult> SmartSyncAsync()
     {
-        var lastSync      = _settings.LastSyncedAt ?? DateTimeOffset.MinValue;
+        var lastSync = _settings.LastSyncedAt ?? DateTimeOffset.MinValue;
         var lastLocalChange = _localDb.GetLocalLastChangeDate();
 
         bool hasLocalChanges = lastLocalChange.HasValue && lastLocalChange.Value > lastSync;
@@ -62,12 +62,10 @@ public sealed class SyncService
             {
                 serverTransactions = await _api.GetTransactionsAsync() ?? new();
             }
-            catch
-            {
-            }
+            catch { }
 
-            var accounts    = serverAccounts.Select(DtoMapper.FromDto).ToList();
-            var categories  = serverCategories.Select(DtoMapper.FromDto).ToList();
+            var accounts = serverAccounts.Select(DtoMapper.FromDto).ToList();
+            var categories = serverCategories.Select(DtoMapper.FromDto).ToList();
             var obligations = serverObligations.Select(DtoMapper.FromDto).ToList();
             var transactions = serverTransactions.Select(DtoMapper.FromDto).ToList();
 
@@ -79,9 +77,7 @@ public sealed class SyncService
                     if (!accountMap.TryGetValue(entry.AccountId, out var acc)) continue;
                     if (acc.Type == AccountType.Assets)
                     {
-                        var delta = entry.Direction == Models.EntryDirection.Debit
-                            ? entry.Amount.Amount
-                            : -entry.Amount.Amount;
+                        var delta = entry.Direction == Models.EntryDirection.Debit ? entry.Amount.Amount : -entry.Amount.Amount;
                         acc.Balance += delta;
                     }
                 }
@@ -155,8 +151,6 @@ public sealed class SyncService
             };
         }
     }
-
-
 }
 
 public sealed class SyncResult

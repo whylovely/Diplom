@@ -44,7 +44,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
             return cached;
         }
 
-        // Кэш устарел
         List<ExchangeRateDto> rates;
         try
         {

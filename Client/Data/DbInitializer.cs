@@ -12,22 +12,18 @@ public sealed class DbInitializer
     private readonly SqliteConFactory _factory;
     public DbInitializer(SqliteConFactory f) => _factory = f;
 
-    /// <summary>Полная инициализация: схема + миграции.</summary>
     public void Initialize()
     {
         EnsureCreated();
         MigrateSchema();
     }
 
-    /// <summary>
-    /// Создаёт все таблицы через CREATE TABLE IF NOT EXISTS — повторный вызов безопасен.
-    /// Здесь хранится «эталонная» схема БД на момент текущей версии клиента.
-    /// </summary>
+    /// Создаёт все таблицы
     private void EnsureCreated()
     {
         using var conn = _factory.Open();
 
-        // Счета пользователя: активы, технические доходы и расходы
+        // Счета
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Accounts (
                 Id TEXT PRIMARY KEY,
@@ -46,7 +42,7 @@ public sealed class DbInitializer
                 UpdatedAt TEXT NOT NULL
             )");
 
-        // Группы счетов — для отображения в боковой панели
+        // Группы счетов
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS AccountGroups (
                 Id TEXT PRIMARY KEY,
@@ -64,7 +60,7 @@ public sealed class DbInitializer
                 UpdatedAt TEXT NOT NULL
             )");
 
-        // Транзакции — заголовки операций
+        // Транзакции
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Transactions (
                 Id TEXT PRIMARY KEY,
@@ -73,7 +69,7 @@ public sealed class DbInitializer
                 CreatedAt TEXT NOT NULL
             )");
 
-        // Проводки двойной записи — Debit/Credit, привязка к счёту и категории
+        // Проводки двойной записи — Debit/Credit
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Entries (
                 Id TEXT PRIMARY KEY,
@@ -87,7 +83,7 @@ public sealed class DbInitializer
                 FOREIGN KEY (AccountId) REFERENCES Accounts(Id)
             )");
 
-        // Долги и займы — кому я должен или мне должны
+        // Долги и займы
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Obligations (
                 Id TEXT PRIMARY KEY,
@@ -102,14 +98,14 @@ public sealed class DbInitializer
                 Note TEXT
             )");
 
-        // Курсы валют к базовой (по умолчанию RUB = 1.0)
+        // Курсы валют
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS CurrencyRates (
                 CurrencyCode TEXT PRIMARY KEY,
                 RateToBase REAL NOT NULL
             )");
 
-        // Сохранённые шаблоны частых операций
+        // Сохранённые шаблоны
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Templates (
                 Id TEXT PRIMARY KEY,
@@ -123,25 +119,18 @@ public sealed class DbInitializer
             )");
     }
 
-    /// <summary>
-    /// Доливает колонки, которые появились в более поздних версиях схемы.
-    /// SQLite не поддерживает «IF NOT EXISTS» для ALTER TABLE, поэтому сначала
-    /// проверяем PRAGMA table_info, и только потом добавляем колонку.
-    /// </summary>
     private void MigrateSchema()
     {
         using var conn = _factory.Open();
 
-        // Колонка IsDeleted появилась после введения мягкого удаления счетов
         if (!ColumnExists(conn, "Accounts", "IsDeleted"))
             SqliteConFactory.Exec(conn, "ALTER TABLE Accounts ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
 
-        // Колонка GroupId — для группировки счетов в боковой панели
         if (!ColumnExists(conn, "Accounts", "GroupId"))
             SqliteConFactory.Exec(conn, "ALTER TABLE Accounts ADD COLUMN GroupId TEXT");
     }
 
-    /// <summary>Проверяет наличие колонки через PRAGMA table_info.</summary>
+    // Проверяет наличие колонки через PRAGMA table_info
     private static bool ColumnExists(SqliteConnection conn, string table, string column)
     {
         using var cmd = conn.CreateCommand();

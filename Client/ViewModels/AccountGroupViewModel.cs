@@ -7,11 +7,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Обёртка над <see cref="AccountGroup"/> для отображения в боковой панели на странице «Счета».
-    /// Содержит коллекцию счетов, входящих в группу, и пересчитывает суммарный баланс
-    /// в базовой валюте при изменении данных или настроек.
-    /// </summary>
     public sealed partial class AccountGroupViewModel : ObservableObject
     {
         private readonly IDataService _data;
@@ -27,8 +22,6 @@ namespace Client.ViewModels
         {
             get
             {
-                // Складываем только баланс в основной валюте каждого счета, переведенный в базовую валюту.
-                // Вторичный баланс - это лишь представление для UI, он не должен прибавляться.
                 return Accounts.Sum(a => a.Balance * _data.GetRate(a.CurrencyCode, _settings.BaseCurrency));
             }
         }
@@ -44,7 +37,6 @@ namespace Client.ViewModels
 
         public void Refresh()
         {
-            // Обновляем вторичный баланс для всех мультивалютных счетов в группе
             foreach (var a in Accounts)
             {
                 if (a.IsMultiCurrency && !string.IsNullOrEmpty(a.SecondaryCurrencyCode))

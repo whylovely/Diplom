@@ -63,11 +63,6 @@ public sealed class AuthController : ControllerBase
         return Ok(new AuthResponse(CreateToken(user)));
     }
 
-    /// <summary>
-    /// Отдельный endpoint для входа в админ-панель: проверяет роль "Admin",
-    /// иначе возвращает 403, даже если пароль правильный. Это защищает от случайного
-    /// открытия админки обычным пользователем.
-    /// </summary>
     [HttpPost("admin/login")]
     public async Task<ActionResult<AuthResponse>> AdminLogin(LoginRequest req, CancellationToken ct)
     {
@@ -82,8 +77,7 @@ public sealed class AuthController : ControllerBase
         return Ok(new AuthResponse(CreateToken(user)));
     }
 
-    // Формирует подписанный JWT (HS256). Settings вынесены в appsettings.json (Jwt:Issuer/Audience/Key),
-    // в тестах ключ переопределяется через PostConfigure<JwtBearerOptions>.
+    // Формирует подписанный JWT (HS256)
     private string CreateToken(UserEntity user)
     {
         var jwt = _cfg.GetSection("Jwt");

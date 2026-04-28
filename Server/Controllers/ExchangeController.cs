@@ -7,7 +7,7 @@ namespace Server.Controllers;
 
 /// <summary>
 /// Endpoint курсов валют. Прокси над <see cref="IExchangeRateService"/>:
-/// в проде — данные ЦБ РФ + CoinGecko, в тестах — фейковый сервис со стабильными значениями.
+/// данные ЦБ РФ + CoinGecko.
 /// Клиент дёргает GET /rates при старте и периодически обновляет локальные курсы.
 /// </summary>
 [ApiController]

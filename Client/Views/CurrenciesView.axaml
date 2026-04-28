@@ -8,7 +8,6 @@
              x:DataType="vm:CurrenciesViewModel">
 
   <UserControl.Styles>
-    <!-- Skeleton Animation -->
     <Style Selector="Border.skeleton">
       <Setter Property="Background" Value="#1AFFFFFF"/>
       <Style.Animations>
@@ -70,7 +69,6 @@
       </TextBox.InnerRightContent>
     </TextBox>
 
-    <!-- Skeleton Loader -->
     <ItemsControl Grid.Row="2" IsVisible="{Binding IsSearching}" Margin="0,8,0,0" ItemsSource="{Binding DummyItems}">
       <ItemsControl.ItemTemplate>
         <DataTemplate>

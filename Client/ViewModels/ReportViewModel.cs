@@ -13,14 +13,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Страница «Отчёты». Через переключатель <see cref="SelectedSection"/> показывает 9 разделов:
-    /// сводный, баланс на дату, помесячная динамика, обороты по счетам, топ расходов/доходов,
-    /// расходы/доходы по категориям с детализацией, календарь.
-    /// Тяжёлая логика вынесена в статические классы <c>OperationWithReport/*</c>,
-    /// которые делегируют чистую агрегацию <see cref="TransactionAggregator"/>.
-    /// Поддерживает экспорт в CSV, TXT и Excel через <see cref="ExportRequested"/>.
-    /// </summary>
+    // Страница «Отчёты»
     public sealed partial class ReportViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -189,7 +182,12 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topExpensesShare;
 
         [RelayCommand]
-        public void RefreshExpenseTop() => ExpenseReport.RefreshExpenseChart(_data, DateFrom, DateTo, ExpenseShareRows, ExpensePieSeries, TotalExpense, TopN, TopExpensesSum, TopExpensesShare, ExpenseRows);
+        public void RefreshExpenseTop()
+        {
+            ExpenseReport.RefreshExpenseChart(_data, DateFrom, DateTo, ExpenseShareRows, ExpensePieSeries, TotalExpense, TopN, out var sum, out var share, ExpenseRows);
+            TopExpensesSum   = sum;
+            TopExpensesShare = share;
+        }
         //
 
         // Подсчет графика по доходам
@@ -199,7 +197,12 @@ namespace Client.ViewModels
         [ObservableProperty] private decimal _topIncomesShare;
 
         [RelayCommand]
-        public void RefreshIncomeTop() => IncomeReport.RefreshIncomeChart(_data, DateFrom, DateTo, IncomeShareRows, IncomePieSeries, TotalIncome, TopN, TopIncomesSum, TopIncomesShare, IncomeRows);
+        public void RefreshIncomeTop()
+        {
+            IncomeReport.RefreshIncomeChart(_data, DateFrom, DateTo, IncomeShareRows, IncomePieSeries, TotalIncome, TopN, out var sum, out var share, IncomeRows);
+            TopIncomesSum   = sum;
+            TopIncomesShare = share;
+        }
         //
 
         // Подсчет остатков и оборотов
@@ -254,23 +257,7 @@ namespace Client.ViewModels
         //
     }
 
-    public enum ExportFormat
-    {
-        CSV,
-        TXT,
-        Excel
-    }
+    public enum ExportFormat { CSV, TXT, Excel }
 
-    public enum ReportSelection
-    {
-        Summary,
-        BalanceAtDate,
-        MothlyDinamics,
-        AccountsTurnover,
-        ExpenseTop,
-        IncomeTop,
-        ExpenseByCategory,
-        IncomeByCategory,
-        Calendar
-    }
+    public enum ReportSelection { Summary, BalanceAtDate, MothlyDinamics, AccountsTurnover, ExpenseTop, IncomeTop, ExpenseByCategory, IncomeByCategory, Calendar }
 }

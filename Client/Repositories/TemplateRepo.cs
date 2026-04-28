@@ -7,16 +7,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-/// <summary>
-/// Хранилище шаблонов транзакций. Шаблон — это набор предзаполненных полей формы,
-/// который пользователь сохраняет для часто повторяющихся операций (например, «оплата интернета»).
-/// Сами шаблоны не порождают транзакции — они только подставляются в форму
-/// <c>NewTransactionViewModel</c>, откуда пользователь нажимает «Сохранить».
-/// </summary>
+// Хранилище шаблонов транзакций
 public sealed class TemplatesRepository
 {
     private readonly SqliteConFactory _factory;
-
     public event Action? Changed;
     private void RaiseChanged() => Changed?.Invoke();
 

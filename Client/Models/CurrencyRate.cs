@@ -5,20 +5,13 @@ using System.Linq;
 
 namespace Client.Models;
 
-/// <summary>
-/// Курс валюты к рублю. RateToBase = сколько рублей за 1 единицу валюты.
-/// Хранится в таблице CurrencyRates, обновляется <c>CurrencyRateService</c> с сервера.
-/// </summary>
+// Курс валюты к рублю
 public sealed class CurrencyRate
 {
     public string CurrencyCode { get; set; } = string.Empty;
     public decimal RateToBase { get; set; }
 }
 
-/// <summary>
-/// Справочник доступных валют (фиат + крипто) и их человекочитаемых названий.
-/// Используется в выпадающих списках выбора валюты.
-/// </summary>
 public static class CurrencyHelper
 {
     public static readonly string[] AvailableCurrencies = 
@@ -47,20 +40,14 @@ public static class CurrencyHelper
     {
         if (CurrencyNames.TryGetValue(code, out var name))
             return name;
-        return code; // Fallback to code if name not found
+        return code;
     }
 
-    /// <summary>
-    /// Возвращает валюты, отфильтрованные по списку избранных.
-    /// Если избранных нет — возвращает все доступные (fallback).
-    /// </summary>
     public static string[] GetFilteredCurrencies(List<string>? favorites)
     {
         if (favorites is null || favorites.Count == 0)
             return AvailableCurrencies;
 
-        // Сохраняем порядок из AvailableCurrencies, добавляя в конец те,
-        // которые есть в избранном, но не в AvailableCurrencies
         var ordered = AvailableCurrencies
             .Where(c => favorites.Contains(c))
             .ToList();
@@ -74,6 +61,5 @@ public static class CurrencyHelper
         return ordered.ToArray();
     }
 
-    public static ObservableCollection<string> GetObservableCurrencies() 
-        => new(AvailableCurrencies);
+    public static ObservableCollection<string> GetObservableCurrencies() => new(AvailableCurrencies);
 }

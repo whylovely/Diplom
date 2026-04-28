@@ -3,11 +3,7 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
-    /// <summary>
-    /// Категория дохода или расхода (например, «Продукты», «Зарплата»).
-    /// При создании автоматически порождает пару технических счетов
-    /// (см. <c>AccountRepository.CreateTechnicalAccountsForCategory</c>).
-    /// </summary>
+    // Категории
     public sealed class Category
     {
         public Guid Id { get; init; } = Guid.NewGuid();

@@ -2,18 +2,12 @@ using Shared.Exchange;
 
 namespace Server.Services;
 
-/// <summary>
-/// Контракт сервиса курсов валют. Боевая реализация — <see cref="CbrExchangeRateService"/>
-/// (ЦБ РФ для фиата + CoinGecko для крипто), в тестах подменяется на FakeExchangeRateService.
-/// </summary>
+// Интерфейс сервиса курсов валют
 public interface IExchangeRateService
 {
-    /// <summary>Возвращает все известные курсы к рублю.</summary>
+    //Возвращает все известные курсы к рублю
     Task<List<ExchangeRateDto>> GetRatesAsync(CancellationToken ct);
 
-    /// <summary>
-    /// Конвертирует <paramref name="amount"/> из <paramref name="from"/> в <paramref name="to"/>.
-    /// Возвращает <c>null</c>, если хоть одна валюта неизвестна.
-    /// </summary>
+    // Конвертирует amount из from" в to
     Task<decimal?> ConvertAsync(string from, string to, decimal amount, CancellationToken ct);
 }

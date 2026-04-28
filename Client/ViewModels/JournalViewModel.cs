@@ -10,11 +10,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Страница «Журнал»: таблица всех транзакций с поиском, фильтром по типу и
-    /// подсветкой возможных дублей (эвристика — одинаковая дата, сумма и счёт).
-    /// Поддерживает сторнирование выбранной транзакции через <c>StornoTransactionCommand</c>.
-    /// </summary>
+    // Страница «Журнал»
     public sealed partial class JournalViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -22,7 +18,7 @@ namespace Client.ViewModels
         private List<JournalRow> _allRows = new();
 
         public ObservableCollection<JournalRow> FilteredRows { get; } = new();
-        [ObservableProperty] private string _searchText = "";   // Строка поиска
+        [ObservableProperty] private string _searchText = "";
 
         [NotifyCanExecuteChangedFor(nameof(StornoTransactionCommand))]
         [ObservableProperty]

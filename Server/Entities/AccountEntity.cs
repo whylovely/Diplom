@@ -1,11 +1,6 @@
 namespace Server.Entities;
 
-/// <summary>
-/// Счёт пользователя на сервере. Kind: 0=Assets, 1=Income, 2=Expense (как на клиенте).
-/// AccountType + SecondaryCurrency + ExchangeRate описывают мультивалютность.
-/// Soft-delete: при удалении выставляется IsDeleted=true и DeletedAt — данные не теряются,
-/// чтобы можно было разворачивать исторические транзакции, ссылающиеся на удалённый счёт.
-/// </summary>
+// Счёт пользователя на сервере
 public sealed class AccountEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

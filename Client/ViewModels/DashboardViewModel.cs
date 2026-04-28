@@ -10,12 +10,7 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Главный экран приложения — дашборд. Показывает четыре виджета:
-    /// карточки активных счетов, общий баланс по валютам, последние операции и
-    /// график доходов/расходов за последние 6 месяцев.
-    /// Чистая агрегация делегируется <see cref="TransactionAggregator"/>.
-    /// </summary>
+    // Главный экран приложения
     public sealed partial class DashboardViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -31,18 +26,14 @@ namespace Client.ViewModels
             Refresh();
         }
 
-        // ── Account Cards ──────────────────────────────────
         public ObservableCollection<Account> AssetAccounts { get; } = new();
 
-        // ── Total Balance ──────────────────────────────────
         [ObservableProperty] private decimal _totalBalance;
         public string BaseCurrency => _settings.BaseCurrency;
         public ObservableCollection<CurrencyBalance> CurrencyBalances { get; } = new();
 
-        // ── Recent Transactions ────────────────────────────
         public ObservableCollection<RecentTransactionItem> RecentTransactions { get; } = new();
 
-        // ── Monthly Dynamics ───────────────────────────────
         [ObservableProperty] private ObservableCollection<ISeries> _monthlySeries = new();
         [ObservableProperty] private LiveChartsCore.SkiaSharpView.Axis[] _xAxes = Array.Empty<LiveChartsCore.SkiaSharpView.Axis[]>() is null ? new Axis[0] : new Axis[0];
         [ObservableProperty] private LiveChartsCore.SkiaSharpView.Axis[] _yAxes = Array.Empty<Axis>();
@@ -86,7 +77,7 @@ namespace Client.ViewModels
         {
             RecentTransactions.Clear();
 
-            var accountById  = _data.Accounts.ToDictionary(a => a.Id);
+            var accountById = _data.Accounts.ToDictionary(a => a.Id);
             var categoryById = _data.Categories.ToDictionary(c => c.Id);
 
             foreach (var item in TransactionAggregator.BuildRecentItems(_data.Transactions, accountById, categoryById))
@@ -97,7 +88,6 @@ namespace Client.ViewModels
         {
             var now = DateTimeOffset.Now;
 
-            // Определяем диапазон: до 6 последних месяцев с данными
             var allMonths = _data.Transactions
                 .Select(t => new { t.Date.Year, t.Date.Month })
                 .Distinct()
@@ -114,21 +104,18 @@ namespace Client.ViewModels
 
             var selected = allMonths.Take(6).OrderBy(m => m.Year).ThenBy(m => m.Month).ToList();
             var from = new DateTimeOffset(selected.First().Year, selected.First().Month, 1, 0, 0, 0, now.Offset);
-            var to   = new DateTimeOffset(selected.Last().Year,  selected.Last().Month,  1, 0, 0, 0, now.Offset)
-                           .AddMonths(1).AddTicks(-1);
+            var to = new DateTimeOffset(selected.Last().Year,  selected.Last().Month,  1, 0, 0, 0, now.Offset).AddMonths(1).AddTicks(-1);
 
             var monthlyRows = new ObservableCollection<MonthlyTotalRow>();
             MonthlyReport.RefreshMonthlyRows(_data, _settings, from, to, monthlyRows);
 
             var newSeries = new ObservableCollection<ISeries>();
-            var labels    = new ObservableCollection<string>();
-            MonthlyReport.RefreshMonthlyChart(monthlyRows, newSeries, labels,
-                out var xAxes, out var yAxes);
+            var labels = new ObservableCollection<string>();
+            MonthlyReport.RefreshMonthlyChart(monthlyRows, newSeries, labels, out var xAxes, out var yAxes);
 
             MonthlySeries = newSeries;
-            XAxes         = xAxes;
-            YAxes         = yAxes;
+            XAxes = xAxes;
+            YAxes = yAxes;
         }
     }
-
 }

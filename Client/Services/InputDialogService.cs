@@ -4,10 +4,7 @@ using Client.Views;
 
 namespace Client.Services;
 
-/// <summary>
-/// Сервис для показа диалога ввода произвольного текста (переименование, ввод заметки и т.п.).
-/// Возвращает введённую строку или <c>null</c>, если пользователь нажал «Отмена».
-/// </summary>
+// Сервис для показа диалога ввода
 public interface IInputDialogService
 {
     Task<string?> PromptAsync(string title, string message, string? initialText = null);

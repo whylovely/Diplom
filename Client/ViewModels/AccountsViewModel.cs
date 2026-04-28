@@ -10,13 +10,6 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
-    /// <summary>
-    /// Страница «Счета»: CRUD счетов, группировка по <see cref="AccountGroupViewModel"/>,
-    /// быстрые операции (расход / доход / перевод) и кнопка синхронизации с сервером.
-    ///
-    /// Логика синхронизации делегирована <see cref="SyncOrchestrator"/> — здесь только
-    /// показ диалога конфликта и обновление статуса в UI после ответа оркестратора.
-    /// </summary>
     public sealed partial class AccountsViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -42,7 +35,7 @@ namespace Client.ViewModels
 
         public string BaseCurrencyCode => _settings.BaseCurrency;
 
-        public decimal TotalBalance // Общий баланс (в базовой валюте)
+        public decimal TotalBalance
         {
             get
             {
@@ -112,9 +105,9 @@ namespace Client.ViewModels
             var currentLoad = ++_loadCounter;
             
             IsLoading = true;
-            await Task.Delay(200); // Небольшая задержка для UI
+            await Task.Delay(200);
             
-            if (currentLoad != _loadCounter) return; // Была запущена новая загрузка
+            if (currentLoad != _loadCounter) return;
 
             Accounts.Clear();
             Groups.Clear();
@@ -122,14 +115,12 @@ namespace Client.ViewModels
             var loadedAccounts = _data.Accounts.Where(a => a.Type == AccountType.Assets).ToList();
             var loadedGroups = _data.AccountGroups.OrderBy(x => x.SortOrder).ThenBy(x => x.Name).ToList();
 
-            // Создаем вьюмодели для всех групп
             foreach (var g in loadedGroups)
             {
                 var gvm = new AccountGroupViewModel(g, _data, _settings);
                 Groups.Add(gvm);
             }
 
-            // Вьюмодель для "Без группы"
             var noGroupVm = new AccountGroupViewModel(null, _data, _settings);
             Groups.Add(noGroupVm);
 
@@ -140,11 +131,9 @@ namespace Client.ViewModels
                 gvm.Accounts.Add(acc);
             }
 
-            // Убираем пустую "Без группы", если нет счетов
             if (noGroupVm.Accounts.Count == 0)
                 Groups.Remove(noGroupVm);
 
-            // Обновляем все группы, чтобы рассчитались вторичные балансы
             foreach (var g in Groups) g.Refresh();
 
             OnPropertyChanged(nameof(TotalBalance));
@@ -261,14 +250,12 @@ namespace Client.ViewModels
         {
             if (acc is null) return;
 
-            // Запрет удаления счёта с ненулевым балансом
             if (acc.Balance != 0)
             {
                 await _notify.ShowErrorAsync($"Нельзя удалить счёт: баланс = {acc.Balance:N2} {acc.CurrencyCode}. Сначала обнулите баланс.");
                 return;
             }
 
-            // Предупреждение если счёт использовался в операциях
             if (_data.IsAccountUsed(acc.Id))
             {
                 var confirmed = await _notify.ShowConfirmAsync(
@@ -317,10 +304,8 @@ namespace Client.ViewModels
             IsSyncing = true;
             SetSyncStatus("Проверка...", "#29B6F6");
 
-            // Фаза 1: анализ
             var analysis = await _orchestrator.AnalyzeAsync();
 
-            // Фаза 2: выбор действия
             SyncAction action;
             if (analysis.NeedsConflictDialog)
             {
@@ -333,7 +318,7 @@ namespace Client.ViewModels
                     "push"   => SyncAction.PushOnly,
                     "server" => SyncAction.PullOnly,
                     "client" => SyncAction.Cancel,
-                    _        => SyncAction.Dismiss   // null = закрыл без выбора
+                    _        => SyncAction.Dismiss 
                 };
             }
             else
@@ -345,7 +330,6 @@ namespace Client.ViewModels
                 action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...",
                 "#29B6F6");
 
-            // Фаза 3: выполнение
             var outcome = await _orchestrator.ExecuteAsync(action);
 
             if (outcome.Success)

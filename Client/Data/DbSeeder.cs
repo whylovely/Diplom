@@ -5,22 +5,12 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
-/// <summary>
-/// Наполняет пустую БД демо-данными при первом запуске:
-/// курсы валют, категории, технические счета, пара активов, пример долга и
-/// несколько транзакций за последние дни. На уже заполненную БД не влияет.
-/// </summary>
+// Демо-данные
 public sealed class DbSeeder
 {
     private readonly SqliteConFactory _factory;
     public DbSeeder(SqliteConFactory f) => _factory = f;
 
-    /// <summary>
-    /// Если в БД нет курсов валют — добавляет дефолтный набор.
-    /// Если нет ни одного счёта — создаёт демо-данные (категории, счета, транзакции, долг).
-    /// Две независимые проверки, чтобы при ручном удалении частей данных
-    /// можно было дозаполнить только нужное.
-    /// </summary>
     public void SeedIfEmpty()
     {
         using var conn = _factory.Open();
@@ -35,7 +25,7 @@ public sealed class DbSeeder
             {
                 { "RUB", 1.0 }, { "USD", 72.0 }, { "EUR", 91.0 }, { "KZT", 0.16 },
                 { "GBP", 104.0 }, { "CNY", 12.0 }, { "TRY", 1.8 }
-            };
+            };  // Захордкоженные курсы валют
 
             foreach (var kvp in defaultRates)
             {
@@ -62,9 +52,6 @@ public sealed class DbSeeder
             var accIncomeTransportId  = Guid.NewGuid().ToString();
             var accExpenseTransportId = Guid.NewGuid().ToString();
 
-            // Создаёт категорию и пару технических счетов «Доходы: X» / «Расходы: X».
-            // Технические счета используются как противоположная сторона проводки
-            // при записи доходов и расходов — без этого нарушится двойная запись.
             void AddCategory(string id, string name, int kind, string incomeId, string expenseId)
             {
                 SqliteConFactory.Exec(conn, @"INSERT INTO Categories (Id, Name, Kind, CreatedAt, UpdatedAt) VALUES (@Id, @Name, @Kind, @Now, @Now)",
@@ -79,8 +66,8 @@ public sealed class DbSeeder
                              ("@Id", incomeId), ("@Name", $"Доходы: {name}"), ("@Now", now));
             }
 
-            AddCategory(catSalaryId,    "Зарплата",  1, accIncomeSalaryId,    accExpenseSalaryId);
-            AddCategory(catFoodId,      "Продукты",  0, accIncomeFoodId,      accExpenseFoodId);
+            AddCategory(catSalaryId, "Зарплата", 1, accIncomeSalaryId, accExpenseSalaryId);
+            AddCategory(catFoodId, "Продукты", 0, accIncomeFoodId, accExpenseFoodId);
             AddCategory(catTransportId, "Транспорт", 0, accIncomeTransportId, accExpenseTransportId);
 
             var act1 = Guid.NewGuid().ToString();
@@ -97,9 +84,6 @@ public sealed class DbSeeder
                          VALUES (@Id, 'Иван', 5000, 'RUB', 0, @Now, 0)",
                          ("@Id", Guid.NewGuid().ToString()), ("@Now", now));
 
-            // Создаёт транзакцию из двух проводок: основной счёт и противоположный технический.
-            // mainAccDir — направление по основному счёту (Debit для дохода, Credit для расхода);
-            // у технического направление автоматически инвертируется, чтобы баланс сошёлся.
             void AddTx(string dateDelta, string desc, string accId, string catId, string techAccId, EntryDirection mainAccDir, double amount, string currency)
             {
                 var txId   = Guid.NewGuid().ToString();
@@ -120,10 +104,10 @@ public sealed class DbSeeder
                              ("@CatId", catId), ("@Dir", (int)techDir), ("@Amt", amount), ("@Cur", currency));
             }
 
-            AddTx("-5", "Аванс",      act1, catSalaryId,    accIncomeSalaryId,    EntryDirection.Debit,  50000, "RUB");
-            AddTx("-2", "Лента",       act1, catFoodId,      accExpenseFoodId,     EntryDirection.Credit,  8500, "RUB");
-            AddTx("-1", "Пятерочка",  act1, catFoodId,      accExpenseFoodId,     EntryDirection.Credit,  1200, "RUB");
-            AddTx("0",  "Такси",      act1, catTransportId, accExpenseTransportId, EntryDirection.Credit,   800, "RUB");
+            AddTx("-5", "Аванс", act1, catSalaryId, accIncomeSalaryId, EntryDirection.Debit, 50000, "RUB");
+            AddTx("-2", "Лента", act1, catFoodId, accExpenseFoodId, EntryDirection.Credit, 8500, "RUB");
+            AddTx("-1", "Пятерочка", act1, catFoodId, accExpenseFoodId, EntryDirection.Credit, 1200, "RUB");
+            AddTx("0", "Такси", act1, catTransportId, accExpenseTransportId, EntryDirection.Credit, 800, "RUB");
         }
     }
 }
