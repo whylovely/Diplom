@@ -21,7 +21,7 @@
         <TextBlock Text="🔐" FontSize="32" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding Title}" 
                    FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"
-                   Foreground="#29B6F6"/>
+                   Foreground="#1F2937"/>
       </StackPanel>
 
       <!-- Form -->
@@ -29,7 +29,7 @@
 
         <!-- Email -->
         <StackPanel Spacing="4">
-          <TextBlock Text="Email" Foreground="#9E9E9E" FontSize="12"/>
+          <TextBlock Text="Email" Foreground="#6B7280" FontSize="12"/>
           <TextBox Text="{Binding Email}" 
                    Watermark="user@example.com"
                    Width="320"/>
@@ -37,7 +37,7 @@
 
         <!-- Password -->
         <StackPanel Spacing="4">
-          <TextBlock Text="Пароль" Foreground="#9E9E9E" FontSize="12"/>
+          <TextBlock Text="Пароль" Foreground="#6B7280" FontSize="12"/>
           <TextBox Text="{Binding Password}" 
                    PasswordChar="●"
                    Watermark="••••••••"
@@ -46,7 +46,7 @@
 
         <!-- Error -->
         <TextBlock Text="{Binding ErrorMessage}"
-                   Foreground="#FF5252"
+                   Foreground="#DC2626"
                    FontSize="13"
                    TextWrapping="Wrap"
                    HorizontalAlignment="Center"
@@ -62,7 +62,7 @@
 
         <!-- Loading indicator -->
         <TextBlock Text="Подключение..."
-                   Foreground="#29B6F6"
+                   Foreground="#1F2937"
                    FontSize="12"
                    HorizontalAlignment="Center"
                    IsVisible="{Binding IsLoading}"/>

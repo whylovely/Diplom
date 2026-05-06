@@ -22,7 +22,7 @@
                     Background="Transparent" BorderThickness="0" Padding="0"
                     Cursor="Hand" ToolTip.Tip="Синхронизировать с сервером"
                     HorizontalAlignment="Right">
-              <Border Padding="8,6" CornerRadius="16" Background="#151A2E">
+              <Border Padding="8,6" CornerRadius="16" Background="#FFFFFF">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <Path Data="{Binding SyncIconData}" 
                         Fill="{Binding SyncIconColor}" 
@@ -172,7 +172,7 @@
         </MultiBinding>
       </StackPanel.IsVisible>
       <Path Data="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z" 
-            Fill="#9E9E9E" Opacity="0.15" Width="120" Height="120" Stretch="Uniform" HorizontalAlignment="Center"/>
+            Fill="#6B7280" Opacity="0.15" Width="120" Height="120" Stretch="Uniform" HorizontalAlignment="Center"/>
       <TextBlock Text="Здесь пока нет счетов..." Classes="dim" FontSize="16" HorizontalAlignment="Center"/>
     </StackPanel>
   </Grid>

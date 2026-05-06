@@ -13,35 +13,29 @@
         <Border Grid.Column="0" Margin="0,0,16,0">
             <Grid RowDefinitions="Auto, *">
                 <TextBlock Grid.Row="0" Text="Мои счета" FontSize="16" FontWeight="SemiBold"
-                           Foreground="#D8D8D8" Margin="0,0,0,12"/>
+                           Foreground="#1F2937" Margin="0,0,0,12"/>
                 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding AssetAccounts}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="m:Account">
-                                <Border Background="#151A2E" CornerRadius="16"
-                                        BorderBrush="#222845" BorderThickness="1"
+                                <Border Background="#FFFFFF" CornerRadius="16"
+                                        BorderBrush="#E5E7EB" BorderThickness="1"
                                         Padding="16" Margin="0,0,0,10">
-                                    <Border.OpacityMask>
-                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                                            <GradientStop Color="#FF151A2E" Offset="0"/>
-                                            <GradientStop Color="#FF151A2E" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Border.OpacityMask>
                                     <Grid RowDefinitions="Auto, Auto">
                                         <!-- Account name + icon -->
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
                                             <Path Data="M4,3A2,2 0 0,0 2,5V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V5A2,2 0 0,0 20,3H4M4,5H20V8H15A3,3 0 0,0 12,11A3,3 0 0,0 15,14H20V19H4V5M15,10A1,1 0 0,1 16,11A1,1 0 0,1 15,12A1,1 0 0,1 14,11A1,1 0 0,1 15,10Z"
-                                                  Fill="#29B6F6" Stretch="Uniform" Width="18" Height="18" VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Medium" Foreground="#D8D8D8"/>
+                                                  Fill="#1F2937" Stretch="Uniform" Width="18" Height="18" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Medium" Foreground="#1F2937"/>
                                         </StackPanel>
                                         <!-- Balance + Currency -->
                                         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6">
                                             <TextBlock Text="{Binding Balance, StringFormat={}{0:N2}}"
                                                        FontFamily="Fira Code, Consolas, monospace"
-                                                       FontSize="20" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                                       FontSize="20" FontWeight="Bold" Foreground="#1F2937"/>
                                             <TextBlock Text="{Binding CurrencyCode}"
-                                                       FontSize="14" Foreground="#9E9E9E"
+                                                       FontSize="14" Foreground="#6B7280"
                                                        VerticalAlignment="Bottom" Margin="0,0,0,2"/>
                                         </StackPanel>
                                     </Grid>
@@ -59,25 +53,25 @@
 
 
             <!-- ── Widget 1: Total Balance (top-left) ──── -->
-            <Border Grid.Row="1" Grid.Column="0" Background="#151A2E" CornerRadius="20"
+            <Border Grid.Row="1" Grid.Column="0" Background="#FFFFFF" CornerRadius="12"
                     Padding="24" Margin="0,0,8,12">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Общий баланс" FontSize="14" Foreground="#9E9E9E"/>
+                    <TextBlock Text="Общий баланс" FontSize="14" Foreground="#6B7280"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="{Binding TotalBalance, StringFormat={}{0:N2}}"
                                    FontFamily="Fira Code, Consolas, monospace"
-                                   FontSize="32" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                   FontSize="32" FontWeight="Bold" Foreground="#1F2937"/>
                         <TextBlock Text="{Binding BaseCurrency}"
-                                   FontSize="16" Foreground="#9E9E9E"
+                                   FontSize="16" Foreground="#6B7280"
                                    VerticalAlignment="Bottom" Margin="0,0,0,6"/>
                     </StackPanel>
-                    <TextBlock Text="(эквивалент)" FontSize="12" Foreground="#555" Margin="0,-4,0,8"/>
+                    <TextBlock Text="(эквивалент)" FontSize="12" Foreground="#6B7280" Margin="0,-4,0,8"/>
 
                     <!-- Per-currency breakdown -->
                     <ItemsControl ItemsSource="{Binding CurrencyBalances}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="m:CurrencyBalance">
-                                <TextBlock FontSize="14" Foreground="#9E9E9E" Margin="0,2">
+                                <TextBlock FontSize="14" Foreground="#6B7280" Margin="0,2">
                                     <Run Text="{Binding Balance, StringFormat={}{0:N2}}"/>
                                     <Run Text=" "/>
                                     <Run Text="{Binding CurrencyCode}"/>
@@ -89,16 +83,16 @@
             </Border>
 
             <!-- ── Widget 2: Recent Transactions (top-right) ── -->
-            <Border Grid.Row="1" Grid.Column="1" Background="#151A2E" CornerRadius="20"
+            <Border Grid.Row="1" Grid.Column="1" Background="#FFFFFF" CornerRadius="12"
                     Padding="24" Margin="8,0,0,12">
                 <Grid RowDefinitions="Auto, *">
-                    <TextBlock Text="Последние операции" FontSize="14" Foreground="#9E9E9E" Margin="0,0,0,8"/>
+                    <TextBlock Text="Последние операции" FontSize="14" Foreground="#6B7280" Margin="0,0,0,8"/>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding RecentTransactions}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="m:RecentTransactionItem">
                                     <Border Padding="8,6" Margin="0,0,0,4"
-                                            Background="#1A2038" CornerRadius="10">
+                                            Background="#F9FAFB" CornerRadius="8">
                                         <Grid ColumnDefinitions="Auto, *, Auto">
                                             <!-- Direction icon -->
                                             <TextBlock Text="{Binding DirectionIcon}"
@@ -109,13 +103,13 @@
                                             <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding CategoryName}"
                                                            FontSize="13" FontWeight="SemiBold"
-                                                           Foreground="#D8D8D8"/>
+                                                           Foreground="#1F2937"/>
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <TextBlock Text="{Binding AccountName}"
-                                                               FontSize="11" Foreground="#777"/>
-                                                    <TextBlock Text="·" FontSize="11" Foreground="#555"/>
+                                                               FontSize="11" Foreground="#6B7280"/>
+                                                    <TextBlock Text="·" FontSize="11" Foreground="#6B7280"/>
                                                     <TextBlock Text="{Binding Date}"
-                                                               FontSize="11" Foreground="#777"/>
+                                                               FontSize="11" Foreground="#6B7280"/>
                                                 </StackPanel>
                                             </StackPanel>
                                             <!-- Amount -->
@@ -139,15 +133,15 @@
                     Padding="20" Margin="0,0,0,0">
                 <Grid RowDefinitions="Auto, *">
                     <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,8">
-                        <TextBlock Text="Помесячная динамика" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                        <TextBlock Text="Помесячная динамика" FontSize="16" FontWeight="SemiBold" Foreground="#1F2937"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Ellipse Width="8" Height="8" Fill="#00E676" VerticalAlignment="Center"/>
-                                <TextBlock Text="Доходы" FontSize="12" Foreground="#9E9E9E"/>
+                                <Ellipse Width="8" Height="8" Fill="#059669" VerticalAlignment="Center"/>
+                                <TextBlock Text="Доходы" FontSize="12" Foreground="#6B7280"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Ellipse Width="8" Height="8" Fill="#FF5252" VerticalAlignment="Center"/>
-                                <TextBlock Text="Расходы" FontSize="12" Foreground="#9E9E9E"/>
+                                <Ellipse Width="8" Height="8" Fill="#DC2626" VerticalAlignment="Center"/>
+                                <TextBlock Text="Расходы" FontSize="12" Foreground="#6B7280"/>
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -155,7 +149,7 @@
                                         XAxes="{Binding XAxes}"
                                         YAxes="{Binding YAxes}"
                                         MinHeight="200"
-                                        TooltipPosition="Top"/>
+                                        TooltipPosition="Top" Background="#FFFFFF"/>
                 </Grid>
             </Border>
         </Grid>

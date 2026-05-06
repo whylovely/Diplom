@@ -51,23 +51,23 @@
           <RadioButton Content="Расход"
                        IsChecked="{Binding IsExpense}"
                        Command="{Binding SetExpenseCommand}"
-                       Foreground="#FF5252"/>
+                       Foreground="#DC2626"/>
           <RadioButton Content="Доход"
                        IsChecked="{Binding IsIncome}"
                        Command="{Binding SetIncomeCommand}"
-                       Foreground="#00E676"/>
+                       Foreground="#059669"/>
           <RadioButton Content="Перевод"
                        IsChecked="{Binding IsTransfer}"
                        Command="{Binding SetTransferCommand}"
-                       Foreground="#29B6F6"/>
+                       Foreground="#2563EB"/>
           <RadioButton Content="Отдал долг"
                        IsChecked="{Binding IsDebtRepayment}"
                        Command="{Binding SetDebtRepaymentCommand}"
-                       Foreground="#FFB74D"/>
+                       Foreground="#D97706"/>
           <RadioButton Content="Мне вернули"
                        IsChecked="{Binding IsDebtReceive}"
                        Command="{Binding SetDebtReceiveCommand}"
-                       Foreground="#BA68C8"/>
+                       Foreground="#6B7280"/>
         </StackPanel>
       </Border>
 

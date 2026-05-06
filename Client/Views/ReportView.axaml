@@ -89,7 +89,7 @@
                         <DatePicker SelectedDate="{Binding BalanceDate}" Width="300"/>
                         <Button Content="Обновить" Command="{Binding RefreshBalanceCommand}" Classes="accent"/>
                         <TextBlock Text="{Binding TotalAssetsAtDate, StringFormat=Итого: {0:N2}}" 
-                                   VerticalAlignment="Center" FontWeight="Bold" Foreground="#29B6F6" Margin="16,0,0,0"/>
+                                   VerticalAlignment="Center" FontWeight="Bold" Foreground="#1F2937" Margin="16,0,0,0"/>
                     </StackPanel>
                 </Border>
 
@@ -137,18 +137,18 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <Border Grid.Row="2" Background="#0D1120" CornerRadius="16" Padding="20" Margin="0,0,0,16">
+                <Border Grid.Row="2" Background="#F9FAFB" CornerRadius="16" Padding="20" Margin="0,0,0,16">
                     <Grid RowDefinitions="Auto, *">
                         <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,12">
                             <TextBlock Text="Помесячная динамика" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF"/>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Ellipse Width="8" Height="8" Fill="#00E676" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Доходы" FontSize="12" Foreground="#9E9E9E"/>
+                                    <Ellipse Width="8" Height="8" Fill="#059669" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Доходы" FontSize="12" Foreground="#6B7280"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Ellipse Width="8" Height="8" Fill="#FF5252" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Расходы" FontSize="12" Foreground="#9E9E9E"/>
+                                    <Ellipse Width="8" Height="8" Fill="#DC2626" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Расходы" FontSize="12" Foreground="#6B7280"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -205,8 +205,8 @@
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshExpenseTopCommand}" Classes="accent"/>
                         <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" Foreground="#FF5252"/>
-                            <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" Foreground="#9E9E9E"/>
+                            <TextBlock Text="{Binding TopExpensesSum, StringFormat=Сумма: {0:N2}}" Foreground="#DC2626"/>
+                            <TextBlock Text="{Binding TopExpensesShare, StringFormat=Доля: {0}%}" Foreground="#6B7280"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -223,16 +223,16 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <Border Grid.Row="2" Background="#151A2E" CornerRadius="20" Padding="20" Margin="0,0,0,16">
+                <Border Grid.Row="2" Background="#FFFFFF" CornerRadius="20" Padding="20" Margin="0,0,0,16">
                     <Grid RowDefinitions="Auto, Auto, *">
                         <StackPanel Spacing="4" Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#9E9E9E" Width="16" Height="16" Stretch="Uniform"/>
-                                <TextBlock Text="Топ расходов" FontSize="14" Foreground="#9E9E9E"/>
+                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#6B7280" Width="16" Height="16" Stretch="Uniform"/>
+                                <TextBlock Text="Топ расходов" FontSize="14" Foreground="#6B7280"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="{Binding TopExpensesSum, StringFormat={}{0:N2}}" FontFamily="Fira Code, Consolas, monospace" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF"/>
-                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#9E9E9E" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#6B7280" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
                             </StackPanel>
                         </StackPanel>
                         <lvc:PieChart Grid.Row="2" Series="{Binding ExpensePieSeries}" MinHeight="250" TooltipPosition="Center" LegendPosition="Bottom" />
@@ -252,8 +252,8 @@
                         <NumericUpDown Minimum="1" Maximum="20" Value="{Binding TopN}" Width="100"/>
                         <Button Content="Обновить" Command="{Binding RefreshIncomeTopCommand}" Classes="accent"/>
                         <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" Foreground="#00E676"/>
-                            <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" Foreground="#9E9E9E"/>
+                            <TextBlock Text="{Binding TopIncomesSum, StringFormat=Сумма: {0:N2}}" Foreground="#059669"/>
+                            <TextBlock Text="{Binding TopIncomesShare, StringFormat=Доля: {0}%}" Foreground="#6B7280"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -270,16 +270,16 @@
                         </DataGrid.Columns>
                 </DataGrid>
 
-                <Border Grid.Row="2" Background="#151A2E" CornerRadius="20" Padding="20" Margin="0,0,0,16">
+                <Border Grid.Row="2" Background="#FFFFFF" CornerRadius="20" Padding="20" Margin="0,0,0,16">
                     <Grid RowDefinitions="Auto, Auto, *">
                         <StackPanel Spacing="4" Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#9E9E9E" Width="16" Height="16" Stretch="Uniform"/>
-                                <TextBlock Text="Топ доходов" FontSize="14" Foreground="#9E9E9E"/>
+                                <Path Data="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" Fill="#6B7280" Width="16" Height="16" Stretch="Uniform"/>
+                                <TextBlock Text="Топ доходов" FontSize="14" Foreground="#6B7280"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="{Binding TopIncomesSum, StringFormat={}{0:N2}}" FontFamily="Fira Code, Consolas, monospace" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF"/>
-                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#9E9E9E" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding BaseCurrencyCode}" FontSize="14" Foreground="#6B7280" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
                             </StackPanel>
                         </StackPanel>
                         <lvc:PieChart Grid.Row="2" Series="{Binding IncomePieSeries}" MinHeight="250" TooltipPosition="Center" LegendPosition="Bottom" />

@@ -39,34 +39,35 @@ namespace Client.ViewModels
 
             foreach (var r in monthlyRows) monthlyLabels.Add(r.Month);
 
-            var incomeGreen = SkiaSharp.SKColor.Parse("#00E676");
+            var incomeGreen = SkiaSharp.SKColor.Parse("#059669");
             monthlySeries.Add(new LineSeries<decimal>
             {
                 Name            = "Доходы",
                 Values          = monthlyRows.Select(r => r.Income).ToArray(),
                 Stroke          = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen, 2),
-                Fill            = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen.WithAlpha(60)),
+                Fill            = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen.WithAlpha(30)),
                 GeometrySize    = 8,
                 GeometryStroke  = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen, 2),
                 GeometryFill    = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(incomeGreen),
                 LineSmoothness  = 0
             });
 
-            var expenseRed = SkiaSharp.SKColor.Parse("#FF5252");
+            var expenseRed = SkiaSharp.SKColor.Parse("#DC2626");
             monthlySeries.Add(new LineSeries<decimal>
             {
                 Name            = "Расходы",
                 Values          = monthlyRows.Select(r => r.Expense).ToArray(),
                 Stroke          = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed, 2),
-                Fill            = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed.WithAlpha(60)),
+                Fill            = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed.WithAlpha(30)),
                 GeometrySize    = 8,
                 GeometryStroke  = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed, 2),
                 GeometryFill    = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(expenseRed),
                 LineSmoothness  = 0
             });
 
-            var gridColor  = SkiaSharp.SKColor.Parse("#222845");
-            var labelColor = SkiaSharp.SKColor.Parse("#9E9E9E");
+            // светлая тема — разделители светло-серые, подписи тёмно-серые
+            var gridColor  = SkiaSharp.SKColor.Parse("#E5E7EB");
+            var labelColor = SkiaSharp.SKColor.Parse("#6B7280");
 
             xAxes = new[]
             {

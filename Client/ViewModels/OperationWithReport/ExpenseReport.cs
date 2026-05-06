@@ -98,7 +98,8 @@ namespace Client.ViewModels
             ObservableCollection<CategoryShareRow> shareRows,
             ObservableCollection<ISeries> pieSeries)
         {
-            var colors = new[] { "#B9F6CA", "#FF9E80", "#80D8FF", "#EA80FC", "#FFD180", "#FFAB91", "#CE93D8", "#80CBC4" };
+            // палитра для светлой темы — насыщенные, но не неоновые
+            var colors = new[] { "#059669", "#DC2626", "#2563EB", "#7C3AED", "#D97706", "#DB2777", "#0891B2", "#65A30D" };
             int i = 0;
             foreach (var r in shareRows)
             {

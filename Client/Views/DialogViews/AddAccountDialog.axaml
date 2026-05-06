@@ -18,7 +18,7 @@
         <TextBlock Text="Название счёта" Classes="dim"/>
         <TextBox Text="{Binding Name}" Watermark="Например: Основной счёт" />
         <TextBlock Text="Название не может быть пустым" 
-                   Foreground="#FF5252" FontSize="12" IsVisible="{Binding HasNameError}" />
+                   Foreground="#DC2626" FontSize="12" IsVisible="{Binding HasNameError}" />
       </StackPanel>
 
       <StackPanel Spacing="4">
@@ -38,7 +38,7 @@
         <TextBlock Text="Начальный баланс" Classes="dim"/>
         <NumericUpDown Value="{Binding InitialBalance}" FormatString="N2" ShowButtonSpinner="False" AllowSpin="False" Watermark="0" />
         <TextBlock Text="Начальный остаток не может быть отрицательным" 
-        Foreground="#FF5252" FontSize="12" IsVisible="{Binding IsBalanceNegative}" />
+        Foreground="#DC2626" FontSize="12" IsVisible="{Binding IsBalanceNegative}" />
       </StackPanel>
 
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">

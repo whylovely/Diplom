@@ -19,12 +19,12 @@
         <TextBlock Text="💰" FontSize="32" HorizontalAlignment="Center"/>
         <TextBlock Text="Добро пожаловать в FinanceApp!" 
                    FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"
-                   Foreground="#29B6F6"/>
+                   Foreground="#1F2937"/>
       </StackPanel>
       
       <StackPanel Grid.Row="1" Spacing="14" VerticalAlignment="Center">
         <TextBlock Text="Выберите базовую валюту для учёта:" 
-                   HorizontalAlignment="Center" Foreground="#E0E0E0"/>
+                   HorizontalAlignment="Center" Foreground="#1F2937"/>
         <ComboBox ItemsSource="{Binding AvailableCurrencies}"
                   SelectedItem="{Binding SelectedCurrency}"
                   HorizontalAlignment="Center" Width="200"/>

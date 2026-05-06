@@ -24,7 +24,7 @@
 
         <!-- Today highlight -->
         <Style Selector="Button.calendarToday">
-            <Setter Property="BorderBrush" Value="#29B6F6"/>
+            <Setter Property="BorderBrush" Value="#1F2937"/>
             <Setter Property="BorderThickness" Value="2"/>
         </Style>
 
@@ -128,11 +128,11 @@
                                         <StackPanel Grid.Row="2" Spacing="2" Margin="0,2,0,0">
                                             <!-- Income indicator (green) -->
                                             <Border Height="3" CornerRadius="1.5"
-                                                    Background="#00E676"
+                                                    Background="#059669"
                                                     IsVisible="{Binding !!TotalIncome}"/>
                                             <!-- Expense indicator (red) -->
                                             <Border Height="3" CornerRadius="1.5"
-                                                    Background="#FF5252"
+                                                    Background="#DC2626"
                                                     IsVisible="{Binding !!TotalExpense}"/>
                                         </StackPanel>
                                     </Grid>
@@ -155,11 +155,11 @@
                     <!-- Day totals -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8"
                                 IsVisible="{Binding SelectedDay, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <TextBlock Foreground="#00E676" FontSize="13"
+                        <TextBlock Foreground="#059669" FontSize="13"
                                    Text="{Binding SelectedDay.TotalIncome, StringFormat=▲ {0:N2}}"/>
-                        <TextBlock Foreground="#FF5252" FontSize="13"
+                        <TextBlock Foreground="#DC2626" FontSize="13"
                                    Text="{Binding SelectedDay.TotalExpense, StringFormat=▼ {0:N2}}"/>
-                        <TextBlock Foreground="#29B6F6" FontSize="13"
+                        <TextBlock Foreground="#1F2937" FontSize="13"
                                    Text="{Binding SelectedDay.Net, StringFormat=Итог: {0:N2}}"/>
                     </StackPanel>
 

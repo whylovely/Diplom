@@ -13,12 +13,12 @@
   <Border Classes="card" Margin="16">
     <StackPanel Spacing="14">
 
-      <TextBlock Text="Выберите группу для счета:" Foreground="#E0E0E0"/>
+      <TextBlock Text="Выберите группу для счета:" Foreground="#1F2937"/>
 
       <ListBox ItemsSource="{Binding Groups}"
                SelectedItem="{Binding SelectedGroup}"
                MaxHeight="250"
-               Background="#0D1120">
+               Background="#F9FAFB">
         <ListBox.ItemTemplate>
           <DataTemplate>
             <TextBlock Text="{Binding Name}"/>

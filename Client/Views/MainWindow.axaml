@@ -73,7 +73,7 @@
       </Border>
 
       <!-- ─── MAIN CONTENT ────────────────────────────────── -->
-      <Border Grid.Row="1" Background="#080C1A" Padding="24,20,24,24">
+      <Border Grid.Row="1" Background="#FAFAFA" Padding="24,20,24,24">
         <ContentControl Content="{Binding Current}" />
       </Border>
 
@@ -89,24 +89,15 @@
             VerticalAlignment="Top" HorizontalAlignment="Left"
             Margin="16,56,16,16" Width="300">
 
-      <!-- Outer glow border -->
-      <Border CornerRadius="20" ClipToBounds="True"
-              BorderBrush="#18FFFFFF" BorderThickness="1"
-              BoxShadow="0 8 32 0 #40000000, 0 0 0 1 #10FFFFFF">
-
-        <!-- Acrylic glass material -->
-        <ExperimentalAcrylicBorder CornerRadius="20">
-          <ExperimentalAcrylicBorder.Material>
-            <ExperimentalAcrylicMaterial BackgroundSource="Digger"
-                                         TintColor="#0A0E1A"
-                                         TintOpacity="0.15"
-                                         MaterialOpacity="0.92" />
-          </ExperimentalAcrylicBorder.Material>
+      <!-- Белая панель навигации -->
+      <Border CornerRadius="16" ClipToBounds="True"
+              Background="#FFFFFF"
+              BorderBrush="#E5E7EB" BorderThickness="0.5">
 
           <StackPanel Spacing="4" Margin="12,16">
 
             <!-- Section label -->
-            <TextBlock Text="НАВИГАЦИЯ" FontSize="10" FontWeight="Bold" Foreground="#55D8D8D8"
+            <TextBlock Text="НАВИГАЦИЯ" FontSize="10" FontWeight="Bold" Foreground="#D1D5DB"
                        Margin="14,4,0,8" LetterSpacing="2"/>
 
             <!-- 0. Главная -->
@@ -150,7 +141,7 @@
             </Button>
 
             <!-- Separator -->
-            <Border Height="1" Background="#15FFFFFF" Margin="12,6"/>
+            <Border Height="0.5" Background="#E5E7EB" Margin="12,6"/>
 
             <!-- 4. + Транзакция (accent) -->
             <Button Command="{Binding NavigateNewTransactionCommand}"
@@ -163,7 +154,7 @@
             </Button>
 
             <!-- Separator -->
-            <Border Height="1" Background="#15FFFFFF" Margin="12,6"/>
+            <Border Height="0.5" Background="#E5E7EB" Margin="12,6"/>
 
             <!-- 5. Отчёты -->
             <Button Command="{Binding NavigateReportCommand}"
@@ -206,7 +197,6 @@
             </Button>
 
           </StackPanel>
-        </ExperimentalAcrylicBorder>
       </Border>
     </Border>
 

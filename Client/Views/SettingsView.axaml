@@ -24,17 +24,16 @@
             <ComboBox ItemsSource="{Binding FavoriteCurrencies}"
                       SelectedItem="{Binding SelectedCurrency}"
                       Width="250" Height="40"
-                      Background="#0D1120"
-                      BorderBrush="#222845"
+                      Background="#F9FAFB"
+                      BorderBrush="#E5E7EB"
                       BorderThickness="1"
                       CornerRadius="8">
               <ComboBox.Styles>
                 <Style Selector="ComboBox:focus /template/ Border#PART_BorderElement">
-                  <Setter Property="BorderBrush" Value="#29B6F6"/>
-                  <Setter Property="BoxShadow" Value="0 0 8 0 #4029B6F6"/>
+                  <Setter Property="BorderBrush" Value="#1F2937"/>
                 </Style>
                 <Style Selector="ComboBox:pointerover /template/ Border#PART_BorderElement">
-                  <Setter Property="BorderBrush" Value="#29B6F6"/>
+                  <Setter Property="BorderBrush" Value="#1F2937"/>
                 </Style>
               </ComboBox.Styles>
             </ComboBox>
@@ -43,7 +42,7 @@
           <!-- Show Helper if NO favorites -->
           <StackPanel Spacing="12" IsVisible="{Binding !HasFavorites}">
             <TextBlock Text="Чтобы выбрать базовую валюту, сначала добавьте её в избранное." 
-                       Classes="dim" TextWrapping="Wrap" Foreground="#9E9E9E"/>
+                       Classes="dim" TextWrapping="Wrap" Foreground="#6B7280"/>
             <Button Content="Перейти к валютам"
                     Command="{Binding GoToCurrenciesCommand}"
                     Classes="outline"

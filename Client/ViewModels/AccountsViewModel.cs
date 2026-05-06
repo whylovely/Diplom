@@ -53,7 +53,7 @@ namespace Client.ViewModels
         private string _syncStatusText = "Синхронизировано";
 
         [ObservableProperty]
-        private string _syncIconColor = "#00E676";
+        private string _syncIconColor = "#059669";
 
         [ObservableProperty]
         private string _syncIconData = "M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z";
@@ -302,7 +302,7 @@ namespace Client.ViewModels
             if (_orchestrator is null || IsSyncing) return;
 
             IsSyncing = true;
-            SetSyncStatus("Проверка...", "#29B6F6");
+            SetSyncStatus("Проверка...", "#6B7280");
 
             var analysis = await _orchestrator.AnalyzeAsync();
 
@@ -328,14 +328,14 @@ namespace Client.ViewModels
 
             SetSyncStatus(
                 action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...",
-                "#29B6F6");
+                "#6B7280");
 
             var outcome = await _orchestrator.ExecuteAsync(action);
 
             if (outcome.Success)
             {
                 if (outcome.DataReplaced) await LoadDataAsync();
-                SetSyncStatus("Синхронизировано", "#00E676");
+                SetSyncStatus("Синхронизировано", "#059669");
             }
             else if (outcome.WasCancelled)
             {
@@ -343,13 +343,13 @@ namespace Client.ViewModels
             }
             else if (outcome.WasDismissed)
             {
-                SetSyncStatus("Синхронизировано", "#00E676");
+                SetSyncStatus("Синхронизировано", "#059669");
             }
             else
             {
                 var err = outcome.ErrorMessage ?? "Неизвестная ошибка";
                 if (err.Length > 60) err = err[..60] + "…";
-                SetSyncStatus($"Ошибка: {err}", "#FF5252");
+                SetSyncStatus($"Ошибка: {err}", "#DC2626");
             }
 
             IsSyncing = false;

@@ -13,7 +13,7 @@
   <Border Classes="card" Margin="16">
     <StackPanel Spacing="14">
 
-      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="#E0E0E0"/>
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="#1F2937"/>
 
       <TextBox Text="{Binding Text}" />
 

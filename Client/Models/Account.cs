@@ -66,7 +66,7 @@ namespace Client.Models
         public string FormattedAmount => IsTransfer
             ? $"{Amount:N2} {Currency}" : (IsIncome ? $"+{Amount:N2}" : $"−{Amount:N2}") + $" {Currency}";
 
-        public string AmountColor => IsTransfer ? "#29B6F6" : (IsIncome ? "#00E676" : "#FF5252");
+        public string AmountColor => IsTransfer ? "#2563EB" : (IsIncome ? "#059669" : "#DC2626");
         public string DirectionIcon => IsTransfer ? "↔" : (IsIncome ? "↗" : "↙");
     }
 
