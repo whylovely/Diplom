@@ -25,14 +25,13 @@ public sealed class ApiService
     }
 
     // Создаёт HttpClient с актуальным BaseAddress и Bearer-токеном.
-    // Таймаут 100 сек — запас для cold-старта на Render (бесплатный хостинг
-    // «засыпает» и первый запрос может занять до 30 сек).
+    // Таймаут 15 сек — достаточно для локального Docker-сервера.
     private HttpClient Build()
     {
         var http = new HttpClient
         {
             BaseAddress = new Uri(_settings.ServerUrl.TrimEnd('/') + "/"),
-            Timeout = TimeSpan.FromSeconds(100)
+            Timeout = TimeSpan.FromSeconds(15)
         };
 
         var token = _settings.AuthToken;

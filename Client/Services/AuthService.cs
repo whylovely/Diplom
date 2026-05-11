@@ -10,17 +10,18 @@ namespace Client.Services
     public class AuthService
     {
         private readonly SettingsService _settings;
-        private readonly HttpClient _http;
 
         public AuthService(SettingsService settings)
         {
             _settings = settings;
-            _http = new HttpClient
-            {
-                BaseAddress = new Uri(settings.ServerUrl.TrimEnd('/') + "/"),
-                Timeout = TimeSpan.FromSeconds(100)
-            };
         }
+
+        // Создаёт HttpClient с актуальным ServerUrl — подхватывает изменения настроек без перезапуска.
+        private HttpClient Build() => new HttpClient
+        {
+            BaseAddress = new Uri(_settings.ServerUrl.TrimEnd('/') + "/"),
+            Timeout = TimeSpan.FromSeconds(15)
+        };
 
         public bool IsLoggedIn => !string.IsNullOrEmpty(_settings.AuthToken);
 
@@ -28,6 +29,7 @@ namespace Client.Services
         {
             try
             {
+                using var _http = Build();
                 var resp = await _http.PostAsJsonAsync("api/auth/login", new LoginRequest(email, password));
 
                 if (resp.IsSuccessStatusCode)
@@ -58,6 +60,7 @@ namespace Client.Services
         {
             try
             {
+                using var _http = Build();
                 var resp = await _http.PostAsJsonAsync("api/auth/register", new RegisterRequest(email, password));
 
                 if (resp.IsSuccessStatusCode)

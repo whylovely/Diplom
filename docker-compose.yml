@@ -11,6 +11,31 @@ services:
     volumes:
       - finance_pg_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance_user -d finance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: finance_server
+    ports:
+      - "5273:8080"
+    environment:
+      # Строка подключения к PostgreSQL внутри Docker-сети
+      ConnectionStrings__db: "Host=db;Port=5432;Database=finance;Username=finance_user;Password=finance_pass"
+      # JWT — при необходимости замените ключ на свой (минимум 32 символа)
+      Jwt__Key: "local-dev-secret-key-change-me-in-prod-32chars"
+      Jwt__Issuer: "FinanceServer"
+      Jwt__Audience: "FinanceClient"
+      ASPNETCORE_ENVIRONMENT: "Production"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   finance_pg_data:

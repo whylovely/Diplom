@@ -9,10 +9,10 @@
         x:DataType="vm:FirstRunDialogViewModel"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
-        Background="#0B1021"
+        Background="#FAFAFA"
         Title="Добро пожаловать">
 
-  <Border Background="#CC1C2235" CornerRadius="16" BorderBrush="#2A3150" BorderThickness="1" Margin="8">
+  <Border Background="#FFFFFF" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="0.5" Margin="8">
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
 
       <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Center">
