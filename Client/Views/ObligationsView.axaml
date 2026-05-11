@@ -29,7 +29,7 @@
     </Style>
     <Style Selector="RadioButton.segment:checked">
       <Setter Property="Background" Value="#1F2937" />
-      <Setter Property="Foreground" Value="#1F2937" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
     </Style>
     <Style Selector="RadioButton.segment:pointerover /template/ Border">
       <Setter Property="Background" Value="#F3F4F6" />
@@ -139,7 +139,7 @@
                               <Setter Property="Foreground" Value="#059669" />
                             </Style>
                             <Style Selector="TextBlock[Tag=Я должен]">
-                              <Setter Property="Foreground" Value="#1F2937" />
+                              <Setter Property="Foreground" Value="#DC2626" />
                             </Style>
                           </TextBlock.Styles>
                           <!-- Tag hack for styling based on label -->

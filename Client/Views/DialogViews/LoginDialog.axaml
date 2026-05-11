@@ -10,10 +10,10 @@
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
         CanResize="False"
-        Background="#0B1021"
+        Background="#FAFAFA"
         Title="Авторизация">
 
-  <Border Background="#CC1C2235" CornerRadius="16" BorderBrush="#2A3150" BorderThickness="1" Margin="8">
+  <Border Background="#FFFFFF" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="0.5" Margin="8">
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
 
       <!-- Header -->
@@ -74,7 +74,7 @@
               Command="{Binding ToggleModeCommand}"
               Background="Transparent"
               BorderThickness="0"
-              Foreground="#6688AA"
+              Foreground="#2563EB"
               FontSize="13"
               HorizontalAlignment="Center"
               Cursor="Hand"/>

@@ -93,6 +93,9 @@ public sealed class LocalDbService : IDataService
         _accountsRepo.CreateTechnicalAccountsForCategory(category);
     }
 
+    public void RenameCategory(Category category, string newName, CategoryKind newKind) =>
+        _categoriesRepo.Update(category, newName, newKind);
+
     public void RemoveCategory(Category category) => _categoriesRepo.Remove(category);
 
     /// <summary>

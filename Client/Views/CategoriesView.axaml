@@ -27,7 +27,7 @@
 
           <dg:DataGrid.ContextMenu>
             <ContextMenu x:CompileBindings="False">
-              <MenuItem Header="Переименовать" Command="{Binding RenameCategoryCommand}" />
+              <MenuItem Header="Изменить" Command="{Binding EditCategoryCommand}" />
               <MenuItem Header="Удалить" Command="{Binding DeleteCategoryCommand}" />
             </ContextMenu>
           </dg:DataGrid.ContextMenu>

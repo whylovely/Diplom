@@ -37,11 +37,20 @@ public sealed partial class CategoriesViewModel : ViewModelBase
 
     public void Refresh()
     {
-        Categories.Clear();
-        foreach (var c in _data.Categories.OrderBy(c => c.Name))
-            Categories.Add(c);
+        // Запоминаем Id до очистки — после Clear() DataGrid сбрасывает Selected через binding
+        var selectedId = Selected?.Id;
 
-        Selected ??= Categories.FirstOrDefault();
+        Categories.Clear();
+        // Кладём свежие копии — DataGrid увидит новые ссылки и перерисует строки
+        // (иначе у Avalonia DataGrid есть оптимизация: при тех же ссылках клетки не обновляются,
+        // т.к. Category не реализует INotifyPropertyChanged).
+        foreach (var c in _data.Categories.OrderBy(c => c.Name))
+            Categories.Add(new Category { Id = c.Id, Name = c.Name, Kind = c.Kind });
+
+        // Восстанавливаем выделение по Id
+        Selected = selectedId.HasValue
+            ? Categories.FirstOrDefault(c => c.Id == selectedId) ?? Categories.FirstOrDefault()
+            : Categories.FirstOrDefault();
     }
 
     private bool hasSelection() => Selected is not null;
@@ -65,14 +74,16 @@ public sealed partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(hasSelection))]
-    private async Task RenameCategoryAsync()
+    private async Task EditCategoryAsync()
     {
         if (Selected is null) return;
 
-        var renamed = await _catDialog.ShowAddCategoryDialogAsync(initialName: Selected.Name);
-        if (renamed is null) return;
+        var result = await _catDialog.ShowAddCategoryDialogAsync(
+            initialName: Selected.Name,
+            initialKind: Selected.Kind);
+        if (result is null) return;
 
-        var newName = renamed.Name.Trim();
+        var newName = result.Name.Trim();
 
         if (_data.Categories.Any(c => c.Id != Selected.Id && c.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
         {
@@ -80,10 +91,10 @@ public sealed partial class CategoriesViewModel : ViewModelBase
             return;
         }
 
-        Selected.Name = newName;
-        Refresh();
+        _data.RenameCategory(Selected, newName, result.Kind);
+        // DataChanged → Refresh() → список обновится, Selected восстановится по Id
 
-        await _notify.ShowInfoAsync("Категория переименована.");
+        await _notify.ShowInfoAsync("Категория обновлена.");
     }
 
     [RelayCommand(CanExecute = nameof(hasSelection))]
@@ -111,7 +122,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
 
     partial void OnSelectedChanged(Category? value)
     {
-        RenameCategoryCommand.NotifyCanExecuteChanged();
+        EditCategoryCommand.NotifyCanExecuteChanged();
         DeleteCategoryCommand.NotifyCanExecuteChanged();
     }
 }

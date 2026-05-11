@@ -11,9 +11,9 @@ public partial class AddCategoryDialog : Window
 {
     public AddCategoryDialog() => InitializeComponent();
 
-    public Task<Category?> ShowDialogAsync(Window owner, string? initialName = null)
+    public Task<Category?> ShowDialogAsync(Window owner, string? initialName = null, CategoryKind? initialKind = null)
     {
-        DataContext = new AddCategoryDialogViewModel(initialName);
+        DataContext = new AddCategoryDialogViewModel(initialName, initialKind);
         return ShowDialog<Category?>(owner);
     }
 

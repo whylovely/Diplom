@@ -12,13 +12,13 @@
 
         <!-- ── Header Bar ─────────────────────────────────────── -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,16">
-            <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <TextBlock Text="Отчёты" Classes="heading" VerticalAlignment="Center" Margin="0,0,24,0"/>
-                <TextBlock Text="Раздел:" VerticalAlignment="Center" Classes="dim" Margin="0,6,0,0"/>
+                <TextBlock Text="Раздел:" VerticalAlignment="Center" Classes="dim"/>
                 <ComboBox ItemsSource="{Binding SectionItems}"
                           SelectedItem="{Binding SelectedSectionItem}"
                           Width="280"
-                          Margin="0,4,0,0">
+                          VerticalAlignment="Center">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:ReportViewModel+SectionItem">
                             <TextBlock Text="{Binding Title}"/>

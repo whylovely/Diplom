@@ -61,6 +61,33 @@ public sealed class CategoriesRepository
         RaiseChanged();
     }
 
+    public void Update(Category category, string newName, CategoryKind newKind)
+    {
+        using var conn = _factory.Open();
+        SqliteConFactory.Exec(conn,
+            "UPDATE Categories SET Name = @Name, Kind = @Kind, UpdatedAt = @Updated WHERE Id = @Id",
+            ("@Name", newName),
+            ("@Kind", (int)newKind),
+            ("@Updated", DateTimeOffset.Now.ToString("O")),
+            ("@Id", category.Id.ToString()));
+
+        // Не мутируем существующий объект — заменяем новым.
+        // DataGrid в Avalonia оптимизирует: если ссылка в ObservableCollection та же,
+        // он не перерисовывает строку. С новым экземпляром перерисовка гарантирована.
+        var idx = _categories.FindIndex(c => c.Id == category.Id);
+        if (idx >= 0)
+        {
+            _categories[idx] = new Category
+            {
+                Id   = category.Id,
+                Name = newName,
+                Kind = newKind
+            };
+        }
+
+        RaiseChanged();
+    }
+
     public void Remove(Category category)
     {
         using var conn = _factory.Open();

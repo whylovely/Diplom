@@ -307,24 +307,26 @@ namespace Client.ViewModels
             var analysis = await _orchestrator.AnalyzeAsync();
 
             SyncAction action;
-            if (analysis.NeedsConflictDialog)
+            if (!analysis.ServerReachable)
             {
-                var dialog = new SyncConflictDialog(
-                    analysis.LocalLastChange, analysis.LocalCount, analysis.ServerCount);
-                var choice = await dialog.ShowDialog<string?>(_getWindow());
+                // Сервер недоступен — ничего не делаем
+                SetSyncStatus("Сервер недоступен", "#DC2626");
+                IsSyncing = false;
+                return;
+            }
 
-                action = choice switch
-                {
-                    "push"   => SyncAction.PushOnly,
-                    "server" => SyncAction.PullOnly,
-                    "client" => SyncAction.Cancel,
-                    _        => SyncAction.Dismiss 
-                };
-            }
-            else
+            // Всегда показываем диалог выбора направления синхронизации
+            var dialog = new SyncConflictDialog(
+                analysis.LocalLastChange, analysis.LocalCount, analysis.ServerCount);
+            var choice = await dialog.ShowDialog<string?>(_getWindow());
+
+            action = choice switch
             {
-                action = SyncAction.SmartSync;
-            }
+                "push"   => SyncAction.PushOnly,
+                "server" => SyncAction.PullOnly,
+                "client" => SyncAction.Cancel,
+                _        => SyncAction.Dismiss
+            };
 
             SetSyncStatus(
                 action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...",

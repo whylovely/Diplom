@@ -26,7 +26,8 @@ namespace Client.ViewModels
             var rows        = TransactionAggregator.AggregateByCategoryRows(
                 entries, data.Categories,
                 (from, to) => data.GetRate(from, to),
-                settings.BaseCurrency);
+                settings.BaseCurrency,
+                accountById);
 
             foreach (var row in rows) incomeRows.Add(row);
             return incomeRows.Sum(r => r.Total);
@@ -48,7 +49,8 @@ namespace Client.ViewModels
             var groups      = TransactionAggregator.AggregateByCategoryGroups(
                 entries, txInRange, data.Categories,
                 (from, to) => data.GetRate(from, to),
-                settings.BaseCurrency);
+                settings.BaseCurrency,
+                accountById);
 
             foreach (var group in groups) incomeGroups.Add(group);
         }

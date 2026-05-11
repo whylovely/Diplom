@@ -19,12 +19,52 @@ public static class TransactionAggregator
             .ToList();
     }
 
+    // Строит множество Id транзакций, которые исключаются из категорийных отчётов:
+    // 1) сами сторно-проводки ([СТОРНО] ...)
+    // 2) оригиналы, которые были сторнированы (для каждого "[СТОРНО] X" находим "X")
+    private static HashSet<Guid> BuildStornoExclusionSet(IReadOnlyList<Transaction> txInRange)
+    {
+        const string prefix = "[СТОРНО] ";
+        var excluded = new HashSet<Guid>();
+
+        // 1) Сами сторнирующие транзакции
+        var stornoTxs = txInRange
+            .Where(t => !string.IsNullOrEmpty(t.Description) && t.Description.StartsWith("[СТОРНО]"))
+            .ToList();
+        foreach (var t in stornoTxs) excluded.Add(t.Id);
+
+        // 2) Оригиналы — для каждого "[СТОРНО] X" ищем транзакцию с описанием "X"
+        var originalDescriptions = stornoTxs
+            .Where(t => t.Description.StartsWith(prefix))
+            .Select(t => t.Description.Substring(prefix.Length))
+            .ToHashSet();
+
+        foreach (var t in txInRange)
+            if (!string.IsNullOrEmpty(t.Description) && originalDescriptions.Contains(t.Description))
+                excluded.Add(t.Id);
+
+        return excluded;
+    }
+
     public static IEnumerable<Entry> GetExpenseEntries(
         IReadOnlyList<Transaction> txInRange,
         IDictionary<Guid, Account> accountById)
     {
+        var stornoExcluded = BuildStornoExclusionSet(txInRange);
+
         foreach (var tx in txInRange)
         {
+            // Сторно и оригиналы сторно не идут в категорийный отчёт
+            if (stornoExcluded.Contains(tx.Id)) continue;
+
+            // Переводы между Assets-счетами не идут в отчёт
+            bool isTransfer = tx.Entries.Count >= 2 && tx.Entries.All(e =>
+                accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
+            if (isTransfer) continue;
+
+            // Основной случай: проводка на технический Expense-счёт.
+            // Категория может отсутствовать (например, у погашения долга — тогда отобразится
+            // под названием транзакции из AggregateByCategoryRows).
             var expenseEntry = tx.Entries.FirstOrDefault(e =>
                 accountById.TryGetValue(e.AccountId, out var acc)
                 && acc.Type == AccountType.Expense
@@ -32,10 +72,12 @@ public static class TransactionAggregator
 
             if (expenseEntry != null) { yield return expenseEntry; continue; }
 
+            // Запасной случай: списание с Assets без техсчёта расходов — только с категорией
             foreach (var e in tx.Entries)
                 if (accountById.TryGetValue(e.AccountId, out var acc)
                     && acc.Type == AccountType.Assets
-                    && e.Direction == EntryDirection.Credit)
+                    && e.Direction == EntryDirection.Credit
+                    && e.CategoryId.HasValue)
                     yield return e;
         }
     }
@@ -44,8 +86,20 @@ public static class TransactionAggregator
         IReadOnlyList<Transaction> txInRange,
         IDictionary<Guid, Account> accountById)
     {
+        var stornoExcluded = BuildStornoExclusionSet(txInRange);
+
         foreach (var tx in txInRange)
         {
+            // Сторно и оригиналы сторно не идут в категорийный отчёт
+            if (stornoExcluded.Contains(tx.Id)) continue;
+
+            // Переводы между Assets-счетами не идут в отчёт
+            bool isTransfer = tx.Entries.Count >= 2 && tx.Entries.All(e =>
+                accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
+            if (isTransfer) continue;
+
+            // Основной случай: проводка на технический Income-счёт.
+            // Категория может отсутствовать (например, у возврата долга).
             var incomeEntry = tx.Entries.FirstOrDefault(e =>
                 accountById.TryGetValue(e.AccountId, out var acc)
                 && acc.Type == AccountType.Income
@@ -53,30 +107,48 @@ public static class TransactionAggregator
 
             if (incomeEntry != null) { yield return incomeEntry; continue; }
 
+            // Запасной случай: поступление на Assets без техсчёта — только с категорией
             foreach (var e in tx.Entries)
                 if (accountById.TryGetValue(e.AccountId, out var acc)
                     && acc.Type == AccountType.Assets
-                    && e.Direction == EntryDirection.Debit)
+                    && e.Direction == EntryDirection.Debit
+                    && e.CategoryId.HasValue)
                     yield return e;
         }
+    }
+
+    // Возвращает виртуальное название «категории» для проводок без CategoryId
+    // (например, погашение/возврат долга идут через технический Expense/Income счёт
+    // без привязки к категории).
+    private static string ResolveCategoryName(
+        Entry e,
+        IReadOnlyList<Category> categories,
+        IDictionary<Guid, Account>? accountById)
+    {
+        if (e.CategoryId.HasValue)
+            return categories.FirstOrDefault(c => c.Id == e.CategoryId.Value)?.Name ?? "—";
+
+        if (accountById != null && accountById.TryGetValue(e.AccountId, out var acc))
+        {
+            if (acc.Type == AccountType.Expense) return "Погашение долга";
+            if (acc.Type == AccountType.Income)  return "Возврат долга";
+        }
+        return "—";
     }
 
     public static IReadOnlyList<CategoryShareRow> AggregateByCategoryRows(
         IEnumerable<Entry> entries,
         IReadOnlyList<Category> categories,
         Func<string, string, decimal> getRate,
-        string baseCurrency)
+        string baseCurrency,
+        IDictionary<Guid, Account>? accountById = null)
     {
         return entries
-            .GroupBy(e => e.CategoryId)
-            .Select(g =>
+            .GroupBy(e => ResolveCategoryName(e, categories, accountById))
+            .Select(g => new CategoryShareRow
             {
-                var catName = categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
-                return new CategoryShareRow
-                {
-                    CategoryName = catName,
-                    Total = g.Sum(e => e.Amount.Amount * getRate(e.Amount.CurrencyCode, baseCurrency))
-                };
+                CategoryName = g.Key,
+                Total = g.Sum(e => e.Amount.Amount * getRate(e.Amount.CurrencyCode, baseCurrency))
             })
             .OrderByDescending(r => r.Total)
             .ToList();
@@ -87,7 +159,8 @@ public static class TransactionAggregator
         IReadOnlyList<Transaction> txInRange,
         IReadOnlyList<Category> categories,
         Func<string, string, decimal> getRate,
-        string baseCurrency)
+        string baseCurrency,
+        IDictionary<Guid, Account>? accountById = null)
     {
         var entryList = entries.ToList();
         var txById = txInRange
@@ -97,10 +170,10 @@ public static class TransactionAggregator
         return entryList
             .Select(e => new { Entry = e, Tx = txById.GetValueOrDefault(e.Id) })
             .Where(x => x.Tx != null)
-            .GroupBy(x => x.Entry.CategoryId)
+            .GroupBy(x => ResolveCategoryName(x.Entry, categories, accountById))
             .Select(g =>
             {
-                var catName = categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "—";
+                var catName = g.Key;
                 var days = g
                     .GroupBy(x => x.Tx!.Date.Date)
                     .OrderBy(d => d.Key)

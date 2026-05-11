@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Client.Models;
 
@@ -21,10 +22,17 @@ public sealed partial class AddCategoryDialogViewModel : ViewModelBase  // Со�
 
     public Action<bool>? Close { get; set; }
 
-    public AddCategoryDialogViewModel(string? initialName = null)
+    public string DialogTitle { get; }
+    public string OkButtonText { get; }
+
+    public AddCategoryDialogViewModel(string? initialName = null, CategoryKind? initialKind = null)
     {
         _name = initialName ?? "";
-        _selectedKind = KindItems[0];
+        _selectedKind = initialKind.HasValue
+            ? KindItems.First(k => k.Kind == initialKind.Value)
+            : KindItems[0];
+        DialogTitle   = initialName is null ? "Новая категория"  : "Редактировать категорию";
+        OkButtonText  = initialName is null ? "✓ Создать"        : "✓ Сохранить";
     }
 
     partial void OnNameChanged(string value) => OnPropertyChanged(nameof(CanOk));

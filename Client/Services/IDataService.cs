@@ -25,6 +25,7 @@ namespace Client.Services
         void SetAccountGroup(Guid accountId, Guid? groupId);
 
         void AddCategory(Category category);
+        void RenameCategory(Category category, string newName, CategoryKind newKind);
         void RemoveCategory(Category category);
 
         Task AddObligationAsync(Obligation obligation);
