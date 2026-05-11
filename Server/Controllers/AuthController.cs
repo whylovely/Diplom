@@ -1,5 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,8 @@ using Shared.Auth;
 namespace Server.Controllers;
 
 /// <summary>
-/// Регистрация и вход пользователей. Выдаёт JWT с claim'ами Sub/Email/NameIdentifier/Role,
-/// срок жизни 7 дней. Пароли хешируются <see cref="PasswordHasher{T}"/> (PBKDF2).
-/// Email нормализуется в lower-case до записи и поиска — чтобы Bob@x.com и bob@x.com были одним юзером.
+/// Регистрация и вход. Выдаёт пару: access token (JWT, 7 дней) + refresh token (60 дней).
+/// Refresh token хранится в БД в виде SHA-256 хеша. При обновлении старый токен отзывается.
 /// </summary>
 [ApiController]
 [Route("api/auth")]
@@ -46,7 +46,7 @@ public sealed class AuthController : ControllerBase
         _db.Users.Add(user);
         await _db.SaveChangesAsync(ct);
 
-        return Ok(new AuthResponse(CreateToken(user)));
+        return Ok(await IssueTokenPairAsync(user, ct));
     }
 
     [HttpPost("login")]
@@ -60,7 +60,7 @@ public sealed class AuthController : ControllerBase
         var vr = _hasher.VerifyHashedPassword(user, user.PasswordHash, req.Password);
         if (vr == PasswordVerificationResult.Failed) return Unauthorized("Invalid credentials.");
 
-        return Ok(new AuthResponse(CreateToken(user)));
+        return Ok(await IssueTokenPairAsync(user, ct));
     }
 
     [HttpPost("admin/login")]
@@ -74,16 +74,65 @@ public sealed class AuthController : ControllerBase
         var vr = _hasher.VerifyHashedPassword(user, user.PasswordHash, req.Password);
         if (vr == PasswordVerificationResult.Failed) return Unauthorized("Invalid credentials.");
 
-        return Ok(new AuthResponse(CreateToken(user)));
+        return Ok(await IssueTokenPairAsync(user, ct));
     }
 
-    // Формирует подписанный JWT (HS256)
-    private string CreateToken(UserEntity user)
+    /// <summary>
+    /// Обновляет пару токенов по действующему refresh token.
+    /// Старый токен отзывается, выдаётся новая пара — rotating refresh tokens.
+    /// </summary>
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AuthResponse>> Refresh(RefreshRequest req, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(req.RefreshToken))
+            return BadRequest("Refresh token is required.");
+
+        var hash = HashToken(req.RefreshToken);
+
+        var stored = await _db.RefreshTokens
+            .Include(x => x.User)
+            .SingleOrDefaultAsync(x => x.TokenHash == hash, ct);
+
+        if (stored is null || stored.IsRevoked || stored.ExpiresAt < DateTimeOffset.UtcNow)
+            return Unauthorized("Refresh token is invalid or expired.");
+
+        if (stored.User.IsBlocked)
+            return Unauthorized("Account is blocked.");
+
+        // Отзываем старый токен и сразу выдаём новую пару
+        stored.IsRevoked = true;
+        await _db.SaveChangesAsync(ct);
+
+        return Ok(await IssueTokenPairAsync(stored.User, ct));
+    }
+
+    // Создаёт access token + refresh token, сохраняет хеш refresh token в БД
+    private async Task<AuthResponse> IssueTokenPairAsync(UserEntity user, CancellationToken ct)
+    {
+        var accessToken  = CreateAccessToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        // Чистим старые отозванные и просроченные токены этого пользователя
+        var stale = _db.RefreshTokens
+            .Where(x => x.UserId == user.Id && (x.IsRevoked || x.ExpiresAt < DateTimeOffset.UtcNow));
+        _db.RefreshTokens.RemoveRange(stale);
+
+        _db.RefreshTokens.Add(new RefreshTokenEntity
+        {
+            UserId    = user.Id,
+            TokenHash = HashToken(refreshToken),
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(60)
+        });
+
+        await _db.SaveChangesAsync(ct);
+
+        return new AuthResponse(accessToken, refreshToken);
+    }
+
+    // Формирует подписанный JWT (HS256), срок — 7 дней
+    private string CreateAccessToken(UserEntity user)
     {
         var jwt = _cfg.GetSection("Jwt");
-        var issuer = jwt["Issuer"]!;
-        var audience = jwt["Audience"]!;
-        var key = jwt["Key"]!;
 
         var claims = new List<Claim>
         {
@@ -94,16 +143,30 @@ public sealed class AuthController : ControllerBase
         };
 
         var creds = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!)),
             SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
+            issuer: jwt["Issuer"],
+            audience: jwt["Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddDays(7),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    // Генерирует криптографически случайный refresh token (32 байта → base64url)
+    private static string GenerateRefreshToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
+
+    // SHA-256 хеш токена — храним в БД только хеш
+    private static string HashToken(string token)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 }

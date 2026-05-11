@@ -94,6 +94,16 @@ namespace Client.Services
             }
         }
 
+        public string? RefreshToken
+        {
+            get => Settings.RefreshToken;
+            set
+            {
+                Settings.RefreshToken = value;
+                Save();
+            }
+        }
+
         public string ServerUrl
         {
             get => Settings.ServerUrl;
@@ -119,7 +129,8 @@ namespace Client.Services
 
         public void Logout()
         {
-            Settings.AuthToken = null;
+            Settings.AuthToken    = null;
+            Settings.RefreshToken = null;
             Settings.LastSyncedAt = null;
             Save();
         }

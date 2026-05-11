@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -13,15 +14,20 @@ using Shared.Transactions;
 namespace Client.Services;
 
 // Тонкая обёртка над HttpClient к серверному REST API.
-// HttpClient создаётся заново при каждом вызове Build() — это гарантирует,
-// что смена ServerUrl в настройках сразу подхватывается без перезапуска.
+// При 401 автоматически пытается обновить access token через refresh token и повторяет запрос.
+// HttpClient создаётся заново при каждом вызове Build() — подхватывает актуальный ServerUrl.
 public sealed class ApiService
 {
     private readonly SettingsService _settings;
+    private readonly AuthService _auth;
 
-    public ApiService(SettingsService settings)
+    // Флаг для защиты от рекурсивного рефреша
+    private bool _isRefreshing;
+
+    public ApiService(SettingsService settings, AuthService auth)
     {
         _settings = settings;
+        _auth = auth;
     }
 
     // Создаёт HttpClient с актуальным BaseAddress и Bearer-токеном.
@@ -41,6 +47,37 @@ public sealed class ApiService
         return http;
     }
 
+    /// <summary>
+    /// Выполняет GET-запрос с автоматическим обновлением токена при 401.
+    /// </summary>
+    private async Task<HttpResponseMessage> SendWithRefreshAsync(Func<HttpClient, Task<HttpResponseMessage>> request)
+    {
+        using var http = Build();
+        var resp = await request(http);
+
+        // Если 401 и у нас есть refresh token — пробуем обновить и повторить один раз
+        if (resp.StatusCode == HttpStatusCode.Unauthorized && !_isRefreshing)
+        {
+            _isRefreshing = true;
+            try
+            {
+                var refreshed = await _auth.TryRefreshAsync();
+                if (refreshed)
+                {
+                    resp.Dispose();
+                    using var http2 = Build(); // новый клиент с обновлённым access token
+                    return await request(http2);
+                }
+            }
+            finally
+            {
+                _isRefreshing = false;
+            }
+        }
+
+        return resp;
+    }
+
     public async Task<bool> PingAsync()
     {
         try
@@ -57,40 +94,35 @@ public sealed class ApiService
 
     public async Task<List<AccountDto>?> GetAccountsAsync()
     {
-        using var http = Build();
-        var resp = await http.GetAsync("api/accounts");
+        var resp = await SendWithRefreshAsync(h => h.GetAsync("api/accounts"));
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<AccountDto>>();
     }
 
     public async Task<List<CategoryDto>?> GetCategoriesAsync()
     {
-        using var http = Build();
-        var resp = await http.GetAsync("api/categories");
+        var resp = await SendWithRefreshAsync(h => h.GetAsync("api/categories"));
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<CategoryDto>>();
     }
 
     public async Task<List<TransactionDto>?> GetTransactionsAsync()
     {
-        using var http = Build();
-        var resp = await http.GetAsync("api/transactions");
+        var resp = await SendWithRefreshAsync(h => h.GetAsync("api/transactions"));
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<TransactionDto>>();
     }
 
     public async Task<List<ObligationDto>?> GetObligationsAsync()
     {
-        using var http = Build();
-        var resp = await http.GetAsync("api/obligations");
+        var resp = await SendWithRefreshAsync(h => h.GetAsync("api/obligations"));
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<List<ObligationDto>>();
     }
 
     public async Task PushAllDataAsync(SyncPushRequest req)
     {
-        using var http = Build();
-        var resp = await http.PostAsJsonAsync("api/sync/push", req);
+        var resp = await SendWithRefreshAsync(h => h.PostAsJsonAsync("api/sync/push", req));
         resp.EnsureSuccessStatusCode();
     }
 }

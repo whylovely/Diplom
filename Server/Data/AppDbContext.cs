@@ -24,6 +24,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
     public DbSet<EntryEntity> Entries => Set<EntryEntity>();
     public DbSet<ObligationEntity> Obligations => Set<ObligationEntity>();
+    public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -94,13 +95,25 @@ public sealed class AppDbContext : DbContext
         {
             e.Property(x => x.Counterparty).HasMaxLength(200).IsRequired();
             e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
-            
+
             e.HasOne(x => x.User)
              .WithMany()
              .HasForeignKey(x => x.UserId)
              .OnDelete(DeleteBehavior.Cascade);
 
             e.HasQueryFilter(x => !x.IsDeleted);
+        });
+
+        b.Entity<RefreshTokenEntity>(e =>
+        {
+            e.Property(x => x.TokenHash).HasMaxLength(64).IsRequired();
+            e.HasIndex(x => x.TokenHash).IsUnique();
+            e.HasIndex(x => new { x.UserId, x.IsRevoked });
+
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

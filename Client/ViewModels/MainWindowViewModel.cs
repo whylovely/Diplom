@@ -60,7 +60,7 @@ namespace Client.ViewModels
 
             var catDialog = new CategoryDialogService();
             var input = new InputDialogService();
-            var apiService = new ApiService(_settings);
+            var apiService = new ApiService(_settings, _auth);
             var syncService   = new SyncService(apiService, (LocalDbService)_data, _settings);
             var syncOrchestrator = new SyncOrchestrator(syncService, _data);
 
