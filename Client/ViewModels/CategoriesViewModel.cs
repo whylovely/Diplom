@@ -37,17 +37,12 @@ public sealed partial class CategoriesViewModel : ViewModelBase
 
     public void Refresh()
     {
-        // Запоминаем Id до очистки — после Clear() DataGrid сбрасывает Selected через binding
         var selectedId = Selected?.Id;
 
         Categories.Clear();
-        // Кладём свежие копии — DataGrid увидит новые ссылки и перерисует строки
-        // (иначе у Avalonia DataGrid есть оптимизация: при тех же ссылках клетки не обновляются,
-        // т.к. Category не реализует INotifyPropertyChanged).
         foreach (var c in _data.Categories.OrderBy(c => c.Name))
             Categories.Add(new Category { Id = c.Id, Name = c.Name, Kind = c.Kind });
 
-        // Восстанавливаем выделение по Id
         Selected = selectedId.HasValue
             ? Categories.FirstOrDefault(c => c.Id == selectedId) ?? Categories.FirstOrDefault()
             : Categories.FirstOrDefault();
@@ -92,7 +87,6 @@ public sealed partial class CategoriesViewModel : ViewModelBase
         }
 
         _data.RenameCategory(Selected, newName, result.Kind);
-        // DataChanged → Refresh() → список обновится, Selected восстановится по Id
 
         await _notify.ShowInfoAsync("Категория обновлена.");
     }

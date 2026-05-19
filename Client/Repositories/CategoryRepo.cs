@@ -71,9 +71,6 @@ public sealed class CategoriesRepository
             ("@Updated", DateTimeOffset.Now.ToString("O")),
             ("@Id", category.Id.ToString()));
 
-        // Не мутируем существующий объект — заменяем новым.
-        // DataGrid в Avalonia оптимизирует: если ссылка в ObservableCollection та же,
-        // он не перерисовывает строку. С новым экземпляром перерисовка гарантирована.
         var idx = _categories.FindIndex(c => c.Id == category.Id);
         if (idx >= 0)
         {

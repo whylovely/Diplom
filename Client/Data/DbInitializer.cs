@@ -130,7 +130,6 @@ public sealed class DbInitializer
             SqliteConFactory.Exec(conn, "ALTER TABLE Accounts ADD COLUMN GroupId TEXT");
     }
 
-    // Проверяет наличие колонки через PRAGMA table_info
     private static bool ColumnExists(SqliteConnection conn, string table, string column)
     {
         using var cmd = conn.CreateCommand();

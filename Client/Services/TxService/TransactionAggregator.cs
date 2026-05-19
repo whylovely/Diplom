@@ -19,21 +19,16 @@ public static class TransactionAggregator
             .ToList();
     }
 
-    // Строит множество Id транзакций, которые исключаются из категорийных отчётов:
-    // 1) сами сторно-проводки ([СТОРНО] ...)
-    // 2) оригиналы, которые были сторнированы (для каждого "[СТОРНО] X" находим "X")
     private static HashSet<Guid> BuildStornoExclusionSet(IReadOnlyList<Transaction> txInRange)
     {
         const string prefix = "[СТОРНО] ";
         var excluded = new HashSet<Guid>();
 
-        // 1) Сами сторнирующие транзакции
         var stornoTxs = txInRange
             .Where(t => !string.IsNullOrEmpty(t.Description) && t.Description.StartsWith("[СТОРНО]"))
             .ToList();
         foreach (var t in stornoTxs) excluded.Add(t.Id);
 
-        // 2) Оригиналы — для каждого "[СТОРНО] X" ищем транзакцию с описанием "X"
         var originalDescriptions = stornoTxs
             .Where(t => t.Description.StartsWith(prefix))
             .Select(t => t.Description.Substring(prefix.Length))
@@ -57,14 +52,10 @@ public static class TransactionAggregator
             // Сторно и оригиналы сторно не идут в категорийный отчёт
             if (stornoExcluded.Contains(tx.Id)) continue;
 
-            // Переводы между Assets-счетами не идут в отчёт
             bool isTransfer = tx.Entries.Count >= 2 && tx.Entries.All(e =>
                 accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
             if (isTransfer) continue;
 
-            // Основной случай: проводка на технический Expense-счёт.
-            // Категория может отсутствовать (например, у погашения долга — тогда отобразится
-            // под названием транзакции из AggregateByCategoryRows).
             var expenseEntry = tx.Entries.FirstOrDefault(e =>
                 accountById.TryGetValue(e.AccountId, out var acc)
                 && acc.Type == AccountType.Expense
@@ -72,7 +63,6 @@ public static class TransactionAggregator
 
             if (expenseEntry != null) { yield return expenseEntry; continue; }
 
-            // Запасной случай: списание с Assets без техсчёта расходов — только с категорией
             foreach (var e in tx.Entries)
                 if (accountById.TryGetValue(e.AccountId, out var acc)
                     && acc.Type == AccountType.Assets
@@ -90,16 +80,12 @@ public static class TransactionAggregator
 
         foreach (var tx in txInRange)
         {
-            // Сторно и оригиналы сторно не идут в категорийный отчёт
             if (stornoExcluded.Contains(tx.Id)) continue;
 
-            // Переводы между Assets-счетами не идут в отчёт
             bool isTransfer = tx.Entries.Count >= 2 && tx.Entries.All(e =>
                 accountById.TryGetValue(e.AccountId, out var a) && a.Type == AccountType.Assets);
             if (isTransfer) continue;
 
-            // Основной случай: проводка на технический Income-счёт.
-            // Категория может отсутствовать (например, у возврата долга).
             var incomeEntry = tx.Entries.FirstOrDefault(e =>
                 accountById.TryGetValue(e.AccountId, out var acc)
                 && acc.Type == AccountType.Income
@@ -107,7 +93,6 @@ public static class TransactionAggregator
 
             if (incomeEntry != null) { yield return incomeEntry; continue; }
 
-            // Запасной случай: поступление на Assets без техсчёта — только с категорией
             foreach (var e in tx.Entries)
                 if (accountById.TryGetValue(e.AccountId, out var acc)
                     && acc.Type == AccountType.Assets
@@ -118,8 +103,6 @@ public static class TransactionAggregator
     }
 
     // Возвращает виртуальное название «категории» для проводок без CategoryId
-    // (например, погашение/возврат долга идут через технический Expense/Income счёт
-    // без привязки к категории).
     private static string ResolveCategoryName(
         Entry e,
         IReadOnlyList<Category> categories,
