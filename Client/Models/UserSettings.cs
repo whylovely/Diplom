@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
-    // Настройки приложения
     public class UserSettings
     {
         public string BaseCurrency { get; set; } = "RUB";

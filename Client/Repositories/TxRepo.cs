@@ -8,7 +8,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-// Репозиторий транзакций
 public sealed class TransactionsRepository
 {
     private readonly SqliteConFactory _factory;
@@ -74,7 +73,6 @@ public sealed class TransactionsRepository
         RaiseChanged();
     }
 
-    /// Строит обратную транзакцию на основе существующей: те же проводки, но с инвертированными направлениями Debit и Credit, используется для отмены операции.
     public Transaction BuildStorno(Guid transactionId, IReadOnlyList<Account> accounts)
     {
         var tx = _transactions.FirstOrDefault(t => t.Id == transactionId) ?? throw new InvalidOperationException("Транзакция не найдена.");

@@ -5,7 +5,7 @@ using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddCategoryDialogViewModel : ViewModelBase  // Создание категорий
+public sealed partial class AddCategoryDialogViewModel : ViewModelBase
 {
     public sealed record KindItem(CategoryKind Kind, string Title);
 
@@ -18,7 +18,7 @@ public sealed partial class AddCategoryDialogViewModel : ViewModelBase  // Со�
     [ObservableProperty] private string _name = "";
     [ObservableProperty] private KindItem _selectedKind;
 
-    public bool CanOk => !string.IsNullOrWhiteSpace(Name);  // Серые кнопки
+    public bool CanOk => !string.IsNullOrWhiteSpace(Name);
 
     public Action<bool>? Close { get; set; }
 
@@ -31,8 +31,8 @@ public sealed partial class AddCategoryDialogViewModel : ViewModelBase  // Со�
         _selectedKind = initialKind.HasValue
             ? KindItems.First(k => k.Kind == initialKind.Value)
             : KindItems[0];
-        DialogTitle   = initialName is null ? "Новая категория"  : "Редактировать категорию";
-        OkButtonText  = initialName is null ? "✓ Создать"        : "✓ Сохранить";
+        DialogTitle = initialName is null ? "Новая категория" : "Редактировать категорию";
+        OkButtonText = initialName is null ? "✓ Создать" : "✓ Сохранить";
     }
 
     partial void OnNameChanged(string value) => OnPropertyChanged(nameof(CanOk));

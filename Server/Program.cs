@@ -8,10 +8,6 @@ using Server.Data;
 using Server.Entities;
 using Server.Services;
 
-// Точка входа сервера. Здесь регистрируются все DI-сервисы, настраивается JWT,
-// EF Core/PostgreSQL, Swagger, после чего применяются миграции и сидится демо-пользователь.
-// В конце файла объявлен «public partial class Program» — это нужно WebApplicationFactory в тестах.
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -28,8 +24,6 @@ if (!string.IsNullOrEmpty(connectionString))
     Console.WriteLine($"[DEBUG] Starts with 'postgres://': {connectionString.StartsWith("postgres://")}");
 }
 
-// Render передаёт connection string в формате URI (postgres://user:pass@host/db),
-// а Npgsql ждёт key=value. Парсим и переписываем в нужный вид.
 if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres", StringComparison.OrdinalIgnoreCase))
 {
     try
@@ -134,7 +128,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("[DB] Migrations applied.");
     }
 
-    // Seed: Admin
     var adminSection = cfg.GetSection("Admin");
     var adminEmail = adminSection["Email"];
     var adminPassword = adminSection["Password"];
@@ -164,8 +157,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Демо-пользователь с примером данных. Создаётся один раз при первом запуске сервера —
-    // удобно для разработки и для показа функционала (логин: demo@finance.local / Demo123).
     const string demoEmail = "demo@finance.local";
     const string demoPassword = "Demo123";
 
@@ -246,5 +237,4 @@ app.MapControllers();
 
 app.Run();
 
-// Позволяет WebApplicationFactory в тестах ссылаться на Program
 public partial class Program { }

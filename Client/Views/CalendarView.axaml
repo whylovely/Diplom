@@ -6,7 +6,6 @@
              x:DataType="vm:CalendarViewModel">
 
     <UserControl.Styles>
-        <!-- Calendar day cell base -->
         <Style Selector="Button.calendarDayCell">
             <Setter Property="Background" Value="#0DFFFFFF"/>
             <Setter Property="BorderBrush" Value="#15FFFFFF"/>
@@ -22,13 +21,11 @@
             <Setter Property="Background" Value="#25FFFFFF"/>
         </Style>
 
-        <!-- Today highlight -->
         <Style Selector="Button.calendarToday">
             <Setter Property="BorderBrush" Value="#1F2937"/>
             <Setter Property="BorderThickness" Value="2"/>
         </Style>
 
-        <!-- Other month dim -->
         <Style Selector="Button.calendarOtherMonth">
             <Setter Property="Opacity" Value="0.35"/>
         </Style>
@@ -36,7 +33,6 @@
 
     <Grid RowDefinitions="Auto, Auto, *">
 
-        <!-- ── Header Bar ─────────────────────────────────────── -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <TextBlock Text="Календарь" Classes="heading" VerticalAlignment="Center" Margin="0,0,24,0"/>
@@ -56,7 +52,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- ── Month Summary Cards ────────────────────────────── -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
             <Border Classes="cardSmall" Margin="0,0,6,0">
                 <StackPanel Spacing="4">
@@ -78,13 +73,10 @@
             </Border>
         </Grid>
 
-        <!-- ── Calendar Grid + Day Detail ─────────────────────── -->
         <Grid Grid.Row="2" ColumnDefinitions="3*,2*" Margin="0,0,0,12">
 
-            <!-- Left: Calendar Grid -->
             <Border Grid.Column="0" Classes="cardSmall" Margin="0,0,8,0" Padding="12">
                 <Grid RowDefinitions="Auto, *">
-                    <!-- Day-of-week headers -->
                     <UniformGrid Grid.Row="0" Columns="7" Margin="0,0,0,8">
                         <TextBlock Text="Пн" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
                         <TextBlock Text="Вт" HorizontalAlignment="Center" Classes="dim" FontWeight="SemiBold"/>
@@ -95,7 +87,6 @@
                         <TextBlock Text="Вс" HorizontalAlignment="Center" Foreground="#EF5350" FontWeight="SemiBold"/>
                     </UniformGrid>
 
-                    <!-- Day cells -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Days}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -116,7 +107,6 @@
                                         Padding="4"
                                         Margin="1">
                                     <Grid RowDefinitions="Auto, *, Auto">
-                                        <!-- Day number -->
                                         <TextBlock Grid.Row="0" 
                                                    Text="{Binding DayNumber}" 
                                                    FontSize="13" 
@@ -124,13 +114,10 @@
                                                    Foreground="#C0C0C0"
                                                    HorizontalAlignment="Left"/>
 
-                                        <!-- Indicators -->
                                         <StackPanel Grid.Row="2" Spacing="2" Margin="0,2,0,0">
-                                            <!-- Income indicator (green) -->
                                             <Border Height="3" CornerRadius="1.5"
                                                     Background="#059669"
                                                     IsVisible="{Binding !!TotalIncome}"/>
-                                            <!-- Expense indicator (red) -->
                                             <Border Height="3" CornerRadius="1.5"
                                                     Background="#DC2626"
                                                     IsVisible="{Binding !!TotalExpense}"/>
@@ -143,7 +130,6 @@
                 </Grid>
             </Border>
 
-            <!-- Right: Selected Day Detail -->
             <Border Grid.Column="1" Classes="cardSmall" Padding="12">
                 <Grid RowDefinitions="Auto, Auto, *">
                     <TextBlock Grid.Row="0" 
@@ -152,7 +138,6 @@
                                Foreground="#E0E0E0" 
                                Margin="0,0,0,8"/>
 
-                    <!-- Day totals -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8"
                                 IsVisible="{Binding SelectedDay, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <TextBlock Foreground="#059669" FontSize="13"
@@ -163,7 +148,6 @@
                                    Text="{Binding SelectedDay.Net, StringFormat=Итог: {0:N2}}"/>
                     </StackPanel>
 
-                    <!-- Transactions DataGrid -->
                     <DataGrid Grid.Row="2" 
                               ItemsSource="{Binding SelectedDayTransactions}" 
                               AutoGenerateColumns="False" 

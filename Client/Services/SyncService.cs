@@ -125,9 +125,9 @@ public sealed class SyncService
             }
 
             var accountsToPush = uniqueAccounts.Values.Select(DtoMapper.ToDto).ToList();
-            var categories     = _localDb.Categories.Select(DtoMapper.ToDto).ToList();
-            var obligations    = _localDb.Obligations.Select(DtoMapper.ToDto).ToList();
-            var transactions   = _localDb.Transactions
+            var categories = _localDb.Categories.Select(DtoMapper.ToDto).ToList();
+            var obligations = _localDb.Obligations.Select(DtoMapper.ToDto).ToList();
+            var transactions = _localDb.Transactions
                 .Select(t => DtoMapper.ToDto(t, accountIdMap)).ToList();
 
             var req = new Shared.Sync.SyncPushRequest(accountsToPush, categories, obligations, transactions);

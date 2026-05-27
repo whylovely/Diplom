@@ -13,15 +13,11 @@ using Shared.Transactions;
 
 namespace Client.Services;
 
-// Тонкая обёртка над HttpClient к серверному REST API.
-// При 401 автоматически пытается обновить access token через refresh token и повторяет запрос.
-// HttpClient создаётся заново при каждом вызове Build() — подхватывает актуальный ServerUrl.
 public sealed class ApiService
 {
     private readonly SettingsService _settings;
     private readonly AuthService _auth;
 
-    // Флаг для защиты от рекурсивного рефреша
     private bool _isRefreshing;
 
     public ApiService(SettingsService settings, AuthService auth)
@@ -30,8 +26,6 @@ public sealed class ApiService
         _auth = auth;
     }
 
-    // Создаёт HttpClient с актуальным BaseAddress и Bearer-токеном.
-    // Таймаут 15 сек — достаточно для локального Docker-сервера.
     private HttpClient Build()
     {
         var http = new HttpClient
@@ -47,15 +41,11 @@ public sealed class ApiService
         return http;
     }
 
-    /// <summary>
-    /// Выполняет GET-запрос с автоматическим обновлением токена при 401.
-    /// </summary>
     private async Task<HttpResponseMessage> SendWithRefreshAsync(Func<HttpClient, Task<HttpResponseMessage>> request)
     {
         using var http = Build();
         var resp = await request(http);
 
-        // Если 401 и у нас есть refresh token — пробуем обновить и повторить один раз
         if (resp.StatusCode == HttpStatusCode.Unauthorized && !_isRefreshing)
         {
             _isRefreshing = true;
@@ -65,7 +55,7 @@ public sealed class ApiService
                 if (refreshed)
                 {
                     resp.Dispose();
-                    using var http2 = Build(); // новый клиент с обновлённым access token
+                    using var http2 = Build();
                     return await request(http2);
                 }
             }

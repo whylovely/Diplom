@@ -21,10 +21,10 @@ namespace Client.ViewModels
             expenseRows.Clear();
             if (!dateFrom.HasValue || !dateTo.HasValue) return 0;
 
-            var txInRange  = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
+            var txInRange = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
             var accountById = data.Accounts.ToDictionary(a => a.Id);
-            var entries    = TransactionAggregator.GetExpenseEntries(txInRange, accountById);
-            var rows       = TransactionAggregator.AggregateByCategoryRows(
+            var entries = TransactionAggregator.GetExpenseEntries(txInRange, accountById);
+            var rows = TransactionAggregator.AggregateByCategoryRows(
                 entries, data.Categories,
                 (from, to) => data.GetRate(from, to),
                 settings.BaseCurrency,
@@ -44,10 +44,10 @@ namespace Client.ViewModels
             expenseGroups.Clear();
             if (!dateFrom.HasValue || !dateTo.HasValue) return;
 
-            var txInRange   = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
+            var txInRange = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
             var accountById = data.Accounts.ToDictionary(a => a.Id);
-            var entries     = TransactionAggregator.GetExpenseEntries(txInRange, accountById);
-            var groups      = TransactionAggregator.AggregateByCategoryGroups(
+            var entries = TransactionAggregator.GetExpenseEntries(txInRange, accountById);
+            var groups = TransactionAggregator.AggregateByCategoryGroups(
                 entries, txInRange, data.Categories,
                 (from, to) => data.GetRate(from, to),
                 settings.BaseCurrency,
@@ -72,7 +72,7 @@ namespace Client.ViewModels
 
             if (totalExpense <= 0)
             {
-                topExpensesSum   = 0;
+                topExpensesSum = 0;
                 topExpensesShare = 0;
                 return;
             }
@@ -83,13 +83,13 @@ namespace Client.ViewModels
                 .Select(r => new CategoryShareRow
                 {
                     CategoryName = r.CategoryName,
-                    Total        = r.Total,
+                    Total = r.Total,
                     SharePercent = r.Total / totalExpense
                 }).ToList();
 
             foreach (var row in top) expenseShareRows.Add(row);
 
-            topExpensesSum   = top.Sum(r => r.Total);
+            topExpensesSum = top.Sum(r => r.Total);
             topExpensesShare = Math.Round((topExpensesSum / totalExpense) * 100m, 2);
 
             expensePieSeries.Clear();
@@ -100,7 +100,6 @@ namespace Client.ViewModels
             ObservableCollection<CategoryShareRow> shareRows,
             ObservableCollection<ISeries> pieSeries)
         {
-            // палитра для светлой темы — насыщенные, но не неоновые
             var colors = new[] { "#059669", "#DC2626", "#2563EB", "#7C3AED", "#D97706", "#DB2777", "#0891B2", "#65A30D" };
             int i = 0;
             foreach (var r in shareRows)
@@ -108,14 +107,14 @@ namespace Client.ViewModels
                 var skColor = SkiaSharp.SKColor.Parse(colors[i % colors.Length]);
                 pieSeries.Add(new PieSeries<decimal>
                 {
-                    Values              = new[] { r.Total },
-                    Name                = r.CategoryName,
-                    InnerRadius         = 50,
+                    Values = new[] { r.Total },
+                    Name = r.CategoryName,
+                    InnerRadius = 50,
                     MaxRadialColumnWidth = 20,
-                    HoverPushout        = 0,
-                    Pushout             = 2,
-                    Stroke              = null,
-                    Fill                = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(skColor)
+                    HoverPushout = 0,
+                    Pushout = 2,
+                    Stroke = null,
+                    Fill = new LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint(skColor)
                 });
                 i++;
             }

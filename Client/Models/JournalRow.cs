@@ -2,22 +2,21 @@ using System;
 
 namespace Client.Models
 {
-    // Строка журнала операций — транзакция с полями для UI
     public sealed class JournalRow
     {
         public Guid TransactionId { get; set; }
         public DateTimeOffset Date { get; set; }
         public string Description { get; set; } = "";
-        public string TypeLabel { get; set; } = "";    // "Расход" / "Доход" / "Перевод"
-        public string AccountName { get; set; } = "";  // имя счёта
-        public string? ToAccountName { get; set; }     // имя счёта назначения (для переводов)
-        public string? CategoryName { get; set; }      // имя категории (null для перевода)
+        public string TypeLabel { get; set; } = "";
+        public string AccountName { get; set; } = "";
+        public string? ToAccountName { get; set; }
+        public string? CategoryName { get; set; }
         public decimal Amount { get; set; }           
         public string CurrencyCode { get; set; } = ""; 
-        public bool IsExpense { get; set; }            // красный
-        public bool IsIncome { get; set; }             // зелёный
-        public bool IsTransfer { get; set; }           // синий
-        public bool IsDuplicate { get; set; }          // возможный дубликат
+        public bool IsExpense { get; set; }
+        public bool IsIncome { get; set; }
+        public bool IsTransfer { get; set; }
+        public bool IsDuplicate { get; set; }
 
         public string FormattedAmount
         {

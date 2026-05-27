@@ -27,9 +27,7 @@ namespace Client.ViewModels.DialogWindow
 
         public string Title => IsRegisterMode ? "Регистрация" : "Вход в аккаунт";
         public string ActionText => IsRegisterMode ? "Зарегистрироваться" : "Войти";
-        public string ToggleText => IsRegisterMode
-            ? "Уже есть аккаунт? Войти"
-            : "Нет аккаунта? Зарегистрироваться";
+        public string ToggleText => IsRegisterMode ? "Уже есть аккаунт? Войти" : "Нет аккаунта? Зарегистрироваться";
 
         public event Action? OnSuccess;
 

@@ -5,7 +5,6 @@ using Client.Models;
 
 namespace Client.Services;
 
-// Строит список проводок (Entry) для транзакции по параметрам формы
 public sealed class TransactionBuilder
 {
     private readonly IDataService _data;

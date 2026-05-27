@@ -16,7 +16,6 @@
   <Border Background="#FFFFFF" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="0.5" Margin="8">
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
 
-      <!-- Header -->
       <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Center">
         <TextBlock Text="🔐" FontSize="32" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding Title}" 
@@ -24,10 +23,8 @@
                    Foreground="#1F2937"/>
       </StackPanel>
 
-      <!-- Form -->
       <StackPanel Grid.Row="1" Spacing="14" VerticalAlignment="Center">
 
-        <!-- Email -->
         <StackPanel Spacing="4">
           <TextBlock Text="Email" Foreground="#6B7280" FontSize="12"/>
           <TextBox Text="{Binding Email}" 
@@ -35,7 +32,6 @@
                    Width="320"/>
         </StackPanel>
 
-        <!-- Password -->
         <StackPanel Spacing="4">
           <TextBlock Text="Пароль" Foreground="#6B7280" FontSize="12"/>
           <TextBox Text="{Binding Password}" 
@@ -44,7 +40,6 @@
                    Width="320"/>
         </StackPanel>
 
-        <!-- Error -->
         <TextBlock Text="{Binding ErrorMessage}"
                    Foreground="#DC2626"
                    FontSize="13"
@@ -52,7 +47,6 @@
                    HorizontalAlignment="Center"
                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
-        <!-- Submit Button -->
         <Button Content="{Binding ActionText}"
                 Command="{Binding SubmitCommand}"
                 Classes="accent"
@@ -60,7 +54,6 @@
                 Width="320" Height="40"
                 IsEnabled="{Binding !IsLoading}"/>
 
-        <!-- Loading indicator -->
         <TextBlock Text="Подключение..."
                    Foreground="#1F2937"
                    FontSize="12"
@@ -68,7 +61,6 @@
                    IsVisible="{Binding IsLoading}"/>
       </StackPanel>
 
-      <!-- Toggle mode -->
       <Button Grid.Row="2" 
               Content="{Binding ToggleText}"
               Command="{Binding ToggleModeCommand}"

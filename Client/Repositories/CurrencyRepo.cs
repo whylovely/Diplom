@@ -7,7 +7,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-// Хранит курсы валют относительно рубля (RateToBase = сколько RUB за 1 единицу валюты)
 public sealed class CurrencyRatesRepository
 {
     private readonly SqliteConFactory _factory;
@@ -40,7 +39,6 @@ public sealed class CurrencyRatesRepository
         }
     }
 
-    // Реализован через рубль как «общий знаменатель»: A→B = (A→RUB) / (B→RUB).
     public decimal Get(string fromCurrency, string toCurrency = "RUB")
     {
         if (fromCurrency == toCurrency) return 1m;

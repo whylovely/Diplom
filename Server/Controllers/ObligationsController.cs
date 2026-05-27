@@ -8,7 +8,6 @@ using Shared.Obligations;
 
 namespace Server.Controllers;
 
-// CRUD обязательств
 [ApiController]
 [Authorize]
 [Route("api/obligations")]

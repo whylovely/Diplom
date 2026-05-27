@@ -1,6 +1,5 @@
 namespace Server.Entities;
 
-// Категория пользователя на сервере
 public sealed class CategoryEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

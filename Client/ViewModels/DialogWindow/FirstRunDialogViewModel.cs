@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Client.ViewModels.DialogWindow
 {
-    public partial class FirstRunDialogViewModel : ViewModelBase    // первое открытие в жизни
+    public partial class FirstRunDialogViewModel : ViewModelBase
     {
         [ObservableProperty] private string _selectedCurrency = "RUB";
 

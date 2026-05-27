@@ -10,7 +10,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Страница «Журнал»
     public sealed partial class JournalViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -33,21 +32,15 @@ namespace Client.ViewModels
             _data.DataChanged += Refresh;
         }
 
-        partial void OnSearchTextChanged(string value) => ApplyFilter();    // ввели один символ - меняем
+        partial void OnSearchTextChanged(string value) => ApplyFilter();
 
         public void Refresh() => RebuildRows();
 
         private void RebuildRows()
         {
-            _allRows = _data.Transactions
-                .SelectMany(tx => ConvertToRows(tx))
-                .OrderByDescending(r => r.Date)
-                .ToList();
+            _allRows = _data.Transactions.SelectMany(tx => ConvertToRows(tx)).OrderByDescending(r => r.Date).ToList();
 
-            // Выявление дубликатов транзакций
-            var duplicates = _allRows.GroupBy(r => new { r.Date.Date, r.Amount, r.TypeLabel })
-                                     .Where(g => g.Count() > 1)
-                                     .SelectMany(g => g);
+            var duplicates = _allRows.GroupBy(r => new { r.Date.Date, r.Amount, r.TypeLabel }).Where(g => g.Count() > 1).SelectMany(g => g);
             foreach (var dup in duplicates)
             {
                 dup.IsDuplicate = true;
@@ -91,7 +84,7 @@ namespace Client.ViewModels
             }
         }
 
-        private static bool MatchesFilter(JournalRow row, string query) // Мега-удобный поиск
+        private static bool MatchesFilter(JournalRow row, string query)
         {
             return row.Description.Contains(query, StringComparison.OrdinalIgnoreCase)
                 || row.AccountName.Contains(query, StringComparison.OrdinalIgnoreCase)

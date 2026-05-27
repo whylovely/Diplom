@@ -5,7 +5,7 @@ using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class ConfirmDialogViewModel : ViewModelBase  // подтверждение действия
+public sealed partial class ConfirmDialogViewModel : ViewModelBase
 {
     public string Title { get; }
     public string Message { get; }

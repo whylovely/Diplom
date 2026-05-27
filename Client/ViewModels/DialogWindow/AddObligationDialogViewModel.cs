@@ -51,13 +51,10 @@ public partial class AddObligationDialogViewModel : ViewModelBase
         set { if (value) Type = ObligationType.Credit; }
     }
 
-    [ObservableProperty] private DateTimeOffset? _dueDate;  // Дата возврата
+    [ObservableProperty] private DateTimeOffset? _dueDate;
     [ObservableProperty] private bool _hasDueDateError;
     [ObservableProperty] private string? _note;
     [ObservableProperty] private string _title = "Новое обязательство";
-
-    // public List<string> Currencies { get; } = new() { "RUB", "USD", "EUR" };
-    //public List<ObligationType> Types { get; } = new() { ObligationType.Debt, ObligationType.Credit };
 
     public Obligation? Result { get; private set; }
 

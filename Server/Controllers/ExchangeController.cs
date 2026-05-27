@@ -5,11 +5,6 @@ using Shared.Exchange;
 
 namespace Server.Controllers;
 
-/// <summary>
-/// Endpoint курсов валют. Прокси над <see cref="IExchangeRateService"/>:
-/// данные ЦБ РФ + CoinGecko.
-/// Клиент дёргает GET /rates при старте и периодически обновляет локальные курсы.
-/// </summary>
 [ApiController]
 [Authorize]
 [Route("api/exchange")]

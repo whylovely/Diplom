@@ -6,10 +6,6 @@ using Shared.Transactions;
 
 namespace Shared.Sync;
 
-/// <summary>
-/// Полный снепшот данных пользователя для Push-синхронизации (POST /api/sync/push).
-/// Сервер удаляет всё текущее и записывает то, что в этом запросе.
-/// </summary>
 public sealed record SyncPushRequest(
     IReadOnlyList<AccountDto> Accounts,
     IReadOnlyList<CategoryDto> Categories,

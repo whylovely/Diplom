@@ -10,7 +10,6 @@ using Client.Repositories;
 
 namespace Client.Services;
 
-// Фасад над репозиториями, реализует IDataService для всех ViewModel
 public sealed class LocalDbService : IDataService
 {
     private readonly Client.Data.SqliteConFactory _factory;
@@ -66,7 +65,6 @@ public sealed class LocalDbService : IDataService
         _currencyRatesRepo.Changed += RaiseChanged;
     }
 
-    // Возвращает дату самого свежего изменения 
     public DateTimeOffset? GetLocalLastChangeDate()
     {
         var dates = new List<DateTimeOffset>();
@@ -98,10 +96,6 @@ public sealed class LocalDbService : IDataService
 
     public void RemoveCategory(Category category) => _categoriesRepo.Remove(category);
 
-    /// <summary>
-    /// Сохраняет транзакцию двойной записи: пишет заголовок в Transactions, все проводки в Entries
-    /// и обновляет балансы Asset-счетов в одной SQL-транзакции (атомарно).
-    /// </exception>
     public Task PostTransactionAsync(Transaction tx)
     {
         if (tx.Entries.Count < 2)

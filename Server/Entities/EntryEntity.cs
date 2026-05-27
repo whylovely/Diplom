@@ -1,10 +1,6 @@
 ﻿namespace Server.Entities;
 
-public enum EntryDirection
-{
-    Debit = 1,
-    Credit = 2
-}
+public enum EntryDirection { Debit = 1, Credit = 2 }
 
 public sealed class EntryEntity
 {

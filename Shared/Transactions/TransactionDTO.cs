@@ -1,13 +1,8 @@
 ﻿namespace Shared.Transactions;
 
-// DTO транзакций и проводок. Используются и в HTTP-API, и в SyncPushRequest.
 public sealed record MoneyDto(decimal Amount, string Currency);
 
-public enum EntryDirection
-{
-    Debit = 0,
-    Credit = 1
-}
+public enum EntryDirection { Debit = 0, Credit = 1 }
 
 public sealed record CreateEntryRequest(
     Guid AccountId,

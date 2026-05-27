@@ -4,7 +4,6 @@ using System;
 
 namespace Client.Models;
 
-// Долговое обязательство
 public partial class Obligation : ObservableObject
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -47,8 +46,4 @@ public partial class Obligation : ObservableObject
     }
 }
 
-public enum ObligationType
-{
-    Debt = 0,   // я должен
-    Credit = 1  // мне должны
-}
+public enum ObligationType { Debt = 0, Credit = 1 }

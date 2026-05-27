@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels;
 
-// Страница «Категории»
 public sealed partial class CategoriesViewModel : ViewModelBase
 {
     private readonly IDataService _data;
@@ -43,9 +42,7 @@ public sealed partial class CategoriesViewModel : ViewModelBase
         foreach (var c in _data.Categories.OrderBy(c => c.Name))
             Categories.Add(new Category { Id = c.Id, Name = c.Name, Kind = c.Kind });
 
-        Selected = selectedId.HasValue
-            ? Categories.FirstOrDefault(c => c.Id == selectedId) ?? Categories.FirstOrDefault()
-            : Categories.FirstOrDefault();
+        Selected = selectedId.HasValue ? Categories.FirstOrDefault(c => c.Id == selectedId) ?? Categories.FirstOrDefault() : Categories.FirstOrDefault();
     }
 
     private bool hasSelection() => Selected is not null;

@@ -2,7 +2,6 @@ using Client.Models;
 
 namespace Client.Services;
 
-// Проверяет корректность параметров формы перед построением транзакции
 public sealed class TransactionValidator
 {
     public string? Validate(

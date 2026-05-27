@@ -15,10 +15,8 @@
 
   <Border Padding="24" Background="{DynamicResource SurfaceBrush}" CornerRadius="12">
     <Grid RowDefinitions="Auto,Auto,*,Auto">
-      <!-- Заголовок -->
       <TextBlock Text="Курсы валют" Classes="heading" Grid.Row="0" Margin="0,0,0,16"/>
 
-      <!-- Поиск -->
       <TextBox Grid.Row="1" 
                Text="{Binding SearchQuery, Mode=TwoWay}"
                Watermark="Поиск валюты (код или название)..."
@@ -29,7 +27,6 @@
         </TextBox.InnerLeftContent>
       </TextBox>
 
-      <!-- Список валют -->
       <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Items}">
           <ItemsControl.ItemTemplate>
@@ -60,7 +57,6 @@
         </ItemsControl>
       </ScrollViewer>
 
-      <!-- Кнопка закрыть -->
       <Button Grid.Row="3" Content="Закрыть" Command="{Binding CloseCommand}" 
               HorizontalAlignment="Right" Classes="outline" Margin="0,16,0,0"/>
     </Grid>

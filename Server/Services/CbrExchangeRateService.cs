@@ -6,15 +6,6 @@ using Shared.Exchange;
 
 namespace Server.Services;
 
-/// <summary>
-/// Боевая реализация сервиса курсов валют. Тянет фиатные курсы из XML-фида ЦБ РФ
-/// и крипто-курсы из CoinGecko. Двухуровневое кеширование:
-/// <list type="bullet">
-///   <item>CacheKey — свежий снепшот, живёт 1 час (свежие данные)</item>
-///   <item>LastKnownKey — последний удачный, живёт 7 дней (fallback при недоступности API)</item>
-/// </list>
-/// При сетевой ошибке возвращаем последний известный — это лучше, чем валить весь endpoint.
-/// </summary>
 public sealed class CbrExchangeRateService : IExchangeRateService
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -81,7 +72,6 @@ public sealed class CbrExchangeRateService : IExchangeRateService
             rates.Add(new ExchangeRateDto("TON", 3.5m * usdRate, DateTimeOffset.UtcNow));
         }
 
-        // Сохраняем в кэш (1 ч + 7 дней)
         _cache.Set(CacheKey, rates, CacheDuration);
         _cache.Set(LastKnownKey, rates, LastKnownDuration);
 
@@ -126,10 +116,10 @@ public sealed class CbrExchangeRateService : IExchangeRateService
         var result = new Dictionary<string, decimal>();
         if (response != null)
         {
-            if (response.TryGetValue("tether",   out var usdt) && usdt.TryGetValue("usd", out var usdtPrice)) result["USDT"] = usdtPrice;
-            if (response.TryGetValue("bitcoin",  out var btc)  && btc.TryGetValue("usd",  out var btcPrice))  result["BTC"]  = btcPrice;
-            if (response.TryGetValue("ethereum", out var eth)  && eth.TryGetValue("usd",  out var ethPrice))  result["ETH"]  = ethPrice;
-            if (response.TryGetValue("solana",   out var sol)  && sol.TryGetValue("usd",  out var solPrice))  result["SOL"]  = solPrice;
+            if (response.TryGetValue("tether", out var usdt) && usdt.TryGetValue("usd", out var usdtPrice)) result["USDT"] = usdtPrice;
+            if (response.TryGetValue("bitcoin", out var btc) && btc.TryGetValue("usd", out var btcPrice))  result["BTC"]  = btcPrice;
+            if (response.TryGetValue("ethereum", out var eth) && eth.TryGetValue("usd", out var ethPrice))  result["ETH"]  = ethPrice;
+            if (response.TryGetValue("solana", out var sol) && sol.TryGetValue("usd", out var solPrice))  result["SOL"]  = solPrice;
             if (response.TryGetValue("the-open-network", out var ton) && ton.TryGetValue("usd", out var tonPrice)) result["TON"] = tonPrice;
         }
         return result;
@@ -148,8 +138,8 @@ public sealed class CbrExchangeRateService : IExchangeRateService
 
         foreach (var element in xdoc.Descendants("Valute"))
         {
-            var charCode      = element.Element("CharCode")?.Value;
-            var valueString   = element.Element("Value")?.Value;
+            var charCode = element.Element("CharCode")?.Value;
+            var valueString = element.Element("Value")?.Value;
             var nominalString = element.Element("Nominal")?.Value;
 
             if (charCode != null && valueString != null && nominalString != null)

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Client.ViewModels
 {
-    // Страница «Курсы валют»
     public partial class CurrenciesViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -59,7 +58,6 @@ namespace Client.ViewModels
                 Currencies.Clear();
                 IsSearching = true;
 
-                // Debounce
                 await Task.Delay(400, token);
                 token.ThrowIfCancellationRequested();
 
@@ -75,8 +73,7 @@ namespace Client.ViewModels
                 }
 
                 var results = allCodes.Distinct()
-                    .Where(c => c.ToLower().Contains(q) || CurrencyHelper.GetCurrencyName(c).ToLower().Contains(q))
-                    .ToList();
+                    .Where(c => c.ToLower().Contains(q) || CurrencyHelper.GetCurrencyName(c).ToLower().Contains(q)).ToList();
 
                 token.ThrowIfCancellationRequested();
 

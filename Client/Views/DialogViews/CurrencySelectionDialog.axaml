@@ -14,7 +14,6 @@
         TransparencyLevelHint="AcrylicBlur">
 
   <Window.Styles>
-    <!-- Skeleton Animation -->
     <Style Selector="Border.skeleton">
       <Setter Property="Background" Value="#1AFFFFFF"/>
       <Style.Animations>
@@ -30,7 +29,6 @@
     </Style>
   </Window.Styles>
 
-  <!-- Glassmorphism Container -->
   <Border CornerRadius="16" 
           Background="#F9FAFB"
           BorderBrush="#2A2F45" BorderThickness="1"
@@ -38,12 +36,10 @@
       
     <Grid RowDefinitions="Auto, Auto, *, Auto">
       
-      <!-- Header -->
       <TextBlock Grid.Row="0" Text="Выбор валюты" 
                  Foreground="#1F2937" FontSize="20" FontWeight="SemiBold"
                  Margin="24,24,24,16"/>
 
-      <!-- Search Box -->
       <TextBox Grid.Row="1" 
                Text="{Binding SearchText, Mode=TwoWay}"
                Watermark="Поиск валюты (USD, Bitcoin)..."
@@ -78,7 +74,6 @@
         </TextBox.InnerRightContent>
       </TextBox>
 
-      <!-- Skeleton Loader -->
       <ItemsControl Grid.Row="2" IsVisible="{Binding IsSearching}" Margin="24,0,24,24" ItemsSource="{Binding DummyItems}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
@@ -94,7 +89,6 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
 
-      <!-- Main List -->
       <ListBox Grid.Row="2" 
                ItemsSource="{Binding Currencies}" 
                IsVisible="{Binding !IsSearching}"

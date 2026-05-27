@@ -17,7 +17,7 @@ namespace Client.ViewModels
         private readonly ICategoryDialogService _catDialog;
 
         private readonly IInputDialogService _input;
-        private readonly Action<Account, TxKindChoice> _onQuickTx;  // Быстрые действия
+        private readonly Action<Account, TxKindChoice> _onQuickTx;
         private readonly Func<Avalonia.Controls.Window> _getWindow;
         private readonly SettingsService _settings;
         private readonly SyncOrchestrator? _orchestrator;
@@ -183,7 +183,7 @@ namespace Client.ViewModels
             var dlg = new Views.DialogViews.GroupSelectionDialog(groups);
             var result = await dlg.ShowDialog<AccountGroup?>(_getWindow());
             
-            if (result == null && !dlg.IsCancelled) // Выбрано "Без группы"
+            if (result == null && !dlg.IsCancelled)
             {
                 _data.SetAccountGroup(acc.Id, null);
                 await LoadDataAsync();
@@ -309,28 +309,24 @@ namespace Client.ViewModels
             SyncAction action;
             if (!analysis.ServerReachable)
             {
-                // Сервер недоступен — ничего не делаем
                 SetSyncStatus("Сервер недоступен", "#DC2626");
                 IsSyncing = false;
                 return;
             }
 
-            // Всегда показываем диалог выбора направления синхронизации
             var dialog = new SyncConflictDialog(
                 analysis.LocalLastChange, analysis.LocalCount, analysis.ServerCount);
             var choice = await dialog.ShowDialog<string?>(_getWindow());
 
             action = choice switch
             {
-                "push"   => SyncAction.PushOnly,
+                "push" => SyncAction.PushOnly,
                 "server" => SyncAction.PullOnly,
                 "client" => SyncAction.Cancel,
-                _        => SyncAction.Dismiss
+                _ => SyncAction.Dismiss
             };
 
-            SetSyncStatus(
-                action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...",
-                "#6B7280");
+            SetSyncStatus(action == SyncAction.PushOnly ? "Отправка на сервер..." : "Синхронизация...", "#6B7280");
 
             var outcome = await _orchestrator.ExecuteAsync(action);
 

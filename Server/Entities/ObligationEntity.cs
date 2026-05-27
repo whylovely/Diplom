@@ -2,7 +2,6 @@ using System;
 
 namespace Server.Entities;
 
-// Обязательство на сервере
 public class ObligationEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

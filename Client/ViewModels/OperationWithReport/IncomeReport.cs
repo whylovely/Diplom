@@ -20,10 +20,10 @@ namespace Client.ViewModels
             incomeRows.Clear();
             if (!dateFrom.HasValue || !dateTo.HasValue) return 0;
 
-            var txInRange   = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
+            var txInRange = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
             var accountById = data.Accounts.ToDictionary(a => a.Id);
-            var entries     = TransactionAggregator.GetIncomeEntries(txInRange, accountById);
-            var rows        = TransactionAggregator.AggregateByCategoryRows(
+            var entries = TransactionAggregator.GetIncomeEntries(txInRange, accountById);
+            var rows = TransactionAggregator.AggregateByCategoryRows(
                 entries, data.Categories,
                 (from, to) => data.GetRate(from, to),
                 settings.BaseCurrency,
@@ -43,10 +43,10 @@ namespace Client.ViewModels
             incomeGroups.Clear();
             if (!dateFrom.HasValue || !dateTo.HasValue) return;
 
-            var txInRange   = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
+            var txInRange = TransactionAggregator.FilterByDateRange(data.Transactions, dateFrom, dateTo);
             var accountById = data.Accounts.ToDictionary(a => a.Id);
-            var entries     = TransactionAggregator.GetIncomeEntries(txInRange, accountById);
-            var groups      = TransactionAggregator.AggregateByCategoryGroups(
+            var entries = TransactionAggregator.GetIncomeEntries(txInRange, accountById);
+            var groups = TransactionAggregator.AggregateByCategoryGroups(
                 entries, txInRange, data.Categories,
                 (from, to) => data.GetRate(from, to),
                 settings.BaseCurrency,
@@ -71,7 +71,7 @@ namespace Client.ViewModels
 
             if (totalIncome <= 0)
             {
-                topIncomesSum   = 0;
+                topIncomesSum = 0;
                 topIncomesShare = 0;
                 return;
             }
@@ -82,13 +82,13 @@ namespace Client.ViewModels
                 .Select(r => new CategoryShareRow
                 {
                     CategoryName = r.CategoryName,
-                    Total        = r.Total,
+                    Total = r.Total,
                     SharePercent = r.Total / totalIncome
                 }).ToList();
 
             foreach (var row in top) incomeShareRows.Add(row);
 
-            topIncomesSum   = top.Sum(r => r.Total);
+            topIncomesSum = top.Sum(r => r.Total);
             topIncomesShare = Math.Round((topIncomesSum / totalIncome) * 100m, 2);
 
             incomePieSeries.Clear();

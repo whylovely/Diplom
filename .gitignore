@@ -49,6 +49,3 @@ ehthumbs.db
 .DS_Store
 .AppleDouble
 .LSOverride
-
-/Server.Tests
-/Client.Tests

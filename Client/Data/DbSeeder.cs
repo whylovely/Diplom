@@ -5,7 +5,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
-// Демо-данные
 public sealed class DbSeeder
 {
     private readonly SqliteConFactory _factory;
@@ -25,7 +24,7 @@ public sealed class DbSeeder
             {
                 { "RUB", 1.0 }, { "USD", 72.0 }, { "EUR", 91.0 }, { "KZT", 0.16 },
                 { "GBP", 104.0 }, { "CNY", 12.0 }, { "TRY", 1.8 }
-            };  // Захордкоженные курсы валют
+            };
 
             foreach (var kvp in defaultRates)
             {
@@ -40,16 +39,16 @@ public sealed class DbSeeder
         {
             var now = DateTimeOffset.Now.ToString("O");
 
-            var catSalaryId    = Guid.NewGuid().ToString();
-            var accIncomeSalaryId  = Guid.NewGuid().ToString();
+            var catSalaryId = Guid.NewGuid().ToString();
+            var accIncomeSalaryId = Guid.NewGuid().ToString();
             var accExpenseSalaryId = Guid.NewGuid().ToString();
 
-            var catFoodId      = Guid.NewGuid().ToString();
-            var accIncomeFoodId    = Guid.NewGuid().ToString();
-            var accExpenseFoodId   = Guid.NewGuid().ToString();
+            var catFoodId = Guid.NewGuid().ToString();
+            var accIncomeFoodId = Guid.NewGuid().ToString();
+            var accExpenseFoodId = Guid.NewGuid().ToString();
 
             var catTransportId = Guid.NewGuid().ToString();
-            var accIncomeTransportId  = Guid.NewGuid().ToString();
+            var accIncomeTransportId = Guid.NewGuid().ToString();
             var accExpenseTransportId = Guid.NewGuid().ToString();
 
             void AddCategory(string id, string name, int kind, string incomeId, string expenseId)
@@ -86,7 +85,7 @@ public sealed class DbSeeder
 
             void AddTx(string dateDelta, string desc, string accId, string catId, string techAccId, EntryDirection mainAccDir, double amount, string currency)
             {
-                var txId   = Guid.NewGuid().ToString();
+                var txId = Guid.NewGuid().ToString();
                 var txDate = DateTimeOffset.Now.AddDays(int.Parse(dateDelta)).ToString("O");
 
                 SqliteConFactory.Exec(conn, @"INSERT INTO Transactions (Id, Date, Description, CreatedAt) VALUES (@Id, @Date, @Desc, @Now)",

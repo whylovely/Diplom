@@ -8,7 +8,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-// Хранилище обязательств
 public sealed class ObligationRepository
 {
     private readonly SqliteConFactory _factory;

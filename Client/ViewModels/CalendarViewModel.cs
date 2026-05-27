@@ -10,7 +10,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Страница «Календарь операций»: 7×6 сетка дней месяца с агрегатами доходов/расходов.
     public sealed partial class CalendarViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -126,7 +125,6 @@ namespace Client.ViewModels
                 Days.Add(BuildDay(prevMonth.AddDays(i), isCurrentMonth: false));
             }
 
-            // Текущий месяц
             for (int d = 1; d <= daysInMonth; d++)
             {
                 Days.Add(BuildDay(new DateTime(DisplayYear, DisplayMonth, d), isCurrentMonth: true));

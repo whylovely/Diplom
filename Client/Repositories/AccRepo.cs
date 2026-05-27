@@ -8,7 +8,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-// Хранилище счетов и групп счетов
 public sealed class AccountRepository
 {
     private readonly SqliteConFactory _factory;
@@ -78,7 +77,6 @@ public sealed class AccountRepository
         }
     }
 
-    // Восстанавливает словари связей «категория → технический счёт» 
     public void RebuildTechnicalAccountMappings(IReadOnlyList<Category> categories)
     {
         _expenseAccountByCategoryId.Clear();
@@ -152,7 +150,6 @@ public sealed class AccountRepository
         RaiseChanged();
     }
 
-    // При смене базовой валюты пользователем переключает Asset-счета
     public void UpdateBaseCurrency(string newBaseCurrency)
     {
         using var conn = _factory.Open();
@@ -235,7 +232,6 @@ public sealed class AccountRepository
         return _accounts.Max(a => a.UpdatedAt);
     }
 
-    // Создаёт пару технических счетов («Расходы: X» / «Доходы: X»)
     public void CreateTechnicalAccountsForCategory(Category category)
     {
         var now = DateTimeOffset.Now;

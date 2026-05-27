@@ -14,7 +14,7 @@ using ClosedXML.Excel;
 
 namespace Client.ViewModels.OperationWithReport
 {
-    public partial class DropReport // Экспорт отчетов
+    public partial class DropReport
     {
         public static string BuildCSVReport(
             DateTimeOffset DateFrom,
@@ -27,7 +27,7 @@ namespace Client.ViewModels.OperationWithReport
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в CSV
+            ObservableCollection<AccountBalanceRow> BalanceRows)
         {
             var sb = new StringBuilder();
 
@@ -81,7 +81,7 @@ namespace Client.ViewModels.OperationWithReport
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в TXT
+            ObservableCollection<AccountBalanceRow> BalanceRows)
         {
             var sb = new StringBuilder();
             var sep = new string('═', 60);
@@ -147,7 +147,7 @@ namespace Client.ViewModels.OperationWithReport
             ObservableCollection<MonthlyTotalRow> MonthlyRows,
             ObservableCollection<AccountTurnoverRow> AccountRows,
             DateTimeOffset BalanceDate,
-            ObservableCollection<AccountBalanceRow> BalanceRows)    // Экспорт в Excel
+            ObservableCollection<AccountBalanceRow> BalanceRows)
         {
             using var wb = new XLWorkbook();
 

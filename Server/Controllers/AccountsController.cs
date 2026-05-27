@@ -8,7 +8,6 @@ using Shared.Accounts;
 
 namespace Server.Controllers;
 
-// CRUD счетов пользователя
 [ApiController]
 [Authorize]
 [Route("api/accounts")]
@@ -173,7 +172,6 @@ public sealed class AccountsController : ControllerBase
             (MultiCurrencyType)entity.AccountType, entity.SecondaryCurrency, entity.ExchangeRate));
     }
 
-    // Soft delete
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, [FromQuery] bool force = false, CancellationToken ct = default)
     {

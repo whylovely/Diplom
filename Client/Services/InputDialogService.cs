@@ -4,7 +4,6 @@ using Client.Views;
 
 namespace Client.Services;
 
-// Сервис для показа диалога ввода
 public interface IInputDialogService
 {
     Task<string?> PromptAsync(string title, string message, string? initialText = null);

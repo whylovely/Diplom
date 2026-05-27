@@ -10,7 +10,6 @@ using Shared.Auth;
 
 namespace Server.Controllers;
 
-// CRUD категорий пользователя
 [ApiController]
 [Authorize]
 [Route("api/categories")]

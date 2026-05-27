@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
-    // Одна клетка календарной сетки в CalendarViewModel
     public sealed class CalendarDay
     {
         public DateTime Date { get; set; }

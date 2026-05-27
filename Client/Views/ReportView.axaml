@@ -10,7 +10,6 @@
 
     <Grid RowDefinitions="Auto, *">
 
-        <!-- ── Header Bar ─────────────────────────────────────── -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <TextBlock Text="Отчёты" Classes="heading" VerticalAlignment="Center" Margin="0,0,24,0"/>
@@ -36,7 +35,6 @@
                             <MenuItem Header="Сохранить как Excel..." Command="{Binding ExportCommand}" CommandParameter="Excel" />
                         </MenuFlyout>
                     </Button.Flyout>
-                    <!-- Download/Export Icon -->
                     <Path Data="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z" 
                           Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20" />
                 </Button>
@@ -45,9 +43,7 @@
 
         <Panel Grid.Row="1">
 
-            <!-- ══ SUMMARY ════════════════════════════════════ -->
             <Grid IsVisible="{Binding IsSummary}" RowDefinitions="Auto, Auto, *">
-                <!-- Date Filter -->
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="С:" VerticalAlignment="Center" Classes="dim"/>
@@ -58,7 +54,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Summary Cards -->
                 <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
                     <Border Classes="cardSmall" Margin="0,0,6,0">
                         <StackPanel Spacing="4">
@@ -81,7 +76,6 @@
                 </Grid>
             </Grid> 
 
-            <!-- ══ BALANCE AT DATE ════════════════════════════ -->
             <Grid IsVisible="{Binding IsBalanceAtDate}" RowDefinitions="Auto, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -110,7 +104,6 @@
                 </DataGrid>
             </Grid>
 
-            <!-- ══ MONTHLY DYNAMICS ═══════════════════════════ -->
            <Grid IsVisible="{Binding IsMonthlyDynamics}" RowDefinitions="Auto, *, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -161,7 +154,6 @@
                 </Border>
             </Grid> 
 
-            <!-- ══ ACCOUNTS TURNOVER ══════════════════════════ -->
             <Grid IsVisible="{Binding IsAccountsTurnover}" RowDefinitions="Auto, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -193,7 +185,6 @@
                 </DataGrid>
             </Grid>
 
-            <!-- ══ EXPENSE TOP ════════════════════════════════ -->
             <Grid IsVisible="{Binding IsExpenseTop}" RowDefinitions="Auto, *, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -240,7 +231,6 @@
                 </Border>
             </Grid>
 
-            <!-- ══ INCOME TOP ═════════════════════════════════ -->
             <Grid IsVisible="{Binding IsIncomeTop}" RowDefinitions="Auto, *, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -287,7 +277,6 @@
                 </Border>
             </Grid>
 
-            <!-- ══ EXPENSE BY CATEGORY ════════════════════════ -->
            <Grid IsVisible="{Binding IsExpenseByCategory}" RowDefinitions="Auto, Auto, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -331,7 +320,6 @@
                 </ScrollViewer>
             </Grid>
 
-            <!-- ══ INCOME BY CATEGORY ═════════════════════════ -->
             <Grid IsVisible="{Binding IsIncomeByCategory}" RowDefinitions="Auto, Auto, *">
                 <Border Grid.Row="0" Classes="cardSmall" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" Spacing="10">
@@ -375,7 +363,6 @@
                 </ScrollViewer>
             </Grid>
 
-            <!-- ══ CALENDAR ═════════════════════════════════════ -->
             <Grid IsVisible="{Binding IsCalendar}">
                 <views:CalendarView DataContext="{Binding CalendarVm}"/>
             </Grid>

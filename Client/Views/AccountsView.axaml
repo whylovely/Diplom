@@ -74,7 +74,6 @@
           <DataTemplate DataType="vm:AccountGroupViewModel">
             <StackPanel Spacing="8" Margin="0,0,0,24">
               
-              <!-- Group Header -->
               <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
                   <TextBlock Text="{Binding Name}" Classes="subheading" VerticalAlignment="Center"/>
@@ -103,7 +102,6 @@
                 </StackPanel>
               </Grid>
 
-              <!-- Accounts in Group -->
               <ItemsControl ItemsSource="{Binding Accounts}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>

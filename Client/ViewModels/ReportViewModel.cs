@@ -13,7 +13,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Страница «Отчёты»
     public sealed partial class ReportViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -68,7 +67,6 @@ namespace Client.ViewModels
             }
         }
 
-        // Формирование заголовков в ComboBoxs
         public record SectionItem(ReportSelection Value, string Title);
 
         public SectionItem[] SectionItems { get; } =
@@ -116,9 +114,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(IsIncomeByCategory));
             OnPropertyChanged(nameof(IsCalendar));
         }
-        //
 
-        // Подсчет Расходов и Доходов
         [ObservableProperty] private DateTimeOffset? _dateFrom = DateTimeOffset.Now.AddMonths(-1);
         partial void OnDateFromChanged(DateTimeOffset? oldValue, DateTimeOffset? newValue) => Refresh();
 
@@ -139,23 +135,17 @@ namespace Client.ViewModels
             TotalIncome = IncomeReport.RefreshIncomeRows(_data, _settings, DateFrom, DateTo, IncomeRows);
             Net = TotalIncome - TotalExpense;
         }
-        //
 
-        // Группировка расходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> ExpenseGroups { get; } = new();
 
         [RelayCommand]
         public void RefreshExpenseCategory() => ExpenseReport.RefreshExpenseGroups(_data, _settings, DateFrom, DateTo, ExpenseGroups);
-        //
 
-        // Группировка доходов по категориям с детализацией по дням
         public ObservableCollection<CategoryDetailGroup> IncomeGroups { get; } = new();
 
         [RelayCommand]
         public void RefreshIncomeCategory() => IncomeReport.RefreshIncomeGroups(_data, _settings, DateFrom, DateTo, IncomeGroups);
-        //
 
-        // Подсчет помесячных итогов
         public ObservableCollection<ISeries> MonthlySeries { get; } = new();
         public ObservableCollection<string> MonthlyLabels { get; } = new();
         public Axis[] XAxes { get; private set; } = Array.Empty<Axis>();
@@ -172,9 +162,7 @@ namespace Client.ViewModels
             OnPropertyChanged(nameof(XAxes));
             OnPropertyChanged(nameof(YAxes));
         }
-        //
 
-        // Подсчет графика по расходам
         public ObservableCollection<CategoryShareRow> ExpenseShareRows { get; } = new();
         public ObservableCollection<ISeries> ExpensePieSeries { get; } = new();
         [ObservableProperty] private int _topN = 5;
@@ -188,9 +176,7 @@ namespace Client.ViewModels
             TopExpensesSum   = sum;
             TopExpensesShare = share;
         }
-        //
 
-        // Подсчет графика по доходам
         public ObservableCollection<CategoryShareRow> IncomeShareRows { get; } = new();
         public ObservableCollection<ISeries> IncomePieSeries { get; } = new();
         [ObservableProperty] private decimal _topIncomesSum;
@@ -203,16 +189,12 @@ namespace Client.ViewModels
             TopIncomesSum   = sum;
             TopIncomesShare = share;
         }
-        //
 
-        // Подсчет остатков и оборотов
         public ObservableCollection<AccountTurnoverRow> AccountRows { get; } = new();
         
         [RelayCommand]
         public void RefreshAccounts() => AccountReport.RefreshAccountsRows(_data, DateFrom, DateTo, AccountRows);
-        //
 
-        // Обновление баланса на дату
         public ObservableCollection<AccountBalanceRow> BalanceRows { get; } = new();
         partial void OnBalanceDateChanged(DateTimeOffset oldValue, DateTimeOffset newValue) => RefreshBalance();
         [ObservableProperty] private DateTimeOffset _balanceDate = DateTimeOffset.Now;
@@ -223,9 +205,7 @@ namespace Client.ViewModels
         {
             TotalAssetsAtDate = BalanceReport.RefreshBalanceRows(_data, BalanceDate, BalanceRows);
         }
-        //
 
-        // Формирование отчета на экспорт
         public event Action<string, byte[]>? ExportRequested;
 
         [RelayCommand]
@@ -254,7 +234,6 @@ namespace Client.ViewModels
                     break;
             }
         }
-        //
     }
 
     public enum ExportFormat { CSV, TXT, Excel }

@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.Models
 {
-    // Группа счетов 
     public sealed class AccountGroup : ObservableObject
     {
         public Guid Id { get; init; } = Guid.NewGuid();

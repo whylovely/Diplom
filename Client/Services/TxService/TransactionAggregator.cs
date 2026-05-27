@@ -5,7 +5,6 @@ using Client.Models;
 
 namespace Client.Services;
 
-// Функции агрегации транзакций
 public static class TransactionAggregator
 {
     public static IReadOnlyList<Transaction> FilterByDateRange(

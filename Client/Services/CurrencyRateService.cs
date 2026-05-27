@@ -7,10 +7,7 @@ using Shared.Exchange;
 
 namespace Client.Services;
 
-/// <summary>
-/// Подтягивает актуальные курсы валют с сервера приложения (GET /api/exchange/rates).
-/// Сервер агрегирует курсы ЦБ РФ (фиат) и CoinGecko (крипто).
-/// </summary>
+// Сервер агрегирует курсы ЦБ РФ (фиат) и CoinGecko (крипто)
 public sealed class CurrencyRateService
 {
     private readonly SettingsService _settings;

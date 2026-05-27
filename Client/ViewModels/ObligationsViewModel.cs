@@ -13,7 +13,6 @@ using Client.Views;
 
 namespace Client.ViewModels;
 
-// Страница «Обязательства»
 public partial class ObligationsViewModel : ViewModelBase
 {
     private readonly IDataService _data;
@@ -135,7 +134,7 @@ public partial class ObligationsViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void PayDebt(Obligation? ob)  // открытие окна для погашения
+    private void PayDebt(Obligation? ob)
     {
         var target = ob ?? SelectedItem;
         if (target == null) return;

@@ -4,10 +4,6 @@ using Avalonia.Interactivity;
 
 namespace Client.Views;
 
-/// <summary>
-/// Диалог выбора при конфликте синхронизации.
-/// Возвращает: "server" / "client" / null (отмена).
-/// </summary>
 public partial class SyncConflictDialog : Window
 {
     public SyncConflictDialog() => InitializeComponent();

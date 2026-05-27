@@ -10,9 +10,6 @@
 
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 
-    <!-- ══ FLUENT TEMPLATE OVERRIDES (работают поверх FluentTheme) ══ -->
-
-    <!-- TextBox: фон и рамка через шаблон -->
     <Style Selector="TextBox /template/ Border#PART_BorderElement">
       <Setter Property="Background" Value="#F9FAFB"/>
       <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -29,7 +26,6 @@
       <Setter Property="BorderBrush" Value="#D1D5DB"/>
     </Style>
 
-    <!-- Button: фон через ContentPresenter в шаблоне -->
     <Style Selector="Button /template/ ContentPresenter">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -43,7 +39,6 @@
       <Setter Property="Background" Value="#E5E7EB"/>
     </Style>
 
-    <!-- Button.accent через ContentPresenter -->
     <Style Selector="Button.accent /template/ ContentPresenter">
       <Setter Property="Background" Value="#1F2937"/>
       <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -58,7 +53,6 @@
       <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
-    <!-- Button.danger через ContentPresenter -->
     <Style Selector="Button.danger /template/ ContentPresenter">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#DC2626"/>
@@ -69,7 +63,6 @@
       <Setter Property="Foreground" Value="#DC2626"/>
     </Style>
 
-    <!-- Button.outline через ContentPresenter -->
     <Style Selector="Button.outline /template/ ContentPresenter">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -79,7 +72,6 @@
       <Setter Property="Background" Value="#F9FAFB"/>
     </Style>
 
-    <!-- ComboBox: фон через шаблон -->
     <Style Selector="ComboBox /template/ Border#Background">
       <Setter Property="Background" Value="#F9FAFB"/>
       <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -94,7 +86,6 @@
       <Setter Property="Background" Value="#F3F4F6"/>
       <Setter Property="BorderBrush" Value="#D1D5DB"/>
     </Style>
-    <!-- ComboBoxItem -->
     <Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
       <Setter Property="Background" Value="#F3F4F6"/>
     </Style>
@@ -102,7 +93,6 @@
       <Setter Property="Background" Value="#F3F4F6"/>
     </Style>
 
-    <!-- ══ GLOBAL FONT ══════════════════════════════════════════ -->
     <Style Selector="TextBlock">
       <Setter Property="FontFamily" Value="Plus Jakarta Sans, Segoe UI, sans-serif"/>
     </Style>
@@ -110,13 +100,11 @@
       <Setter Property="FontFamily" Value="Plus Jakarta Sans, Segoe UI, sans-serif"/>
     </Style>
 
-    <!-- ══ WINDOW ═══════════════════════════════════════════════ -->
     <Style Selector="Window">
       <Setter Property="Background" Value="#FAFAFA"/>
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- ══ BUTTONS ══════════════════════════════════════════════ -->
     <Style Selector="Button">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -130,7 +118,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Accent button — первичная тёмная кнопка -->
     <Style Selector="Button.accent">
       <Setter Property="Background" Value="#1F2937"/>
       <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -142,7 +129,6 @@
       <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
-    <!-- Danger button — деструктивная -->
     <Style Selector="Button.danger">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#DC2626"/>
@@ -154,7 +140,6 @@
       <Setter Property="Foreground" Value="#DC2626"/>
     </Style>
 
-    <!-- outline button — вторичная -->
     <Style Selector="Button.outline">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -166,7 +151,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- ══ TEXT INPUTS ══════════════════════════════════════════ -->
     <Style Selector="TextBox">
       <Setter Property="Background" Value="#F9FAFB"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -204,19 +188,16 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- ══ RADIO BUTTONS ═══════════════════════════════════════ -->
     <Style Selector="RadioButton">
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- ══ SEPARATOR ═══════════════════════════════════════════ -->
     <Style Selector="Separator">
       <Setter Property="Background" Value="#E5E7EB"/>
       <Setter Property="Height" Value="0.5"/>
       <Setter Property="Margin" Value="0,4"/>
     </Style>
 
-    <!-- ══ DATAGRID ════════════════════════════════════════════ -->
     <Style Selector="DataGrid">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -236,7 +217,6 @@
       <Setter Property="Padding" Value="10,8"/>
     </Style>
 
-    <!-- ══ EXPANDER ════════════════════════════════════════════ -->
     <Style Selector="Expander">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -245,7 +225,6 @@
       <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
-    <!-- ══ CONTEXT MENU ═══════════════════════════════════════ -->
     <Style Selector="ContextMenu">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="BorderBrush" Value="#E5E7EB"/>
@@ -259,12 +238,10 @@
       <Setter Property="Background" Value="#F3F4F6"/>
     </Style>
 
-    <!-- ══ SCROLLBAR ══════════════════════════════════════════ -->
     <Style Selector="ScrollBar">
       <Setter Property="Opacity" Value="0.4"/>
     </Style>
 
-    <!-- ══ CARD STYLE CLASS ═══════════════════════════════════ -->
     <Style Selector="Border.card">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="CornerRadius" Value="12"/>
@@ -281,7 +258,6 @@
       <Setter Property="Padding" Value="14"/>
     </Style>
 
-    <!-- ══ TEXT CLASSES ═══════════════════════════════════════ -->
     <Style Selector="TextBlock.heading">
       <Setter Property="FontSize" Value="24"/>
       <Setter Property="FontWeight" Value="Bold"/>
@@ -299,7 +275,6 @@
       <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <!-- ══ SKELETON LOADING ═══════════════════════════════════ -->
     <Style Selector="Border.skeleton">
       <Setter Property="Background" Value="#E5E7EB"/>
       <Setter Property="CornerRadius" Value="4"/>
@@ -320,7 +295,6 @@
       </Style.Animations>
     </Style>
 
-    <!-- ══ MONEY CLASSES ══════════════════════════════════════ -->
     <Style Selector="TextBlock.moneyGreen">
       <Setter Property="FontFamily" Value="Fira Code, Consolas, monospace"/>
       <Setter Property="FontFeatures" Value="tnum, zero"/>
@@ -349,13 +323,11 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Перевод — профессиональный банковский синий -->
     <Style Selector="TextBlock.cyan">
       <Setter Property="Foreground" Value="#2563EB"/>
       <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
-    <!-- ══ DOCK / TOOLBAR BUTTONS ═════════════════════════════ -->
     <Style Selector="Button.dockItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -378,7 +350,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Active dock item -->
     <Style Selector="Button.navDock /template/ ContentPresenter">
       <Setter Property="Background" Value="#F3F4F6"/>
       <Setter Property="Foreground" Value="#1F2937"/>
@@ -388,7 +359,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Center Add Button -->
     <Style Selector="Button.dockCenterItem">
       <Setter Property="Background" Value="#1F2937"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -412,14 +382,12 @@
       <Setter Property="Foreground" Value="#FFFFFF"/>
     </Style>
 
-    <!-- ══ HEADER BAR ═══════════════════════════════════════════ -->
     <Style Selector="Border.headerBar">
       <Setter Property="Background" Value="#FFFFFF"/>
       <Setter Property="BorderBrush" Value="#E5E7EB"/>
       <Setter Property="BorderThickness" Value="0,0,0,0.5"/>
     </Style>
 
-    <!-- ══ HAMBURGER BUTTON ═══════════ -->
     <Style Selector="Button.hamburgerBtn">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -445,7 +413,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- ══ DIMMING OVERLAY ══════════════════════════════════════ -->
     <Style Selector="Border.dimOverlay">
       <Setter Property="Background" Value="#000000"/>
       <Setter Property="Opacity" Value="0"/>
@@ -461,7 +428,6 @@
       <Setter Property="IsHitTestVisible" Value="True"/>
     </Style>
 
-    <!-- ══ FLOATING MENU WRAPPER ════════════════════════════════ -->
     <Style Selector="Border.floatingMenuWrapper">
       <Setter Property="Opacity" Value="0"/>
       <Setter Property="IsHitTestVisible" Value="False"/>
@@ -480,7 +446,6 @@
       <Setter Property="RenderTransform" Value="translate(0px, 0px) scale(1)"/>
     </Style>
 
-    <!-- ══ MENU ITEMS ═══════════════════════════════════════════ -->
     <Style Selector="Button.menuItem">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -500,7 +465,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Accent menu item (New Transaction) -->
     <Style Selector="Button.menuItemAccent">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="BorderThickness" Value="0"/>
@@ -520,7 +484,6 @@
       <Setter Property="Foreground" Value="#1F2937"/>
     </Style>
 
-    <!-- Active menu item -->
     <Style Selector="Button.menuItemActive /template/ ContentPresenter">
       <Setter Property="Background" Value="#F3F4F6"/>
       <Setter Property="Foreground" Value="#1F2937"/>

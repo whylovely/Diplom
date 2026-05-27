@@ -3,7 +3,6 @@ using Client.Models;
 
 namespace Client.Services;
 
-/// Создаёт TransactionTemplate из полей формы
 public sealed class TemplateService
 {
     public TransactionTemplate Create(

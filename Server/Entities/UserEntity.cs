@@ -5,7 +5,7 @@ public sealed class UserEntity
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Email { get; set; } = default!;
-    public string PasswordHash { get; set; } = default!;    // PBKDF2 от ASP.NET Identity
+    public string PasswordHash { get; set; } = default!; 
 
     public string Role { get; set; } = "User";
 

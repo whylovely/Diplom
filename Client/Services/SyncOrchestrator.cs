@@ -18,14 +18,7 @@ public sealed class SyncAnalysis
 }
 
 
-public enum SyncAction
-{
-    SmartSync,  // автоматически: push если есть изменения, затем pull
-    PushOnly,   // только отправить локальные данные на сервер
-    PullOnly,   // только загрузить данные с сервера
-    Cancel,     // пользователь выбрал «оставить локальные данные»
-    Dismiss     // пользователь закрыл диалог без выбора
-}
+public enum SyncAction { SmartSync, PushOnly, PullOnly, Cancel, Dismiss }
 
 public sealed class SyncOutcome
 {
@@ -47,7 +40,6 @@ public sealed class SyncOutcome
     public static SyncOutcome Dismissed() => new() { WasDismissed = true };
 }
 
-// Принимает решения о синхронизации и выполняет их
 public sealed class SyncOrchestrator
 {
     private readonly SyncService _sync;

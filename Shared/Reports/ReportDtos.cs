@@ -1,6 +1,5 @@
 namespace Shared.Reports;
 
-// DTO серверных отчётов
 public sealed record CategoryTotalDto(Guid? CategoryId, string CategoryName, decimal Total);
 
 public sealed record MonthlyTotalDto(int Year, int Month, decimal Income, decimal Expense);

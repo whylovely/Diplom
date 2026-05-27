@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Client.Models
 {
-    // Категории
     public sealed class Category
     {
         public Guid Id { get; init; } = Guid.NewGuid();
@@ -15,21 +14,21 @@ namespace Client.Models
 
     public enum CategoryKind { Expense, Income }
 
-    public sealed class CategoryShareRow    // Доля категорий 
+    public sealed class CategoryShareRow
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Total { get; set; }
         public decimal SharePercent { get; set; }
     }
 
-    public sealed class DailyDetailRow  // день - категория
+    public sealed class DailyDetailRow
     {
         public string Date { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string? Description { get; set; }
     }
 
-    public sealed class CategoryDetailGroup // Группировка по категории
+    public sealed class CategoryDetailGroup
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Total { get; set; }

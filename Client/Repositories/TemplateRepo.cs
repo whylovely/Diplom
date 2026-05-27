@@ -7,7 +7,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-// Хранилище шаблонов транзакций
 public sealed class TemplatesRepository
 {
     private readonly SqliteConFactory _factory;

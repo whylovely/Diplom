@@ -6,8 +6,6 @@ using Shared.Auth;
 
 namespace Client.Services
 {
-    // Обёртка над endpoint'ами /api/auth/*.
-    // Создаёт HttpClient при каждом вызове — подхватывает актуальный ServerUrl без перезапуска.
     public class AuthService
     {
         private readonly SettingsService _settings;
@@ -87,11 +85,6 @@ namespace Client.Services
             }
         }
 
-        /// <summary>
-        /// Обновляет access token используя сохранённый refresh token.
-        /// Вызывается автоматически из ApiService при получении 401.
-        /// Возвращает true если токены успешно обновлены, false — нужен повторный логин.
-        /// </summary>
         public async Task<bool> TryRefreshAsync()
         {
             var refreshToken = _settings.RefreshToken;
@@ -109,21 +102,18 @@ namespace Client.Services
                     return true;
                 }
 
-                // Refresh token просрочен или отозван — чистим, нужен ре-логин
                 _settings.Logout();
                 return false;
             }
             catch
             {
-                // Сервер недоступен — не очищаем токены, попробуем позже
                 return false;
             }
         }
 
-        // Сохраняет оба токена из ответа сервера
         private void SaveTokens(AuthResponse body)
         {
-            _settings.AuthToken    = body.AccessToken;
+            _settings.AuthToken = body.AccessToken;
             _settings.RefreshToken = body.RefreshToken;
         }
     }

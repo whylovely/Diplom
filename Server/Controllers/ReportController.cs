@@ -8,7 +8,6 @@ using Shared.Reports;
 
 namespace Server.Controllers;
 
-// Серверные отчёты
 [ApiController]
 [Authorize]
 [Route("api/reports")]
@@ -17,7 +16,6 @@ public sealed class ReportController : ControllerBase
     private readonly AppDbContext _db;
     public ReportController(AppDbContext db) => _db = db;
 
-    // Сводный отчёт
     [HttpGet("summary")]
     public async Task<ActionResult<SummaryDto>> GetSummary(
         [FromQuery] DateTimeOffset from,
@@ -36,7 +34,6 @@ public sealed class ReportController : ControllerBase
             expenseByCategory, incomeByCategory));
     }
 
-    // Группировка по категориям для указанного вида счёта
     [HttpGet("by-category")]
     public async Task<ActionResult<IReadOnlyList<CategoryTotalDto>>> GetByCategory(
         [FromQuery] DateTimeOffset from,
@@ -53,7 +50,6 @@ public sealed class ReportController : ControllerBase
         return Ok(result);
     }
 
-    // Помесячная динамика
     [HttpGet("monthly")]
     public async Task<ActionResult<IReadOnlyList<MonthlyTotalDto>>> GetMonthly(
         [FromQuery] DateTimeOffset from,
@@ -88,7 +84,6 @@ public sealed class ReportController : ControllerBase
         return Ok(monthly);
     }
 
-    // Обороты по счетам
     [HttpGet("turnover")]
     public async Task<ActionResult<IReadOnlyList<AccountTurnoverDto>>> GetTurnover(
         [FromQuery] DateTimeOffset from,

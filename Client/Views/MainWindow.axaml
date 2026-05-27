@@ -45,62 +45,49 @@
 
   <Panel>
 
-    <!-- ═══ BASE LAYOUT: HEADER + CONTENT ══════════════════════ -->
     <Grid RowDefinitions="Auto,*">
 
-      <!-- ─── HEADER BAR ──────────────────────────────────── -->
       <Border Grid.Row="0" Classes="headerBar" Padding="20,10">
         <Grid ColumnDefinitions="Auto,*,Auto">
 
-          <!-- Hamburger / Close Button (LEFT) -->
           <Button Grid.Column="0" Command="{Binding ToggleMenuCommand}" Classes="hamburgerBtn">
             <Panel>
-              <!-- Hamburger icon (3 lines) — visible when menu CLOSED -->
               <Path Data="M3,6H21V7.5H3V6M3,11.25H21V12.75H3V11.25M3,16.5H21V18H3V16.5Z"
                     Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="20" Height="20"
                     IsVisible="{Binding !IsMenuOpen}"/>
-              <!-- Cross icon — visible when menu OPEN -->
               <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                     Fill="{Binding $parent[Button].Foreground}" Stretch="Uniform" Width="18" Height="18"
                     IsVisible="{Binding IsMenuOpen}"/>
             </Panel>
           </Button>
 
-          <!-- App Title (CENTER) -->
           <TextBlock Grid.Column="1" Text="FinanceApp" Classes="heading" FontSize="18"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
       </Border>
 
-      <!-- ─── MAIN CONTENT ────────────────────────────────── -->
       <Border Grid.Row="1" Background="#FAFAFA" Padding="24,20,24,24">
         <ContentControl Content="{Binding Current}" />
       </Border>
 
     </Grid>
 
-    <!-- ═══ DIMMING OVERLAY ════════════════════════════════════ -->
-    <!-- Covers entire window, click to close menu -->
     <Border Classes="dimOverlay" Classes.open="{Binding IsMenuOpen}"
             PointerPressed="OnOverlayPointerPressed"/>
 
-    <!-- ═══ FLOATING GLASS MENU PANEL ══════════════════════════ -->
     <Border Classes="floatingMenuWrapper" Classes.open="{Binding IsMenuOpen}"
             VerticalAlignment="Top" HorizontalAlignment="Left"
             Margin="16,56,16,16" Width="300">
 
-      <!-- Белая панель навигации -->
       <Border CornerRadius="16" ClipToBounds="True"
               Background="#FFFFFF"
               BorderBrush="#E5E7EB" BorderThickness="0.5">
 
           <StackPanel Spacing="4" Margin="12,16">
 
-            <!-- Section label -->
             <TextBlock Text="НАВИГАЦИЯ" FontSize="10" FontWeight="Bold" Foreground="#D1D5DB"
                        Margin="14,4,0,8" LetterSpacing="2"/>
 
-            <!-- 0. Главная -->
             <Button Command="{Binding NavigateDashboardCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsDashboardActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -110,7 +97,6 @@
               </StackPanel>
             </Button>
 
-            <!-- 1. Счета -->
             <Button Command="{Binding NavigateAccountsCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsAccountsActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -120,7 +106,6 @@
               </StackPanel>
             </Button>
 
-            <!-- 2. Категории -->
             <Button Command="{Binding NavigateCategoriesCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsCategoriesActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -130,7 +115,6 @@
               </StackPanel>
             </Button>
 
-            <!-- 3. Журнал -->
             <Button Command="{Binding NavigateJournalCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsJournalActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -140,10 +124,8 @@
               </StackPanel>
             </Button>
 
-            <!-- Separator -->
             <Border Height="0.5" Background="#E5E7EB" Margin="12,6"/>
 
-            <!-- 4. + Транзакция (accent) -->
             <Button Command="{Binding NavigateNewTransactionCommand}"
                     Classes="menuItemAccent" Classes.menuItemActive="{Binding IsNewTransactionActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -153,10 +135,8 @@
               </StackPanel>
             </Button>
 
-            <!-- Separator -->
             <Border Height="0.5" Background="#E5E7EB" Margin="12,6"/>
 
-            <!-- 5. Отчёты -->
             <Button Command="{Binding NavigateReportCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsReportActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -166,7 +146,6 @@
               </StackPanel>
             </Button>
 
-            <!-- 6. Долги -->
             <Button Command="{Binding NavigateObligationsCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsObligationsActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -176,7 +155,6 @@
               </StackPanel>
             </Button>
 
-            <!-- Валюты -->
             <Button Command="{Binding NavigateCurrenciesCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsCurrenciesActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">
@@ -186,7 +164,6 @@
               </StackPanel>
             </Button>
 
-            <!-- 7. Настройки -->
             <Button Command="{Binding NavigateSettingsCommand}"
                     Classes="menuItem" Classes.menuItemActive="{Binding IsSettingsActive}">
               <StackPanel Orientation="Horizontal" Spacing="14">

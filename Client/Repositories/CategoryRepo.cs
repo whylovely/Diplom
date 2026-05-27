@@ -8,7 +8,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Repositories;
 
-/// Хранилище категорий, техническиех счетов
 public sealed class CategoriesRepository
 {
     private readonly SqliteConFactory _factory;
@@ -76,7 +75,7 @@ public sealed class CategoriesRepository
         {
             _categories[idx] = new Category
             {
-                Id   = category.Id,
+                Id = category.Id,
                 Name = newName,
                 Kind = newKind
             };

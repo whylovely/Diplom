@@ -5,10 +5,6 @@ using System.Text.Json;
 
 namespace Client.Services
 {
-    /// <summary>
-    /// Хранит настройки приложения в JSON-файле <c>%AppData%/Diplom/user_settings.json</c>
-    /// Настройки сохраняются автоматически после каждой записи в свойство
-    /// </summary>
     public class SettingsService
     {
         private const string AppName = "Diplom";
@@ -129,7 +125,7 @@ namespace Client.Services
 
         public void Logout()
         {
-            Settings.AuthToken    = null;
+            Settings.AuthToken = null;
             Settings.RefreshToken = null;
             Settings.LastSyncedAt = null;
             Save();

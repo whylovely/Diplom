@@ -10,7 +10,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Главный экран приложения
     public sealed partial class DashboardViewModel : ViewModelBase
     {
         private readonly IDataService _data;

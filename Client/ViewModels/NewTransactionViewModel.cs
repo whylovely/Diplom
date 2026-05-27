@@ -10,7 +10,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Страница «Новая транзакция»
     public sealed partial class NewTransactionViewModel : ViewModelBase
     {
         private readonly IDataService _data;
@@ -40,14 +39,14 @@ namespace Client.ViewModels
 
         [ObservableProperty] TxKindChoice _choice = TxKindChoice.None;
 
-        public bool IsExpense       => Choice == TxKindChoice.Expense;
-        public bool IsIncome        => Choice == TxKindChoice.Income;
-        public bool IsTransfer      => Choice == TxKindChoice.Transfer;
+        public bool IsExpense => Choice == TxKindChoice.Expense;
+        public bool IsIncome => Choice == TxKindChoice.Income;
+        public bool IsTransfer => Choice == TxKindChoice.Transfer;
         public bool IsDebtRepayment => Choice == TxKindChoice.DebtRepayment;
-        public bool IsDebtReceive   => Choice == TxKindChoice.DebtReceive;
+        public bool IsDebtReceive => Choice == TxKindChoice.DebtReceive;
 
-        public bool IsSingleAccount    => IsExpense || IsIncome || IsDebtRepayment || IsDebtReceive;
-        public bool IsCategoryRequire  => IsExpense || IsIncome;
+        public bool IsSingleAccount => IsExpense || IsIncome || IsDebtRepayment || IsDebtReceive;
+        public bool IsCategoryRequire => IsExpense || IsIncome;
         public bool IsObligationRequire => IsDebtRepayment || IsDebtReceive;
 
         public NewTransactionViewModel(
@@ -56,19 +55,19 @@ namespace Client.ViewModels
             IInputDialogService input,
             Action onPosted)
         {
-            _data     = data;
-            _notify   = notify;
-            _input    = input;
+            _data = data;
+            _notify = notify;
+            _input = input;
             _onPosted = onPosted;
 
             _builder = new TransactionBuilder(_data);
 
-            Accounts   = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
+            Accounts = new ObservableCollection<Account>(_data.Accounts.Where(a => a.Type == AccountType.Assets));
             Categories = new ObservableCollection<Category>(_data.Categories);
 
             _fromAccount = Accounts.FirstOrDefault();
-            _toAccount   = Accounts.Skip(1).FirstOrDefault();
-            _category    = Categories.FirstOrDefault();
+            _toAccount = Accounts.Skip(1).FirstOrDefault();
+            _category = Categories.FirstOrDefault();
 
             _data.DataChanged += OnDataChanged;
             ReloadTemplates();
@@ -99,9 +98,9 @@ namespace Client.ViewModels
 
         public void PresetForQuickTx(Account account, TxKindChoice choice)
         {
-            Choice      = choice;
+            Choice = choice;
             FromAccount = Accounts.FirstOrDefault(a => a.Id == account.Id) ?? Accounts.FirstOrDefault();
-            Amount      = 0;
+            Amount = 0;
             Description = "";
 
             ResetIrrelevantFields();
@@ -111,12 +110,11 @@ namespace Client.ViewModels
 
         public void PresetForDebtTx(Obligation obligation)
         {
-            Choice      = obligation.Type == ObligationType.Debt ? TxKindChoice.DebtRepayment : TxKindChoice.DebtReceive;
-            Amount      = obligation.Amount;
+            Choice = obligation.Type == ObligationType.Debt ? TxKindChoice.DebtRepayment : TxKindChoice.DebtReceive;
+            Amount = obligation.Amount;
             Description = $"Погашение долга: {obligation.Counterparty}";
 
-            SelectedObligation = ActiveObligations.FirstOrDefault(o => o.Id == obligation.Id)
-                                 ?? ActiveObligations.FirstOrDefault();
+            SelectedObligation = ActiveObligations.FirstOrDefault(o => o.Id == obligation.Id) ?? ActiveObligations.FirstOrDefault();
 
             ResetIrrelevantFields();
             ReloadCategories();
@@ -159,9 +157,9 @@ namespace Client.ViewModels
 
             var tx = new Transaction
             {
-                Date        = Date,
+                Date = Date,
                 Description = string.IsNullOrWhiteSpace(Description) ? Choice.ToString() : Description,
-                Entries     = entries
+                Entries = entries
             };
 
             try
@@ -193,7 +191,7 @@ namespace Client.ViewModels
                 }
             }
 
-            Amount      = 0;
+            Amount = 0;
             Description = "";
             _onPosted();
         }
@@ -226,13 +224,13 @@ namespace Client.ViewModels
         {
             if (template == null) return;
 
-            Choice      = template.Choice;
+            Choice = template.Choice;
             FromAccount = Accounts.FirstOrDefault(a => a.Id == template.FromAccountId) ?? Accounts.FirstOrDefault();
-            ToAccount   = Accounts.FirstOrDefault(a => a.Id == template.ToAccountId)   ?? Accounts.Skip(1).FirstOrDefault();
+            ToAccount = Accounts.FirstOrDefault(a => a.Id == template.ToAccountId)   ?? Accounts.Skip(1).FirstOrDefault();
 
             ReloadCategories();
-            Category    = FilteredCategories.FirstOrDefault(c => c.Id == template.CategoryId) ?? FilteredCategories.FirstOrDefault();
-            Amount      = template.Amount;
+            Category = FilteredCategories.FirstOrDefault(c => c.Id == template.CategoryId) ?? FilteredCategories.FirstOrDefault();
+            Amount = template.Amount;
             Description = template.Description;
 
             OnPropertyChanged(nameof(Amount));
@@ -254,7 +252,7 @@ namespace Client.ViewModels
                 Accounts.Add(a);
 
             FromAccount ??= Accounts.FirstOrDefault();
-            ToAccount   ??= Accounts.Skip(1).FirstOrDefault();
+            ToAccount ??= Accounts.Skip(1).FirstOrDefault();
         }
 
         public void ReloadCategories()
@@ -295,10 +293,10 @@ namespace Client.ViewModels
                 Category = null;
         }
 
-        [RelayCommand] private void SetExpense()       => Choice = TxKindChoice.Expense;
-        [RelayCommand] private void SetIncome()        => Choice = TxKindChoice.Income;
-        [RelayCommand] private void SetTransfer()      => Choice = TxKindChoice.Transfer;
+        [RelayCommand] private void SetExpense() => Choice = TxKindChoice.Expense;
+        [RelayCommand] private void SetIncome() => Choice = TxKindChoice.Income;
+        [RelayCommand] private void SetTransfer() => Choice = TxKindChoice.Transfer;
         [RelayCommand] private void SetDebtRepayment() => Choice = TxKindChoice.DebtRepayment;
-        [RelayCommand] private void SetDebtReceive()   => Choice = TxKindChoice.DebtReceive;
+        [RelayCommand] private void SetDebtReceive() => Choice = TxKindChoice.DebtReceive;
     }
 }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Client.Services
 {
-    // ViewModel вызывают эти методы вместо MessageBox
     public interface INotificationService
     {
         Task ShowErrorAsync(string message, string title = "Ошибка");
@@ -15,7 +14,6 @@ namespace Client.Services
         Task<bool> ShowConfirmAsync(string message, string title = "Подтверждение");
     }
 
-    // Реальная реализация: показывает диалоги MessageDialog и ConfirmDialog
     public sealed class NotificationService : INotificationService
     {
         public Task ShowErrorAsync(string message, string title = "Ошибка")

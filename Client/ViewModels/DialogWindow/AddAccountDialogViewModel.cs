@@ -5,14 +5,13 @@ using System.Linq;
 
 namespace Client.ViewModels;
 
-public sealed partial class AddAccountDialogViewModel : ViewModelBase   // Добавление счета
+public sealed partial class AddAccountDialogViewModel : ViewModelBase
 {
     public string[] Currencies { get; }
 
     public AddAccountDialogViewModel(SettingsService? settings = null)
     {
-        Currencies = Models.CurrencyHelper.GetFilteredCurrencies(
-            settings?.Settings.FavoriteCurrencies);
+        Currencies = Models.CurrencyHelper.GetFilteredCurrencies(settings?.Settings.FavoriteCurrencies);
     }
 
     [ObservableProperty] private string _name = "";
@@ -21,7 +20,7 @@ public sealed partial class AddAccountDialogViewModel : ViewModelBase   // До�
     
     [ObservableProperty] private decimal _initialBalance;
 
-    public bool CanOk => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(SelectedCurrency) && InitialBalance >= 0;   // Кнопочки серые
+    public bool CanOk => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(SelectedCurrency) && InitialBalance >= 0;
 
     public bool HasNameError => Name.Length > 0 ? false : _nameTouched;
     private bool _nameTouched;

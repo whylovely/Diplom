@@ -9,7 +9,6 @@ using EntryDirection = Shared.Transactions.EntryDirection;
 
 namespace Server.Controllers;
 
-// CRUD транзакций с валидацией двойной записи
 [ApiController]
 [Authorize]
 [Route("api/transactions")]
@@ -44,13 +43,11 @@ public sealed class TransactionsController : ControllerBase
         return Ok(items);
     }
 
-    // Создаёт транзакцию двойной записи
     [HttpPost]
     public async Task<ActionResult<TransactionDto>> Create(CreateTransactionRequest req, CancellationToken ct)
     {
         var userId = UserContext.GetUserId(User);
 
-        // Двойная запись требует минимум 2 проводки; верхний лимит — защита от случайного DoS
         if (req.Entries is null || req.Entries.Count < 2)
             return BadRequest("Transaction must contain at least 2 entries.");
 
@@ -96,8 +93,6 @@ public sealed class TransactionsController : ControllerBase
                 return BadRequest("Invalid entry direction.");
         }
 
-        // Главная инвариантность двойной записи: Debit − Credit = 0.
-        // Без этой проверки можно «нарисовать» деньги из ниоткуда.
         decimal signedSum = 0m;
         foreach (var e in req.Entries)
         {

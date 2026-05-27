@@ -2,12 +2,7 @@ using System;
 
 namespace Shared.Obligations;
 
-// DTO обязательств — долгов и займов
-public enum ObligationType
-{
-    Debt = 0,   // Я должен
-    Credit = 1  // Мне должны
-}
+public enum ObligationType { Debt = 0, Credit = 1 }
 
 public sealed record ObligationDto(
     Guid Id,

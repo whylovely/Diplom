@@ -5,7 +5,6 @@ using Client.Models;
 
 namespace Client.Services
 {
-    // Единый контракт доступа к данным для всех ViewModel
     public interface IDataService
     {
         event Action? DataChanged;

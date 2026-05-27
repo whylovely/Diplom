@@ -12,10 +12,6 @@ using Shared.Auth;
 
 namespace Server.Controllers;
 
-/// <summary>
-/// Регистрация и вход. Выдаёт пару: access token (JWT, 7 дней) + refresh token (60 дней).
-/// Refresh token хранится в БД в виде SHA-256 хеша. При обновлении старый токен отзывается.
-/// </summary>
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController : ControllerBase
@@ -77,10 +73,6 @@ public sealed class AuthController : ControllerBase
         return Ok(await IssueTokenPairAsync(user, ct));
     }
 
-    /// <summary>
-    /// Обновляет пару токенов по действующему refresh token.
-    /// Старый токен отзывается, выдаётся новая пара — rotating refresh tokens.
-    /// </summary>
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> Refresh(RefreshRequest req, CancellationToken ct)
     {
@@ -106,13 +98,11 @@ public sealed class AuthController : ControllerBase
         return Ok(await IssueTokenPairAsync(stored.User, ct));
     }
 
-    // Создаёт access token + refresh token, сохраняет хеш refresh token в БД
     private async Task<AuthResponse> IssueTokenPairAsync(UserEntity user, CancellationToken ct)
     {
         var accessToken  = CreateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
 
-        // Чистим старые отозванные и просроченные токены этого пользователя
         var stale = _db.RefreshTokens
             .Where(x => x.UserId == user.Id && (x.IsRevoked || x.ExpiresAt < DateTimeOffset.UtcNow));
         _db.RefreshTokens.RemoveRange(stale);
@@ -129,7 +119,6 @@ public sealed class AuthController : ControllerBase
         return new AuthResponse(accessToken, refreshToken);
     }
 
-    // Формирует подписанный JWT (HS256), срок — 7 дней
     private string CreateAccessToken(UserEntity user)
     {
         var jwt = _cfg.GetSection("Jwt");
@@ -156,14 +145,12 @@ public sealed class AuthController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // Генерирует криптографически случайный refresh token (32 байта → base64url)
     private static string GenerateRefreshToken()
     {
         var bytes = RandomNumberGenerator.GetBytes(32);
         return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 
-    // SHA-256 хеш токена — храним в БД только хеш
     private static string HashToken(string token)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));

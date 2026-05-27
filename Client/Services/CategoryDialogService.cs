@@ -5,7 +5,6 @@ using Client.Views;
 
 namespace Client.Services;
 
-// Показывает диалог добавления категории
 public interface ICategoryDialogService
 {
     Task<Category?> ShowAddCategoryDialogAsync(string? initialName = null, CategoryKind? initialKind = null);

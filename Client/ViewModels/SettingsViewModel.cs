@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace Client.ViewModels
 {
-    // Страница «Настройки»
     public partial class SettingsViewModel : ViewModelBase
     {
         private readonly IDataService _data;

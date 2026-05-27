@@ -4,10 +4,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
-/// <summary>
-/// Единственное место в проекте, где формируется строка подключения и путь к файлу БД (%AppData%/Diplom/finance.db)
-/// Все репозитории получают её через DI и открывают соединения через "Open"
-/// </summary>
 public sealed class SqliteConFactory
 {
     public string ConnectionString { get; }

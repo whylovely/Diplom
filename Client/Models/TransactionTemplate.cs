@@ -2,7 +2,6 @@ using System;
 
 namespace Client.Models
 {
-    ///Сохранённый шаблон формы транзакции
     public sealed class TransactionTemplate
     {
         public Guid Id { get; init; } = Guid.NewGuid();

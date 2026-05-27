@@ -1,6 +1,5 @@
 ﻿namespace Server.Entities;
 
-// Заголовок транзакции. Сами проводки лежат в Entries
 public sealed class TransactionEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

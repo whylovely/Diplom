@@ -4,7 +4,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Client.ViewModels;
 
-public sealed partial class InputDialogViewModel : ViewModelBase    // окно ввода
+public sealed partial class InputDialogViewModel : ViewModelBase
 {
     [ObservableProperty] private string _title = "";
     [ObservableProperty] private string _message = "";

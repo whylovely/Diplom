@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Client.Models
 {
-    // Счёт пользователя
     public sealed partial class Account : ObservableObject
     {
         public Guid Id { get; init; } = Guid.NewGuid();
@@ -11,7 +10,7 @@ namespace Client.Models
 
         [ObservableProperty] private Guid? _groupId;
 
-        public string CurrencyCode { get; set; } = "RUB";   // Основная валюта
+        public string CurrencyCode { get; set; } = "RUB";
         public string? SecondaryCurrencyCode { get; set; }
 
         public decimal InitialBalance { get; set; } 
@@ -33,18 +32,9 @@ namespace Client.Models
         public bool IsDeleted { get; set; }
     }
 
-    public enum AccountType
-    {
-        Assets  = 0,   // активы
-        Income  = 1,   // доход
-        Expense = 2    // расход
-    }
+    public enum AccountType { Assets  = 0, Income  = 1, Expense = 2 }
 
-    public enum MultiCurrencyType
-    {
-        Standard = 0,
-        MultiCurrency = 1
-    }
+    public enum MultiCurrencyType { Standard = 0, MultiCurrency = 1 }
 
     public sealed class CurrencyBalance
     {

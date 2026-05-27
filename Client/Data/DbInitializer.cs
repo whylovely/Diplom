@@ -3,10 +3,6 @@ using Microsoft.Data.Sqlite;
 
 namespace Client.Data;
 
-/// <summary>
-/// Создаёт схему БД при первом запуске и доливает недостающие колонки
-/// при обновлении приложения. Вызывается один раз из конструктора <c>LocalDbService</c>.
-/// </summary>
 public sealed class DbInitializer
 {
     private readonly SqliteConFactory _factory;
@@ -18,12 +14,10 @@ public sealed class DbInitializer
         MigrateSchema();
     }
 
-    /// Создаёт все таблицы
     private void EnsureCreated()
     {
         using var conn = _factory.Open();
 
-        // Счета
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Accounts (
                 Id TEXT PRIMARY KEY,
@@ -42,7 +36,6 @@ public sealed class DbInitializer
                 UpdatedAt TEXT NOT NULL
             )");
 
-        // Группы счетов
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS AccountGroups (
                 Id TEXT PRIMARY KEY,
@@ -50,7 +43,6 @@ public sealed class DbInitializer
                 SortOrder INTEGER NOT NULL DEFAULT 0
             )");
 
-        // Категории расходов и доходов
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Categories (
                 Id TEXT PRIMARY KEY,
@@ -60,7 +52,6 @@ public sealed class DbInitializer
                 UpdatedAt TEXT NOT NULL
             )");
 
-        // Транзакции
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Transactions (
                 Id TEXT PRIMARY KEY,
@@ -69,7 +60,6 @@ public sealed class DbInitializer
                 CreatedAt TEXT NOT NULL
             )");
 
-        // Проводки двойной записи — Debit/Credit
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Entries (
                 Id TEXT PRIMARY KEY,
@@ -83,7 +73,6 @@ public sealed class DbInitializer
                 FOREIGN KEY (AccountId) REFERENCES Accounts(Id)
             )");
 
-        // Долги и займы
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Obligations (
                 Id TEXT PRIMARY KEY,
@@ -98,14 +87,12 @@ public sealed class DbInitializer
                 Note TEXT
             )");
 
-        // Курсы валют
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS CurrencyRates (
                 CurrencyCode TEXT PRIMARY KEY,
                 RateToBase REAL NOT NULL
             )");
 
-        // Сохранённые шаблоны
         SqliteConFactory.Exec(conn, @"
             CREATE TABLE IF NOT EXISTS Templates (
                 Id TEXT PRIMARY KEY,

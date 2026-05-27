@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Client.Models;
 
-// Курс валюты к рублю
 public sealed class CurrencyRate
 {
     public string CurrencyCode { get; set; } = string.Empty;

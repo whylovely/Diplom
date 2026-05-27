@@ -5,7 +5,7 @@ using Client.Models;
 
 namespace Client.ViewModels;
 
-public sealed partial class MessageDialogViewModel : ViewModelBase  // окно уведомлений
+public sealed partial class MessageDialogViewModel : ViewModelBase
 {
     public string Title { get; }
     public string Message { get; }
