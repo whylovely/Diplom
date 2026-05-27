@@ -26,7 +26,7 @@
 
           <!-- Клиент -->
           <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Spacing="4">
-            <TextBlock Text="📱 Клиент" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <TextBlock Text="📱 Клиент" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ClientDateText" Text="—" FontSize="13" Foreground="#90CAF9" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ClientCountText" Text="" FontSize="12" Foreground="#78909C" HorizontalAlignment="Center"/>
           </StackPanel>
@@ -37,7 +37,7 @@
 
           <!-- Сервер -->
           <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
-            <TextBlock Text="☁️ Сервер" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <TextBlock Text="☁️ Сервер" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ServerDateText" Text="—" FontSize="13" Foreground="#A5D6A7" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ServerCountText" Text="" FontSize="12" Foreground="#78909C" HorizontalAlignment="Center"/>
           </StackPanel>
@@ -46,14 +46,14 @@
       </Border>
 
       <!-- Кнопки -->
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
-        <Button Content="☁️ Взять с сервера" Classes="accent" Width="170"
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="8" Margin="0,8,0,0">
+        <Button Content="☁️ Взять" Classes="accent" Width="100"
                 HorizontalContentAlignment="Center"
                 Click="OnTakeServer"/>
-        <Button Content="📱 Отправить на сервер" Classes="accent" Width="190"
+        <Button Content="📱 Отправить" Classes="accent" Width="140"
                 HorizontalContentAlignment="Center"
                 Click="OnPushServer"/>
-        <Button Content="📱 Оставить мои" Width="150"
+        <Button Content="📱 Оставить" Width="120"
                 HorizontalContentAlignment="Center"
                 Click="OnKeepClient"/>
         <Button Content="Отмена" Width="90"
