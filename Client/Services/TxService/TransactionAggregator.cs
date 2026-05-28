@@ -48,7 +48,6 @@ public static class TransactionAggregator
 
         foreach (var tx in txInRange)
         {
-            // Сторно и оригиналы сторно не идут в категорийный отчёт
             if (stornoExcluded.Contains(tx.Id)) continue;
 
             bool isTransfer = tx.Entries.Count >= 2 && tx.Entries.All(e =>
@@ -101,7 +100,6 @@ public static class TransactionAggregator
         }
     }
 
-    // Возвращает виртуальное название «категории» для проводок без CategoryId
     private static string ResolveCategoryName(
         Entry e,
         IReadOnlyList<Category> categories,
